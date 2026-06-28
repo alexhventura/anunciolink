@@ -1,0 +1,6 @@
+{
+  "name": "Anuncio Link",
+  "description": "Plataforma de desapego ultra-rápida. Crie anúncio com foto, Pix e link compartilhável em segundos — sem cadastro.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
