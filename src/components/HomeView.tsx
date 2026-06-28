@@ -3,9 +3,11 @@ import { motion } from "motion/react";
 import type { AdFormState } from "../hooks/useAdForm";
 import { ImageFallback } from "./ImageFallback";
 import { AdImage } from "./AdImage";
+import { ImageCropEditor } from "./ImageCropEditor";
 import { MyAdsPanel } from "./MyAdsPanel";
 import { formatBRL, formatPhoneNumber, isValidPaymentUrl } from "../lib/formatters";
-import { validateImageFile, ImageCompressorError, compressImage } from "../lib/imageCompressor";
+import { DEFAULT_CROP, type CropTransform } from "../lib/imageCrop";
+import { validateImageFile, ImageCompressorError, compressCroppedImage } from "../lib/imageCompressor";
 import { MAX_DESC_LENGTH, MAX_PIX_LENGTH, MAX_TITLE_LENGTH, SITE_NAME } from "../lib/constants";
 
 interface HomeViewProps {
@@ -38,6 +40,12 @@ export function HomeView({
   const previewUrlRef = useRef<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [crop, setCrop] = useState<CropTransform>(DEFAULT_CROP);
+  const [croppedPreview, setCroppedPreview] = useState("");
+
+  const handleCroppedPreview = useCallback((dataUrl: string) => {
+    setCroppedPreview(dataUrl);
+  }, []);
 
   const getPlaceholderTitle = () => {
     if (form.adType === "venda") return "iPhone 13 Pro Max 128GB";
@@ -62,6 +70,8 @@ export function HomeView({
       if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
       const localUrl = URL.createObjectURL(file);
       previewUrlRef.current = localUrl;
+      setCrop(DEFAULT_CROP);
+      setCroppedPreview("");
       onPhotoChange(file, localUrl);
     },
     [onImageError, onPhotoChange]
@@ -81,9 +91,9 @@ export function HomeView({
     }
 
     let compressedImage: string | undefined;
-    if (form.photoFile) {
+    if (form.photoPreview) {
       try {
-        compressedImage = await compressImage(form.photoFile, form.printMode);
+        compressedImage = await compressCroppedImage(form.photoPreview, crop, form.printMode);
       } catch (err) {
         const message =
           err instanceof ImageCompressorError
@@ -289,6 +299,8 @@ export function HomeView({
               {form.imageError && (
                 <p role="alert" className="mb-3 text-xs font-medium text-red-600">{form.imageError.message}</p>
               )}
+
+              {!form.photoPreview ? (
               <div
                 onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
                 onDragLeave={() => setIsDragging(false)}
@@ -298,7 +310,7 @@ export function HomeView({
                   const file = e.dataTransfer.files?.[0];
                   if (file) handleFile(file);
                 }}
-                className={`relative flex flex-col items-center justify-center rounded-lg border-[3px] border-dashed border-black p-10 text-center neo-shadow-sm min-h-[140px] transition-all duration-150 ${
+                className={`relative flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-zinc-900 p-10 text-center shadow-[3px_3px_0_0_#18181b] min-h-[140px] transition-all duration-150 ${
                   isDragging ? "bg-lime-200 border-lime-400" : "bg-amber-50 hover:bg-amber-100"
                 }`}
               >
@@ -313,36 +325,41 @@ export function HomeView({
                     if (file) handleFile(file);
                   }}
                 />
-                {form.photoPreview ? (
-                  <div className="relative flex flex-col items-center gap-3 z-10">
-                    <div className="relative h-24 w-24 overflow-hidden rounded-lg border-[3px] border-black neo-shadow-sm">
-                      <img src={form.photoPreview} alt="" className="h-full w-full object-cover" width={96} height={96} />
-                      <button
-                        type="button"
-                        id="btn-remove-photo"
-                        aria-label="Remover foto"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
-                          previewUrlRef.current = null;
-                          onPhotoChange(null, "");
-                          if (fileInputRef.current) fileInputRef.current.value = "";
-                        }}
-                        className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-md bg-zinc-900 text-[10px] text-white hover:bg-zinc-700"
-                      >
-                        ×
-                      </button>
-                    </div>
-                    <span className="text-xs font-medium text-zinc-500">{form.photoFile?.name ?? "Foto selecionada"}</span>
-                  </div>
-                ) : (
                   <div className="pointer-events-none space-y-1">
                     <p className="text-sm font-medium text-zinc-800">Arraste ou clique para enviar</p>
                     <p className="text-xs text-zinc-400">JPG, PNG ou WebP — máx. 5 MB</p>
                   </div>
-                )}
               </div>
+              ) : (
+                <div className="space-y-4 rounded-lg border-2 border-zinc-900 bg-white p-5 shadow-[3px_3px_0_0_#18181b]">
+                  <ImageCropEditor
+                    src={form.photoPreview}
+                    crop={crop}
+                    onCropChange={setCrop}
+                    onCroppedPreview={handleCroppedPreview}
+                    fillWhite={form.printMode}
+                  />
+                  <div className="flex items-center justify-between gap-3 pt-1">
+                    <span className="text-xs font-medium text-zinc-500 truncate">{form.photoFile?.name ?? "Foto selecionada"}</span>
+                    <button
+                      type="button"
+                      id="btn-remove-photo"
+                      aria-label="Remover foto"
+                      onClick={() => {
+                        if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
+                        previewUrlRef.current = null;
+                        setCrop(DEFAULT_CROP);
+                        setCroppedPreview("");
+                        onPhotoChange(null, "");
+                        if (fileInputRef.current) fileInputRef.current.value = "";
+                      }}
+                      className="shrink-0 rounded-md border-2 border-zinc-900 bg-white px-3 py-1.5 text-xs font-bold uppercase shadow-[2px_2px_0_0_#18181b] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0_0_#18181b] transition-all"
+                    >
+                      Remover
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="rounded-lg border-[3px] border-black bg-amber-100 p-5 flex items-center justify-between gap-4 neo-shadow-sm">
@@ -373,13 +390,13 @@ export function HomeView({
               <h3 className="label-field mb-0">Prévia ao vivo</h3>
               <div className="neo-card-white p-5 space-y-5 !shadow-[4px_4px_0_0_#000]">
                 <div className="bento-image !min-h-[200px] !max-h-[220px] max-w-[200px] mx-auto">
-                  {form.photoPreview ? (
+                  {croppedPreview || form.photoPreview ? (
                     <AdImage
-                      src={form.photoPreview}
+                      src={croppedPreview || form.photoPreview}
                       alt={form.title || "Prévia"}
                       type={form.adType}
                       title={form.title}
-                      printMode={form.printMode}
+                      printMode={false}
                     />
                   ) : (
                     <ImageFallback title={form.title} type={form.adType} />

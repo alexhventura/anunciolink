@@ -1,5 +1,11 @@
 import { MAX_IMAGE_BYTES } from "./constants";
 import type { ImageUploadError } from "../types/ad";
+import {
+  CROP_VIEWPORT,
+  DEFAULT_CROP,
+  exportCropToDataUrl,
+  type CropTransform,
+} from "./imageCrop";
 
 export class ImageCompressorError extends Error {
   code: ImageUploadError["code"];
@@ -21,21 +27,43 @@ export function validateImageFile(file: File): ImageUploadError | null {
   return null;
 }
 
-const IMAGE_MAX_DIM = 160;
-const WEBP_QUALITY = 0.52;
-const JPEG_FALLBACK_QUALITY = 0.5;
+const OUTPUT_COVER = 240;
+const OUTPUT_PRINT = 280;
 
-function canvasToDataUrl(canvas: HTMLCanvasElement): string {
-  const webp = canvas.toDataURL("image/webp", WEBP_QUALITY);
-  if (webp.startsWith("data:image/webp")) return webp;
+/** Compacta imagem já recortada pelo editor (Canvas → WebP) */
+export async function compressCroppedImage(
+  imageSrc: string,
+  crop: CropTransform = DEFAULT_CROP,
+  isPrintMode = false
+): Promise<string> {
+  try {
+    const outputSize = isPrintMode ? OUTPUT_PRINT : OUTPUT_COVER;
+    let quality = isPrintMode ? 0.62 : 0.58;
 
-  const jpeg = canvas.toDataURL("image/jpeg", JPEG_FALLBACK_QUALITY);
-  if (!jpeg || jpeg.length < 100) {
-    throw new ImageCompressorError("COMPRESS_FAILED", "A imagem compactada ficou inválida.");
+    let result = await exportCropToDataUrl(imageSrc, crop, {
+      viewportSize: CROP_VIEWPORT,
+      outputSize,
+      quality,
+      fillWhite: isPrintMode,
+    });
+
+    if (result.length > 120_000 && quality > 0.42) {
+      result = await exportCropToDataUrl(imageSrc, crop, {
+        viewportSize: CROP_VIEWPORT,
+        outputSize: OUTPUT_COVER,
+        quality: 0.48,
+        fillWhite: isPrintMode,
+      });
+    }
+
+    return result;
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Falha ao processar o recorte.";
+    throw new ImageCompressorError("COMPRESS_FAILED", message);
   }
-  return jpeg;
 }
 
+/** @deprecated Use compressCroppedImage após o editor de recorte */
 export function compressImage(file: File, isPrintMode = false): Promise<string> {
   const validation = validateImageFile(file);
   if (validation) {
@@ -50,47 +78,7 @@ export function compressImage(file: File, isPrintMode = false): Promise<string> 
         reject(new ImageCompressorError("READ_FAILED", "Não foi possível ler o arquivo de imagem."));
         return;
       }
-
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        const maxDim = IMAGE_MAX_DIM;
-        canvas.width = maxDim;
-        canvas.height = maxDim;
-
-        const ctx = canvas.getContext("2d");
-        if (!ctx) {
-          reject(new ImageCompressorError("COMPRESS_FAILED", "Seu navegador não suportou a compactação da imagem."));
-          return;
-        }
-
-        const { width, height } = img;
-
-        if (isPrintMode) {
-          ctx.fillStyle = "#ffffff";
-          ctx.fillRect(0, 0, maxDim, maxDim);
-          const ratio = Math.min(maxDim / width, maxDim / height);
-          const newWidth = width * ratio;
-          const newHeight = height * ratio;
-          const x = (maxDim - newWidth) / 2;
-          const y = (maxDim - newHeight) / 2;
-          ctx.drawImage(img, 0, 0, width, height, x, y, newWidth, newHeight);
-        } else {
-          const size = Math.min(width, height);
-          const sx = (width - size) / 2;
-          const sy = (height - size) / 2;
-          ctx.drawImage(img, sx, sy, size, size, 0, 0, maxDim, maxDim);
-        }
-
-        try {
-          resolve(canvasToDataUrl(canvas));
-        } catch (err) {
-          if (err instanceof ImageCompressorError) reject(err);
-          else reject(new ImageCompressorError("COMPRESS_FAILED", "Falha ao gerar WebP compactado."));
-        }
-      };
-      img.onerror = () => reject(new ImageCompressorError("READ_FAILED", "Não foi possível processar esta imagem."));
-      img.src = result;
+      compressCroppedImage(result, DEFAULT_CROP, isPrintMode).then(resolve).catch(reject);
     };
     reader.onerror = () => reject(new ImageCompressorError("READ_FAILED", "Erro ao abrir o arquivo de imagem."));
     reader.readAsDataURL(file);
