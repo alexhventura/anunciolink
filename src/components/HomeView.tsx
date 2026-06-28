@@ -1,13 +1,14 @@
 import { useCallback, useRef, useState, type FormEvent } from "react";
 import { motion } from "motion/react";
 import type { AdFormState } from "../hooks/useAdForm";
+import type { AdImagePayload } from "../types/ad";
 import { ImageFallback } from "./ImageFallback";
 import { AdImage } from "./AdImage";
 import { ImageCropEditor } from "./ImageCropEditor";
 import { MyAdsPanel } from "./MyAdsPanel";
 import { formatBRL, formatPhoneNumber, isValidPaymentUrl } from "../lib/formatters";
-import { DEFAULT_CROP, type CropTransform } from "../lib/imageCrop";
-import { validateImageFile, ImageCompressorError, compressCroppedImage } from "../lib/imageCompressor";
+import { DEFAULT_CROP } from "../lib/imageCrop";
+import { validateImageFile, ImageCompressorError, compressSourceImage } from "../lib/imageCompressor";
 import { MAX_DESC_LENGTH, MAX_PIX_LENGTH, MAX_TITLE_LENGTH, SITE_NAME } from "../lib/constants";
 import { TOOLTIP_COPY } from "../lib/tooltipCopy";
 import { ActionButtonWithHint, FieldLabelWithHint } from "./HelpTooltip";
@@ -19,7 +20,7 @@ interface HomeViewProps {
   onPhotoChange: (file: File | null, preview: string) => void;
   onImageError: (error: { code: string; message: string } | null) => void;
   onSubmitError: (error: string | null) => void;
-  onSubmit: (compressedImage?: string) => void;
+  onSubmit: (payload?: AdImagePayload) => void;
   onOpenSavedAd: (url: string) => void;
 }
 
@@ -42,12 +43,6 @@ export function HomeView({
   const previewUrlRef = useRef<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [crop, setCrop] = useState<CropTransform>(DEFAULT_CROP);
-  const [croppedPreview, setCroppedPreview] = useState("");
-
-  const handleCroppedPreview = useCallback((dataUrl: string) => {
-    setCroppedPreview(dataUrl);
-  }, []);
 
   const getPlaceholderTitle = () => {
     if (form.adType === "venda") return "iPhone 13 Pro Max 128GB";
@@ -72,8 +67,7 @@ export function HomeView({
       if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
       const localUrl = URL.createObjectURL(file);
       previewUrlRef.current = localUrl;
-      setCrop(DEFAULT_CROP);
-      setCroppedPreview("");
+      onFieldChange("photoCrop", DEFAULT_CROP);
       onPhotoChange(file, localUrl);
     },
     [onImageError, onPhotoChange]
@@ -92,10 +86,11 @@ export function HomeView({
       return;
     }
 
-    let compressedImage: string | undefined;
+    let imagePayload: AdImagePayload | undefined;
     if (form.photoPreview) {
       try {
-        compressedImage = await compressCroppedImage(form.photoPreview, crop, form.printMode);
+        const image = await compressSourceImage(form.photoPreview);
+        imagePayload = { image, crop: form.photoCrop };
       } catch (err) {
         const message =
           err instanceof ImageCompressorError
@@ -107,7 +102,7 @@ export function HomeView({
       }
     }
 
-    onSubmit(compressedImage);
+    onSubmit(imagePayload);
   };
 
   const segmentBase = "neo-segment";
@@ -340,9 +335,8 @@ export function HomeView({
                 <div className="space-y-4 rounded-lg border-2 border-zinc-900 bg-white p-5 shadow-[3px_3px_0_0_#18181b]">
                   <ImageCropEditor
                     src={form.photoPreview}
-                    crop={crop}
-                    onCropChange={setCrop}
-                    onCroppedPreview={handleCroppedPreview}
+                    crop={form.photoCrop}
+                    onCropChange={(c) => onFieldChange("photoCrop", c)}
                     fillWhite={form.printMode}
                   />
                   <div className="flex items-center justify-between gap-3 pt-1">
@@ -354,8 +348,7 @@ export function HomeView({
                       onClick={() => {
                         if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
                         previewUrlRef.current = null;
-                        setCrop(DEFAULT_CROP);
-                        setCroppedPreview("");
+                        onFieldChange("photoCrop", DEFAULT_CROP);
                         onPhotoChange(null, "");
                         if (fileInputRef.current) fileInputRef.current.value = "";
                       }}
@@ -396,13 +389,14 @@ export function HomeView({
               <h3 className="label-field mb-0">Prévia ao vivo</h3>
               <div className="neo-card-white p-5 space-y-5 !shadow-[4px_4px_0_0_#000]">
                 <div className="bento-image !min-h-[200px] !max-h-[220px] max-w-[200px] mx-auto">
-                  {croppedPreview || form.photoPreview ? (
+                  {form.photoPreview ? (
                     <AdImage
-                      src={croppedPreview || form.photoPreview}
+                      src={form.photoPreview}
+                      crop={form.photoCrop}
                       alt={form.title || "Prévia"}
                       type={form.adType}
                       title={form.title}
-                      printMode={false}
+                      variant="create"
                     />
                   ) : (
                     <ImageFallback title={form.title} type={form.adType} />

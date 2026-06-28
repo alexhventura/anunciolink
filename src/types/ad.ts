@@ -3,6 +3,13 @@ export type BillingType = "unico" | "recorrente";
 export type AdSenseSlot = "topo" | "meio" | "rodape";
 export type AppView = "home" | "success" | "anuncio";
 
+/** Vetores de enquadramento do mini-editor (viewport 280px) */
+export interface CropTransform {
+  zoom: number;
+  panX: number;
+  panY: number;
+}
+
 export interface AdData {
   t: AdType;
   title: string;
@@ -13,6 +20,8 @@ export interface AdData {
   pix?: string;
   cardLink?: string;
   img?: string;
+  /** Enquadramento escolhido pelo vendedor — reaplicado via CSS na visualização */
+  crop?: CropTransform;
   timestamp: number;
   printMode?: boolean;
 }
@@ -20,4 +29,9 @@ export interface AdData {
 export interface ImageUploadError {
   code: "INVALID_TYPE" | "FILE_TOO_LARGE" | "READ_FAILED" | "COMPRESS_FAILED";
   message: string;
+}
+
+export interface AdImagePayload {
+  image?: string;
+  crop?: CropTransform;
 }

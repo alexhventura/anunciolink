@@ -45,11 +45,12 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
         <div className="checkout-image">
           <AdImage
             src={ad.img}
+            crop={ad.crop}
             alt={ad.title}
             type={ad.t}
             title={ad.title}
-            printMode={ad.printMode}
             priority
+            variant="checkout"
           />
         </div>
 

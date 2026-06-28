@@ -48,6 +48,7 @@ export function AdSocialCardDownload({
         title: ad.title,
         price: ad.price,
         imageSrc: ad.img,
+        crop: ad.crop,
         adUrl: qrUrl,
         qrCanvas,
         billingRecorrente: ad.billingType === "recorrente",

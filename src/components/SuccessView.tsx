@@ -52,6 +52,7 @@ export function SuccessView({
     pix: form.pix || undefined,
     cardLink: form.cardLink || undefined,
     img: form.photoPreview || undefined,
+    crop: form.photoCrop,
     timestamp: Date.now(),
     printMode: form.printMode,
   };
@@ -158,7 +159,15 @@ export function SuccessView({
         <div className="neo-card-white overflow-hidden">
           <div className="bento-image !rounded-none !border-x-0 !border-t-0 !shadow-none !min-h-[280px]">
             {form.photoPreview ? (
-              <AdImage src={form.photoPreview} alt={form.title} type={form.adType} title={form.title} printMode={form.printMode} />
+              <AdImage
+                src={form.photoPreview}
+                crop={form.photoCrop}
+                alt={form.title}
+                type={form.adType}
+                title={form.title}
+                printMode={form.printMode}
+                variant="create"
+              />
             ) : (
               <ImageFallback title={form.title} type={form.adType} />
             )}

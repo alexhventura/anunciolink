@@ -1,3 +1,6 @@
+import type { CropTransform } from "../types/ad";
+import { CROP_VIEWPORT, DEFAULT_CROP, getCropSourceRect, loadImageElement } from "./imageCrop";
+
 const SIZE = 1080;
 const MUSTARD = "#d97706";
 const MUSTARD_SOFT = "#f59e0b";
@@ -69,15 +72,6 @@ function drawBrandMark(ctx: CanvasRenderingContext2D, x: number, y: number) {
   ctx.stroke();
 }
 
-function loadImage(src: string): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = () => reject(new Error("Falha ao carregar imagem"));
-    img.src = src;
-  });
-}
-
 function truncateText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string {
   if (ctx.measureText(text).width <= maxWidth) return text;
   let out = text;
@@ -91,6 +85,7 @@ export interface SocialCardInput {
   title: string;
   price: string;
   imageSrc?: string;
+  crop?: CropTransform;
   adUrl: string;
   qrCanvas: HTMLCanvasElement;
   billingRecorrente?: boolean;
@@ -132,21 +127,17 @@ export async function renderSocialCard(input: SocialCardInput): Promise<Blob> {
 
   if (input.imageSrc) {
     try {
-      const img = await loadImage(input.imageSrc);
+      const img = await loadImageElement(input.imageSrc);
+      const crop = input.crop ?? DEFAULT_CROP;
+      const inner = photoSize - 6;
       drawFrame(ctx, photoX, photoY, photoSize, photoSize, 16, WHITE);
       ctx.save();
-      roundRect(ctx, photoX + 3, photoY + 3, photoSize - 6, photoSize - 6, 14);
+      roundRect(ctx, photoX + 3, photoY + 3, inner, inner, 14);
       ctx.clip();
-      const scale = Math.max((photoSize - 6) / img.width, (photoSize - 6) / img.height);
-      const dw = img.width * scale;
-      const dh = img.height * scale;
-      ctx.drawImage(
-        img,
-        photoX + 3 + (photoSize - 6 - dw) / 2,
-        photoY + 3 + (photoSize - 6 - dh) / 2,
-        dw,
-        dh
-      );
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
+      const { srcX, srcY, srcSize } = getCropSourceRect(img, crop, CROP_VIEWPORT);
+      ctx.drawImage(img, srcX, srcY, srcSize, srcSize, photoX + 3, photoY + 3, inner, inner);
       ctx.restore();
     } catch {
       drawFrame(ctx, photoX, photoY, photoSize, photoSize, 16, "#fef3c7");

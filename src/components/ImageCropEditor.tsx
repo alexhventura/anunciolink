@@ -3,7 +3,6 @@ import { ZoomIn, ZoomOut, Move } from "lucide-react";
 import {
   CROP_VIEWPORT,
   DEFAULT_CROP,
-  exportCropToDataUrl,
   getCropPreviewStyle,
   loadImageElement,
   type CropTransform,
@@ -13,7 +12,6 @@ interface ImageCropEditorProps {
   src: string;
   crop: CropTransform;
   onCropChange: (crop: CropTransform) => void;
-  onCroppedPreview: (dataUrl: string) => void;
   fillWhite?: boolean;
 }
 
@@ -21,13 +19,10 @@ export function ImageCropEditor({
   src,
   crop,
   onCropChange,
-  onCroppedPreview,
-  fillWhite = false,
 }: ImageCropEditorProps) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{ x: number; y: number; panX: number; panY: number } | null>(null);
   const [loadedImg, setLoadedImg] = useState<HTMLImageElement | null>(null);
-  const exportTimer = useRef<number | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -38,18 +33,6 @@ export function ImageCropEditor({
       cancelled = true;
     };
   }, [src]);
-
-  useEffect(() => {
-    if (exportTimer.current) window.clearTimeout(exportTimer.current);
-    exportTimer.current = window.setTimeout(() => {
-      exportCropToDataUrl(src, crop, { fillWhite, outputSize: 240 })
-        .then(onCroppedPreview)
-        .catch(() => {});
-    }, 180);
-    return () => {
-      if (exportTimer.current) window.clearTimeout(exportTimer.current);
-    };
-  }, [src, crop, fillWhite, onCroppedPreview]);
 
   const handlePointerDown = useCallback(
     (e: PointerEvent) => {

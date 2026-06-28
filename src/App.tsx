@@ -15,6 +15,7 @@ import { useAdForm } from "./hooks/useAdForm";
 import { useDocumentMeta } from "./hooks/useDocumentMeta";
 import { useAdSenseLoader } from "./hooks/useAdSenseLoader";
 import { useAdHistory } from "./hooks/useAdHistory";
+import type { AdImagePayload } from "./types/ad";
 import {
   AdCodecError,
   buildAdUrl,
@@ -48,13 +49,13 @@ export default function App() {
   }, [resetForm, resetToHome]);
 
   const handleGenerate = useCallback(
-    (compressedImage?: string) => {
+    (payload?: AdImagePayload) => {
       setIsSubmitting(true);
       setSubmitError(null);
       setImageStrippedWarning(false);
 
       try {
-        const rawAd = toAdData(compressedImage);
+        const rawAd = toAdData(payload?.image, payload?.crop);
         const { ad: adObject, hash: hashResult, imageStripped } = fitAdToUrlLength(
           rawAd,
           encodeAdData

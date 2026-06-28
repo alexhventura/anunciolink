@@ -123,7 +123,7 @@ export function fitAdToUrlLength(
   }
 
   if (current.img) {
-    current = { ...current, img: undefined };
+    current = { ...current, img: undefined, crop: undefined };
     hash = encodeFn(current);
     if (estimateUrlLength(hash) <= MAX_SHARE_URL_LENGTH) {
       return { ad: current, hash, imageStripped: true };

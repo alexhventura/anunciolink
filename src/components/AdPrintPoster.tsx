@@ -4,6 +4,7 @@ import type { AdData } from "../types/ad";
 import { isQrUrlSafe } from "../lib/qrShareUrl";
 import { TOOLTIP_COPY } from "../lib/tooltipCopy";
 import { BrandMark } from "./BrandMark";
+import { CroppedAdImage } from "./CroppedAdImage";
 import { ActionButtonWithHint } from "./HelpTooltip";
 import { SITE_DOMAIN } from "../lib/constants";
 
@@ -64,12 +65,15 @@ export function AdPrintPoster({
 
               <div className="a4-poster__photo-zone">
                 {ad.img ? (
-                  <img
+                  <CroppedAdImage
                     src={ad.img}
+                    crop={ad.crop}
                     alt={ad.title}
+                    type={ad.t}
+                    title={ad.title}
+                    fixedContainerSize={600}
                     className="a4-poster__photo"
-                    width={600}
-                    height={600}
+                    variant="create"
                   />
                 ) : (
                   <div className="a4-poster__photo-placeholder">{ad.title}</div>

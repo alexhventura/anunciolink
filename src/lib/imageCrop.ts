@@ -1,14 +1,31 @@
-export interface CropTransform {
-  zoom: number;
-  panX: number;
-  panY: number;
-}
+import type { CropTransform } from "../types/ad";
+
+export type { CropTransform };
 
 export const CROP_VIEWPORT = 280;
 export const DEFAULT_CROP: CropTransform = { zoom: 1, panX: 0, panY: 0 };
 
-const WEBP_QUALITY = 0.58;
-const JPEG_FALLBACK_QUALITY = 0.52;
+const WEBP_QUALITY = 0.68;
+const JPEG_FALLBACK_QUALITY = 0.55;
+
+export function isDefaultCrop(crop: CropTransform): boolean {
+  return crop.zoom === 1 && crop.panX === 0 && crop.panY === 0;
+}
+
+/** Escala vetores do editor (280px) para outro tamanho de viewport */
+export function scaleCropForViewport(
+  crop: CropTransform,
+  displayViewport: number,
+  editorViewport = CROP_VIEWPORT
+): CropTransform {
+  if (displayViewport === editorViewport) return crop;
+  const ratio = displayViewport / editorViewport;
+  return {
+    zoom: crop.zoom,
+    panX: crop.panX * ratio,
+    panY: crop.panY * ratio,
+  };
+}
 
 export function loadImageElement(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -30,7 +47,7 @@ function canvasToDataUrl(canvas: HTMLCanvasElement, quality: number): string {
   return jpeg;
 }
 
-/** Calcula retângulo de origem (quadrado) a partir do viewport interativo */
+/** Calcula retângulo de origem (quadrado) — usado em canvas (card social) */
 export function getCropSourceRect(
   img: HTMLImageElement,
   crop: CropTransform,
@@ -51,7 +68,7 @@ export function getCropSourceRect(
   return { srcX, srcY, srcSize: clampedSize, scale };
 }
 
-/** Estilo CSS espelhando o recorte no preview interativo */
+/** Posicionamento CSS idêntico ao mini-editor */
 export function getCropPreviewStyle(
   img: HTMLImageElement,
   crop: CropTransform,
@@ -67,10 +84,20 @@ export function getCropPreviewStyle(
   return {
     width: drawW,
     height: drawH,
-    transform: `translate(${drawX}px, ${drawY}px)`,
+    transform: `translate3d(${drawX}px, ${drawY}px, 0)`,
   };
 }
 
+export function getCropPreviewStyleForContainer(
+  img: HTMLImageElement,
+  crop: CropTransform,
+  containerSize: number
+) {
+  const scaled = scaleCropForViewport(crop, containerSize);
+  return getCropPreviewStyle(img, scaled, containerSize);
+}
+
+/** Export legado — recorte baked (card/impressão offline) */
 export async function exportCropToDataUrl(
   imageSrc: string,
   crop: CropTransform,
@@ -82,16 +109,17 @@ export async function exportCropToDataUrl(
   } = {}
 ): Promise<string> {
   const viewportSize = options.viewportSize ?? CROP_VIEWPORT;
-  const outputSize = options.outputSize ?? 240;
+  const outputSize = options.outputSize ?? 480;
   const img = await loadImageElement(imageSrc);
 
   const canvas = document.createElement("canvas");
   canvas.width = outputSize;
   canvas.height = outputSize;
   const ctx = canvas.getContext("2d");
-  if (!ctx) {
-    throw new Error("Canvas indisponível neste navegador.");
-  }
+  if (!ctx) throw new Error("Canvas indisponível neste navegador.");
+
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
 
   if (options.fillWhite) {
     ctx.fillStyle = "#ffffff";

@@ -1,30 +1,46 @@
-import { useState } from "react";
-import type { AdType } from "../types/ad";
+import type { AdType, CropTransform } from "../types/ad";
+import { CroppedAdImage } from "./CroppedAdImage";
 import { ImageFallback } from "./ImageFallback";
 
 interface AdImageProps {
   src?: string;
+  crop?: CropTransform;
   alt: string;
   type: AdType;
   title: string;
   printMode?: boolean;
   priority?: boolean;
   className?: string;
+  variant?: "checkout" | "create";
 }
 
 export function AdImage({
   src,
+  crop,
   alt,
   type,
   title,
   printMode = false,
   priority = false,
   className = "",
+  variant = "checkout",
 }: AdImageProps) {
-  const [loadError, setLoadError] = useState(false);
-  const objectClass = printMode ? "object-contain bg-white p-4" : "object-cover";
+  if (crop || !printMode) {
+    return (
+      <CroppedAdImage
+        src={src}
+        crop={crop}
+        alt={alt}
+        type={type}
+        title={title}
+        priority={priority}
+        className={className}
+        variant={variant}
+      />
+    );
+  }
 
-  if (!src || loadError) {
+  if (!src) {
     return <ImageFallback title={title} type={type} />;
   }
 
@@ -32,13 +48,12 @@ export function AdImage({
     <img
       src={src}
       alt={alt}
-      width={400}
-      height={400}
+      width={480}
+      height={480}
       decoding={priority ? "sync" : "async"}
       fetchPriority={priority ? "high" : "auto"}
       loading={priority ? "eager" : "lazy"}
-      onError={() => setLoadError(true)}
-      className={`h-full w-full ${objectClass} ${className}`}
+      className={`h-full w-full object-contain bg-white p-4 ${className}`}
     />
   );
 }

@@ -1,4 +1,5 @@
-import type { AdData, AdType, BillingType } from "../types/ad";
+import type { AdData, AdType, BillingType, CropTransform } from "../types/ad";
+import { DEFAULT_CROP, isDefaultCrop } from "./imageCrop";
 
 /** Payload compacto na URL — chaves mínimas para reduzir bytes antes do deflate */
 export interface CompactAdWire {
@@ -12,8 +13,30 @@ export interface CompactAdWire {
   c?: string;
   /** w:webp ou j:jpeg + base64 sem prefixo data: */
   i?: string;
+  /** Crop: zoom×100, panX×10, panY×10 (viewport editor 280px) */
+  cz?: number;
+  cx?: number;
+  cy?: number;
   ts: number;
   pm?: boolean;
+}
+
+function encodeCrop(crop: CropTransform): Pick<CompactAdWire, "cz" | "cx" | "cy"> | undefined {
+  if (isDefaultCrop(crop)) return undefined;
+  return {
+    cz: Math.round(crop.zoom * 100),
+    cx: Math.round(crop.panX * 10),
+    cy: Math.round(crop.panY * 10),
+  };
+}
+
+function decodeCrop(wire: CompactAdWire): CropTransform | undefined {
+  if (wire.cz === undefined) return undefined;
+  return {
+    zoom: wire.cz / 100,
+    panX: (wire.cx ?? 0) / 10,
+    panY: (wire.cy ?? 0) / 10,
+  };
 }
 
 export function toCompactWire(ad: AdData): CompactAdWire {
@@ -30,6 +53,8 @@ export function toCompactWire(ad: AdData): CompactAdWire {
   if (ad.cardLink) wire.c = ad.cardLink;
   if (ad.printMode) wire.pm = true;
   if (ad.img) wire.i = stripImageDataUrl(ad.img);
+  const cropFields = ad.crop ? encodeCrop(ad.crop) : undefined;
+  if (cropFields) Object.assign(wire, cropFields);
   return wire;
 }
 
@@ -44,6 +69,7 @@ export function fromCompactWire(wire: CompactAdWire): AdData {
     pix: wire.x,
     cardLink: wire.c,
     img: wire.i ? expandImageDataUrl(wire.i) : undefined,
+    crop: decodeCrop(wire),
     timestamp: wire.ts,
     printMode: wire.pm,
   };
@@ -81,6 +107,7 @@ export function normalizeLegacyAd(parsed: Record<string, unknown>): AdData | nul
     pix: legacy.pix,
     cardLink: legacy.cardLink,
     img: legacy.img,
+    crop: legacy.crop ?? DEFAULT_CROP,
     timestamp: legacy.timestamp ?? Date.now(),
     printMode: legacy.printMode,
   };
