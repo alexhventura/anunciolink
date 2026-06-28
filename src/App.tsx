@@ -19,7 +19,6 @@ import {
   AdCodecError,
   buildAdUrl,
   encodeAdData,
-  buildAdHashPayload,
   fitAdToUrlLength,
 } from "./lib/adCodec";
 import { saveAdToHistory } from "./lib/adHistory";
@@ -31,7 +30,6 @@ export default function App() {
     useAdForm();
   const { refresh: refreshHistory } = useAdHistory();
   const [generatedLink, setGeneratedLink] = useState("");
-  const [qrCodeLink, setQrCodeLink] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imageStrippedWarning, setImageStrippedWarning] = useState(false);
 
@@ -44,7 +42,6 @@ export default function App() {
   const handleResetHome = useCallback(() => {
     resetForm();
     setGeneratedLink("");
-    setQrCodeLink("");
     setImageStrippedWarning(false);
     resetToHome();
   }, [resetForm, resetToHome]);
@@ -63,7 +60,6 @@ export default function App() {
         );
 
         const finalLink = buildAdUrl(hashResult);
-        const qrHash = encodeAdData(buildAdHashPayload(adObject, false));
 
         saveAdToHistory({
           title: adObject.title,
@@ -74,7 +70,6 @@ export default function App() {
         refreshHistory();
 
         setGeneratedLink(finalLink);
-        setQrCodeLink(buildAdUrl(qrHash));
         setImageStrippedWarning(imageStripped);
         setCurrentView("success");
       } catch (err) {
@@ -113,7 +108,6 @@ export default function App() {
             <SuccessView
               form={form}
               generatedLink={generatedLink}
-              qrCodeLink={qrCodeLink}
               adsenseReady={adsenseReady}
               imageStrippedWarning={imageStrippedWarning}
               onBackToEdit={backToEdit}

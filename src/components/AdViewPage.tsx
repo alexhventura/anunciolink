@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { motion } from "motion/react";
+import { MessageCircle } from "lucide-react";
 import type { AdData } from "../types/ad";
 import { AdSenseSlot } from "./AdSenseSlot";
 import { AdImage } from "./AdImage";
+import { AdShareTools } from "./AdShareTools";
 import { copyToClipboard } from "../lib/formatters";
 
 interface AdViewPageProps {
@@ -13,6 +15,7 @@ interface AdViewPageProps {
 
 export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
   const [pixCopied, setPixCopied] = useState(false);
+  const adUrl = window.location.href;
 
   const handleCopyPix = async () => {
     if (!ad.pix) return;
@@ -76,6 +79,8 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
             {ad.desc}
           </p>
         </section>
+
+        <AdShareTools ad={ad} adUrl={adUrl} />
 
         <AdSenseSlot slot="meio" ready={adsenseReady} />
 
@@ -143,6 +148,7 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
                 id="btn-wa-buyer-contact"
                 className="btn-whatsapp"
               >
+                <MessageCircle className="h-6 w-6 shrink-0" strokeWidth={2.5} aria-hidden="true" />
                 WhatsApp com vendedor
               </a>
             )}

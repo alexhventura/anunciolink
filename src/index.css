@@ -123,13 +123,55 @@
 }
 
 @utility btn-whatsapp {
-  @apply flex w-full items-center justify-center rounded-lg border-[3px] border-black bg-white py-4 px-6 text-base font-black text-black min-h-[60px];
+  @apply flex w-full items-center justify-center gap-2 rounded-lg border-[3px] border-black bg-[#25D366] py-4 px-6 text-base font-black text-white min-h-[64px];
   box-shadow: 5px 5px 0 0 #000;
 }
 
 .btn-whatsapp:hover {
   transform: translate(2px, 2px);
   box-shadow: 2px 2px 0 0 #000;
+  background-color: #20bd5a;
+  border-color: var(--color-neo-lime);
+}
+
+@utility btn-share-print {
+  @apply flex w-full items-center justify-center gap-3 rounded-lg border-[3px] border-black bg-black py-5 px-6 text-sm sm:text-base font-black uppercase text-amber-400 min-h-[64px];
+  box-shadow: 6px 6px 0 0 #000;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-share-print:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 0 #000;
+}
+
+@utility btn-share-card {
+  @apply flex w-full items-center justify-center gap-3 rounded-lg border-[3px] border-black bg-amber-500 py-5 px-6 text-sm sm:text-base font-black uppercase text-black min-h-[64px];
+  box-shadow: 6px 6px 0 0 #000;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.btn-share-card:hover:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 0 #000;
+  border-color: var(--color-neo-lime);
+}
+
+.btn-share-card:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+@utility sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
 
 @utility btn-payment-pix {
@@ -219,10 +261,227 @@
 .bento-desc { min-height: 120px; }
 .bento-actions { min-height: 96px; }
 
+/* ——— Cartaz A4 (tela: oculto / impressão: full bleed) ——— */
+.a4-poster {
+  position: fixed;
+  left: -10000px;
+  top: 0;
+  width: 210mm;
+  height: 297mm;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.a4-poster__sheet {
+  box-sizing: border-box;
+  width: 210mm;
+  height: 297mm;
+  padding: 10mm 12mm;
+  background: #fbbf24;
+  border: 4mm solid #000;
+  display: flex;
+  flex-direction: column;
+  gap: 6mm;
+  font-family: "Inter", Arial, sans-serif;
+  color: #000;
+}
+
+.a4-poster__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4mm;
+}
+
+.a4-poster__chip {
+  display: inline-block;
+  padding: 2mm 5mm;
+  border: 1.2mm solid #000;
+  background: #000;
+  color: #fbbf24;
+  font-size: 11pt;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  box-shadow: 2mm 2mm 0 0 #000;
+}
+
+.a4-poster__title-banner {
+  background: #000;
+  border: 1.5mm solid #000;
+  padding: 5mm 6mm;
+  box-shadow: 4mm 4mm 0 0 #000;
+  transform: rotate(-0.8deg);
+}
+
+.a4-poster__title {
+  margin: 0;
+  font-size: 22pt;
+  font-weight: 900;
+  line-height: 1.05;
+  color: #fbbf24;
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
+  word-break: break-word;
+}
+
+.a4-poster__hero {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6mm;
+  align-items: stretch;
+  min-height: 0;
+}
+
+.a4-poster__photo-frame {
+  border: 2mm solid #000;
+  background: #fff;
+  box-shadow: 5mm 5mm 0 0 #000;
+  overflow: hidden;
+  min-height: 95mm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.a4-poster__photo {
+  max-height: 95mm;
+  object-fit: contain !important;
+}
+
+.a4-poster__price-block {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  gap: 3mm;
+}
+
+.a4-poster__price-label {
+  font-size: 12pt;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.a4-poster__price {
+  margin: 0;
+  font-size: 34pt;
+  font-weight: 900;
+  line-height: 1;
+  background: #000;
+  color: #fbbf24;
+  border: 2mm solid #000;
+  padding: 5mm 6mm;
+  box-shadow: 5mm 5mm 0 0 #000;
+  transform: rotate(1deg);
+  letter-spacing: -0.04em;
+}
+
+.a4-poster__desc {
+  margin: 0;
+  font-size: 10pt;
+  font-weight: 600;
+  line-height: 1.45;
+  background: #fff;
+  border: 1.2mm solid #000;
+  padding: 4mm 5mm;
+  box-shadow: 3mm 3mm 0 0 #000;
+  max-height: 28mm;
+  overflow: hidden;
+}
+
+.a4-poster__footer {
+  display: flex;
+  align-items: center;
+  gap: 6mm;
+  margin-top: auto;
+  background: #fff;
+  border: 2mm solid #000;
+  padding: 5mm 6mm;
+  box-shadow: 4mm 4mm 0 0 #000;
+}
+
+.a4-poster__qr-wrap {
+  flex-shrink: 0;
+  padding: 2mm;
+  border: 1.5mm solid #000;
+  background: #fff;
+  box-shadow: 2mm 2mm 0 0 #000;
+}
+
+.a4-poster__cta-headline {
+  margin: 0 0 2mm;
+  font-size: 14pt;
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 1.1;
+}
+
+.a4-poster__cta-body {
+  margin: 0 0 3mm;
+  font-size: 11pt;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.a4-poster__domain {
+  margin: 0;
+  font-size: 10pt;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
 @media print {
-  body { background: white !important; color: black !important; }
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+
+  html, body {
+    width: 210mm !important;
+    height: 297mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  .a4-poster,
+  .a4-poster * {
+    visibility: visible;
+  }
+
+  .a4-poster {
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 210mm !important;
+    height: 297mm !important;
+    pointer-events: none;
+    z-index: 99999;
+    overflow: hidden;
+  }
+
+  .a4-poster__sheet {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
   .no-print { display: none !important; }
+
   .print-container {
+    visibility: visible !important;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
     border: 3px solid #000 !important;
     box-shadow: none !important;
     padding: 2rem !important;
@@ -231,5 +490,10 @@
     max-width: 100% !important;
     page-break-inside: avoid;
   }
+
+  .print-container * {
+    visibility: visible !important;
+  }
+
   header, footer { display: none !important; }
 }

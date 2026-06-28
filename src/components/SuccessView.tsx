@@ -1,18 +1,17 @@
 import { useState } from "react";
 import { motion } from "motion/react";
-import { Check, Zap } from "lucide-react";
-import { QRCodeSVG } from "qrcode.react";
+import { Check, MessageCircle, Zap } from "lucide-react";
 import type { AdFormState } from "../hooks/useAdForm";
+import type { AdData } from "../types/ad";
 import { AdSenseSlot } from "./AdSenseSlot";
 import { AdImage } from "./AdImage";
 import { ImageFallback } from "./ImageFallback";
-import { formatPhoneNumber, copyToClipboard } from "../lib/formatters";
-import { SITE_DOMAIN } from "../lib/constants";
+import { AdShareTools } from "./AdShareTools";
+import { copyToClipboard } from "../lib/formatters";
 
 interface SuccessViewProps {
   form: AdFormState;
   generatedLink: string;
-  qrCodeLink: string;
   adsenseReady: boolean;
   imageStrippedWarning?: boolean;
   onBackToEdit: () => void;
@@ -28,7 +27,6 @@ const typeLabel = {
 export function SuccessView({
   form,
   generatedLink,
-  qrCodeLink,
   adsenseReady,
   imageStrippedWarning,
   onBackToEdit,
@@ -42,6 +40,20 @@ export function SuccessView({
       setLinkCopied(true);
       window.setTimeout(() => setLinkCopied(false), 2500);
     }
+  };
+
+  const adSnapshot: AdData = {
+    t: form.adType,
+    title: form.title,
+    price: form.price,
+    billingType: form.billingType,
+    desc: form.description,
+    phone: form.phone,
+    pix: form.pix || undefined,
+    cardLink: form.cardLink || undefined,
+    img: form.photoPreview || undefined,
+    timestamp: Date.now(),
+    printMode: form.printMode,
   };
 
   return (
@@ -115,15 +127,11 @@ export function SuccessView({
             id="btn-whatsapp-share-success"
             className="btn-whatsapp"
           >
+            <MessageCircle className="h-6 w-6 shrink-0" strokeWidth={2.5} aria-hidden="true" />
             Compartilhar no WhatsApp
           </a>
 
-          <div className="rounded-lg border-[3px] border-black bg-amber-100 p-5 flex flex-col sm:flex-row justify-between items-center gap-4 neo-shadow-sm">
-            <p className="text-xs font-black uppercase text-black">Cartaz com QR Code para impressão</p>
-            <button type="button" onClick={() => window.print()} id="btn-print-cartaz" className="btn-ghost text-xs !min-h-[48px]">
-              Imprimir / PDF
-            </button>
-          </div>
+          <AdShareTools ad={adSnapshot} adUrl={generatedLink} />
         </div>
 
         <div className="flex flex-col sm:flex-row items-stretch justify-center gap-3 border-t-[3px] border-black pt-8">
@@ -142,70 +150,6 @@ export function SuccessView({
           <button type="button" onClick={onResetHome} id="btn-create-another-success" className="btn-ghost !min-h-[64px]">
             Novo anúncio
           </button>
-        </div>
-      </div>
-
-      <div className="print-container neo-card-white p-8 space-y-6 text-left">
-        <div className="flex items-start justify-between border-b-[3px] border-black pb-5 gap-4">
-          <div>
-            <span className="chip mb-2">{typeLabel[form.adType]}</span>
-            <h1 className="text-xl font-black text-black">{form.title}</h1>
-          </div>
-          <div className="text-right shrink-0">
-            <span className="text-[11px] font-black uppercase text-zinc-600">Preço</span>
-            <p className="text-lg font-black text-black bg-amber-500 border-2 border-black px-2 py-0.5 mt-1 inline-block">
-              {form.price}
-              {form.billingType === "recorrente" ? " /mês" : ""}
-            </p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center min-h-[200px]">
-          {form.photoPreview && (
-            <div className="md:col-span-2 rounded-lg border-[3px] border-black bg-white p-4 flex justify-center items-center h-52 neo-shadow-sm">
-              <img
-                src={form.photoPreview}
-                alt={form.title}
-                className="max-w-full max-h-full object-contain rounded-md"
-                width={320}
-                height={208}
-              />
-            </div>
-          )}
-          <div
-            className={`${
-              form.photoPreview ? "md:col-span-1" : "md:col-span-3"
-            } flex flex-col items-center justify-center rounded-lg border-[3px] border-dashed border-black p-4 bg-amber-50 text-center gap-2 min-h-[160px] neo-shadow-sm`}
-          >
-            <QRCodeSVG value={qrCodeLink} size={120} level="M" includeMargin className="rounded-md bg-white p-1 border-2 border-black" />
-            <span className="text-[10px] font-black uppercase text-black">Escaneie o QR Code</span>
-          </div>
-        </div>
-
-        <p className="text-sm text-black leading-relaxed whitespace-pre-wrap rounded-lg bg-amber-100 p-5 border-[3px] border-black font-medium">
-          {form.description}
-        </p>
-
-        {(form.phone || form.pix) && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {form.phone && (
-              <div className="rounded-lg border-[3px] border-black p-4 bg-white neo-shadow-sm">
-                <span className="text-[11px] font-black uppercase text-zinc-600">WhatsApp</span>
-                <p className="text-sm font-bold text-black font-mono mt-1">{formatPhoneNumber(form.phone)}</p>
-              </div>
-            )}
-            {form.pix && (
-              <div className="rounded-lg border-[3px] border-black p-4 bg-white neo-shadow-sm">
-                <span className="text-[11px] font-black uppercase text-zinc-600">Pix</span>
-                <p className="text-[11px] font-mono text-black truncate mt-1">{form.pix}</p>
-              </div>
-            )}
-          </div>
-        )}
-
-        <div className="border-t-[3px] border-black pt-4 flex justify-between text-[10px] font-bold text-zinc-600 uppercase">
-          <span>{SITE_DOMAIN}</span>
-          <span>Anuncio Link</span>
         </div>
       </div>
 
