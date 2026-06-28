@@ -36,7 +36,7 @@ export function AdSenseSlot({ slot, ready }: AdSenseSlotProps) {
         />
       ) : (
         <div
-          className="adsense-slot__placeholder flex items-center justify-center rounded-lg border border-dashed border-zinc-200 bg-zinc-50 text-[10px] font-medium uppercase tracking-wider text-zinc-400"
+          className="adsense-slot__placeholder flex items-center justify-center text-[10px] font-bold uppercase text-zinc-500"
           aria-hidden="true"
         >
           Patrocinado

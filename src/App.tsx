@@ -91,7 +91,7 @@ export default function App() {
   );
 
   return (
-    <div className="min-h-screen bg-zinc-50 font-sans antialiased">
+    <div className="min-h-screen bg-amber-50/40 font-sans antialiased">
       <Header showNewAdButton={currentView !== "home"} onResetHome={handleResetHome} />
 
       <main className="mx-auto max-w-xl px-5 py-12 md:py-16">

@@ -1,17 +1,17 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&family=JetBrains+Mono:wght@500;600&display=swap");
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --color-neo-lime: #bef264;
 }
 
 @layer base {
   body {
-    @apply font-sans bg-zinc-50 text-zinc-600 antialiased selection:bg-amber-100 selection:text-zinc-900;
-    letter-spacing: -0.011em;
-    font-feature-settings: "cv11", "ss01";
+    @apply font-sans bg-amber-50/40 text-zinc-900 antialiased;
+    letter-spacing: -0.015em;
   }
 
   img {
@@ -20,118 +20,182 @@
   }
 
   h1, h2, h3 {
-    @apply text-zinc-950;
-    letter-spacing: -0.025em;
+    @apply text-black font-extrabold;
+    letter-spacing: -0.03em;
   }
 }
 
-/* ——— Superfícies Bento ——— */
-@utility bento {
-  @apply rounded-xl border border-zinc-200 bg-white p-6;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+/* ——— Neo-Brutalismo ——— */
+.neo-shadow { box-shadow: 5px 5px 0 0 #000; }
+.neo-shadow-lg { box-shadow: 8px 8px 0 0 #000; }
+.neo-shadow-sm { box-shadow: 3px 3px 0 0 #000; }
+
+.neo-interactive {
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
-@utility bento-muted {
-  @apply rounded-xl border border-zinc-200/90 bg-zinc-50/70 p-6;
+.neo-interactive:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 0 #000;
 }
 
-@utility card {
-  @apply rounded-xl border border-zinc-200 bg-white;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+.neo-interactive:active {
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 0 0 #000;
 }
 
-@utility card-muted {
-  @apply rounded-xl border border-zinc-200/90 bg-zinc-50/70;
+@utility neo-card {
+  @apply rounded-lg border-[3px] border-black bg-amber-500 p-6;
+  box-shadow: 5px 5px 0 0 #000;
 }
 
-/* ——— Tipografia ——— */
+@utility neo-card-white {
+  @apply rounded-lg border-[3px] border-black bg-white p-6;
+  box-shadow: 5px 5px 0 0 #000;
+}
+
+@utility neo-card-muted {
+  @apply rounded-lg border-[3px] border-black bg-amber-100 p-6;
+  box-shadow: 4px 4px 0 0 #000;
+}
+
+@utility bento { @apply neo-card-white; }
+@utility bento-muted { @apply neo-card-muted; }
+@utility card { @apply neo-card-white; }
+@utility card-muted { @apply neo-card-muted; }
+
 @utility text-display {
-  @apply font-semibold text-zinc-950;
-  letter-spacing: -0.03em;
+  @apply font-extrabold text-black;
+  letter-spacing: -0.04em;
 }
 
 @utility text-price {
-  @apply font-bold text-amber-600 tabular-nums;
-  letter-spacing: -0.03em;
+  @apply font-black tabular-nums;
+  letter-spacing: -0.04em;
 }
 
 @utility label-field {
-  @apply block text-[11px] font-medium uppercase text-zinc-500 mb-2;
-  letter-spacing: 0.06em;
+  @apply block text-xs font-bold uppercase text-black mb-2;
+  letter-spacing: 0.08em;
 }
 
 @utility input-field {
-  @apply w-full rounded-lg border border-zinc-200 bg-zinc-100/50 px-4 py-3 text-sm font-normal text-zinc-900 transition-all duration-200;
-  letter-spacing: -0.01em;
-  @apply placeholder:text-zinc-400;
-  @apply hover:border-zinc-300 hover:bg-zinc-100/80;
-  @apply focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-[3px] focus:ring-amber-500/10;
+  @apply w-full rounded-lg border-[3px] border-black bg-white px-4 py-3.5 text-sm font-semibold text-black;
+  box-shadow: 3px 3px 0 0 #000;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  @apply placeholder:text-zinc-500 placeholder:font-medium;
 }
 
-/* ——— Botões ——— */
+.input-field:focus {
+  outline: none;
+  border-color: var(--color-neo-lime);
+  box-shadow: 3px 3px 0 0 var(--color-neo-lime);
+}
+
 @utility btn-primary {
-  @apply inline-flex items-center justify-center rounded-lg bg-zinc-950 px-6 py-3 text-sm font-semibold text-white transition-all duration-200;
-  letter-spacing: -0.01em;
-  @apply hover:bg-zinc-800 disabled:opacity-50 disabled:pointer-events-none;
+  @apply inline-flex w-full items-center justify-center rounded-lg border-[3px] border-black bg-black px-8 py-5 text-base font-black uppercase text-amber-400 min-h-[64px];
+  box-shadow: 6px 6px 0 0 #000;
+}
+
+.btn-primary:not(:disabled):hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 0 #000;
 }
 
 @utility btn-accent {
-  @apply inline-flex items-center justify-center rounded-lg bg-amber-500 px-5 py-2.5 text-sm font-semibold text-zinc-950 transition-all duration-200;
-  @apply hover:bg-amber-400;
+  @apply inline-flex items-center justify-center rounded-lg border-[3px] border-black bg-amber-500 px-6 py-3 text-sm font-black uppercase text-black;
+  box-shadow: 4px 4px 0 0 #000;
+}
+
+.btn-accent:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 0 #000;
 }
 
 @utility btn-ghost {
-  @apply inline-flex items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 py-2.5 text-sm font-medium text-zinc-700 transition-all duration-200;
-  @apply hover:bg-zinc-50 hover:border-zinc-300;
+  @apply inline-flex items-center justify-center rounded-lg border-[3px] border-black bg-white px-5 py-3 text-sm font-bold text-black;
+  box-shadow: 4px 4px 0 0 #000;
+}
+
+.btn-ghost:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 0 #000;
 }
 
 @utility btn-whatsapp {
-  @apply flex w-full items-center justify-center rounded-lg border border-zinc-200 bg-white py-3.5 px-5 text-sm font-medium text-zinc-800 transition-all duration-200 min-h-[52px];
-  @apply hover:bg-zinc-50 hover:border-zinc-300;
+  @apply flex w-full items-center justify-center rounded-lg border-[3px] border-black bg-white py-4 px-6 text-base font-black text-black min-h-[60px];
+  box-shadow: 5px 5px 0 0 #000;
+}
+
+.btn-whatsapp:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 0 #000;
 }
 
 @utility btn-payment-pix {
-  @apply flex w-full items-center justify-center gap-2 rounded-lg bg-amber-500 py-4 px-5 text-sm font-semibold text-zinc-950 transition-all duration-200 min-h-[56px];
-  letter-spacing: -0.01em;
-  @apply hover:bg-amber-400;
+  @apply flex w-full items-center justify-center rounded-lg border-[3px] border-black bg-amber-500 py-5 px-6 text-base font-black uppercase text-black min-h-[64px];
+  box-shadow: 6px 6px 0 0 #000;
+}
+
+.btn-payment-pix:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 0 #000;
+  border-color: var(--color-neo-lime);
 }
 
 @utility btn-payment-pix-copied {
-  @apply flex w-full items-center justify-center gap-2 rounded-lg border border-amber-300 bg-amber-50 py-4 px-5 text-sm font-semibold text-amber-900 transition-all duration-200 min-h-[56px];
+  @apply flex w-full items-center justify-center rounded-lg border-[3px] border-black bg-lime-300 py-5 px-6 text-base font-black uppercase text-black min-h-[64px];
+  box-shadow: 4px 4px 0 0 #000;
 }
 
 @utility btn-payment-card {
-  @apply flex w-full items-center justify-center gap-2 rounded-lg bg-zinc-950 py-4 px-5 text-sm font-semibold text-white transition-all duration-200 min-h-[56px];
-  letter-spacing: -0.01em;
-  @apply hover:bg-zinc-800;
+  @apply flex w-full items-center justify-center rounded-lg border-[3px] border-black bg-black py-5 px-6 text-base font-black uppercase text-white min-h-[64px];
+  box-shadow: 6px 6px 0 0 #000;
+}
+
+.btn-payment-card:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 0 #000;
+  background-color: #422006;
 }
 
 @utility chip {
-  @apply inline-flex items-center rounded-md border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-[11px] font-medium text-zinc-600;
+  @apply inline-flex items-center rounded-md border-2 border-black bg-white px-2.5 py-1 text-[11px] font-bold uppercase text-black;
+  box-shadow: 2px 2px 0 0 #000;
 }
 
 @utility chip-accent {
-  @apply inline-flex items-center rounded-md border border-amber-200/80 bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-800;
+  @apply inline-flex items-center rounded-md border-2 border-black bg-amber-500 px-2.5 py-1 text-[11px] font-black uppercase text-black;
+  box-shadow: 2px 2px 0 0 #000;
 }
 
-/* ——— Layout página do anúncio (CLS) ——— */
+.neo-hero-banner {
+  @apply inline-block rounded-lg border-[4px] border-black bg-amber-500 px-6 py-5 sm:px-10 sm:py-7;
+  box-shadow: 8px 8px 0 0 #000;
+  transform: rotate(-1.5deg);
+}
+
+.neo-segment {
+  @apply flex items-center justify-center rounded-lg border-[3px] border-black px-3 py-3.5 text-xs sm:text-sm font-bold uppercase min-h-[52px];
+  box-shadow: 3px 3px 0 0 #000;
+}
+
+.neo-segment:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 0 #000;
+}
+
+.neo-segment-active { @apply bg-black text-amber-400; }
+.neo-segment-idle { @apply bg-white text-black; }
+.neo-segment-amber { @apply bg-amber-500 text-black; }
+
 .bento-page {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.25rem;
 }
 
-@media (min-width: 640px) {
-  .bento-page {
-    gap: 1.25rem;
-  }
-}
-
-.adsense-slot {
-  contain: layout style;
-  width: 100%;
-}
-
+.adsense-slot { contain: layout style; width: 100%; }
 .adsense-slot--topo { min-height: 90px; }
 .adsense-slot--meio { min-height: 280px; }
 .adsense-slot--rodape { min-height: 250px; }
@@ -139,6 +203,7 @@
 .adsense-slot__placeholder {
   min-height: inherit;
   width: 100%;
+  @apply rounded-lg border-2 border-dashed border-black bg-white;
 }
 
 .bento-image {
@@ -147,22 +212,18 @@
   max-height: 420px;
   width: 100%;
   overflow: hidden;
-  @apply rounded-xl border border-zinc-200 bg-zinc-100;
+  @apply rounded-lg border-[3px] border-black bg-white;
+  box-shadow: 5px 5px 0 0 #000;
 }
 
-.bento-desc {
-  min-height: 120px;
-}
-
-.bento-actions {
-  min-height: 88px;
-}
+.bento-desc { min-height: 120px; }
+.bento-actions { min-height: 96px; }
 
 @media print {
   body { background: white !important; color: black !important; }
   .no-print { display: none !important; }
   .print-container {
-    border: 2px solid #d97706 !important;
+    border: 3px solid #000 !important;
     box-shadow: none !important;
     padding: 2rem !important;
     margin: 0 !important;

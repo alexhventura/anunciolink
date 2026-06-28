@@ -98,10 +98,9 @@ export function HomeView({
     onSubmit(compressedImage);
   };
 
-  const segmentBase =
-    "flex items-center justify-center rounded-lg border px-4 py-4 text-sm font-medium transition-all duration-200 min-h-[48px]";
-  const segmentActive = "border-zinc-900 bg-zinc-900 text-white";
-  const segmentIdle = "border-zinc-200 bg-white text-zinc-600 hover:border-zinc-300 hover:bg-zinc-50";
+  const segmentBase = "neo-segment";
+  const segmentActive = "neo-segment-active";
+  const segmentIdle = "neo-segment-idle";
 
   return (
     <motion.div
@@ -113,14 +112,20 @@ export function HomeView({
       className="space-y-20"
     >
       {/* Hero */}
-      <div className="text-center max-w-lg mx-auto space-y-5 px-2">
-        <span className="chip-accent">Sem cadastro · Grátis</span>
-        <h1 className="text-display text-4xl sm:text-[2.75rem] font-extrabold leading-[1.08]">
-          Anúncio pronto em{" "}
-          <span className="text-amber-600">segundos</span>
-        </h1>
-        <p className="text-[15px] text-zinc-500 font-normal leading-relaxed max-w-md mx-auto">
-          Foto, preço e Pix em um link. Rápido e direto — {SITE_NAME}.
+      <div className="text-center max-w-lg mx-auto space-y-6 px-2">
+        <span className="chip-accent">Sem cadastro · 100% grátis</span>
+
+        <div className="neo-hero-banner mx-auto max-w-md">
+          <h1 className="text-display text-3xl sm:text-4xl font-black leading-[1.05] text-black uppercase">
+            Anúncio pronto
+            <br />
+            <span className="text-white bg-black px-2 py-0.5 inline-block mt-1 -rotate-1">em segundos</span>
+          </h1>
+        </div>
+
+        <p className="text-base font-semibold text-black max-w-md mx-auto leading-snug">
+          Foto + Pix + link compartilhável.
+          <span className="block text-sm font-medium text-zinc-700 mt-1">Rápido como raio — {SITE_NAME}.</span>
         </p>
       </div>
 
@@ -128,15 +133,15 @@ export function HomeView({
 
       {/* Formulário */}
       <div className="max-w-xl mx-auto w-full">
-        <div className="bento p-8 md:p-10">
-          <header className="mb-10 pb-6 border-b border-zinc-100">
-            <h2 className="text-display text-lg font-bold">Novo anúncio</h2>
-            <p className="mt-1.5 text-sm text-zinc-500 font-normal">Campos com * são obrigatórios</p>
+        <div className="neo-card-white p-8 md:p-10">
+          <header className="mb-10 pb-6 border-b-[3px] border-black">
+            <h2 className="text-display text-xl font-black uppercase">Novo anúncio</h2>
+            <p className="mt-2 text-sm font-bold text-zinc-700">Preencha e gere seu link *</p>
           </header>
 
           <form onSubmit={handleSubmit} className="space-y-9" noValidate>
             {form.submitError && (
-              <div role="alert" className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-800">
+              <div role="alert" className="rounded-lg border-[3px] border-black bg-red-400 px-4 py-3 text-sm font-bold text-black neo-shadow-sm">
                 {form.submitError}
               </div>
             )}
@@ -170,9 +175,7 @@ export function HomeView({
                     aria-pressed={form.billingType === billing}
                     onClick={() => onFieldChange("billingType", billing)}
                     className={`${segmentBase} ${
-                      form.billingType === billing
-                        ? "border-amber-500 bg-amber-500 text-zinc-950"
-                        : segmentIdle
+                      form.billingType === billing ? "neo-segment-amber" : segmentIdle
                     }`}
                   >
                     {billing === "unico" ? "Valor único" : "Recorrente"}
@@ -295,8 +298,8 @@ export function HomeView({
                   const file = e.dataTransfer.files?.[0];
                   if (file) handleFile(file);
                 }}
-                className={`relative flex flex-col items-center justify-center rounded-lg border border-dashed p-10 text-center transition-all duration-200 min-h-[140px] ${
-                  isDragging ? "border-amber-500 bg-amber-50/30" : "border-zinc-200 bg-zinc-50/50 hover:border-zinc-300"
+                className={`relative flex flex-col items-center justify-center rounded-lg border-[3px] border-dashed border-black p-10 text-center neo-shadow-sm min-h-[140px] transition-all duration-150 ${
+                  isDragging ? "bg-lime-200 border-lime-400" : "bg-amber-50 hover:bg-amber-100"
                 }`}
               >
                 <input
@@ -312,7 +315,7 @@ export function HomeView({
                 />
                 {form.photoPreview ? (
                   <div className="relative flex flex-col items-center gap-3 z-10">
-                    <div className="relative h-24 w-24 overflow-hidden rounded-lg border border-zinc-200">
+                    <div className="relative h-24 w-24 overflow-hidden rounded-lg border-[3px] border-black neo-shadow-sm">
                       <img src={form.photoPreview} alt="" className="h-full w-full object-cover" width={96} height={96} />
                       <button
                         type="button"
@@ -342,7 +345,7 @@ export function HomeView({
               </div>
             </div>
 
-            <div className="rounded-lg border border-zinc-200 p-5 flex items-center justify-between gap-4 bg-zinc-50/50">
+            <div className="rounded-lg border-[3px] border-black bg-amber-100 p-5 flex items-center justify-between gap-4 neo-shadow-sm">
               <div>
                 <span id="print-mode-label" className="text-sm font-medium text-zinc-800">Modo panfleto / QR Code</span>
                 <p className="text-xs text-zinc-500 mt-0.5 font-normal">Imagem inteira, ideal para impressão</p>
@@ -353,22 +356,22 @@ export function HomeView({
                 aria-checked={form.printMode}
                 aria-labelledby="print-mode-label"
                 onClick={() => onFieldChange("printMode", !form.printMode)}
-                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors duration-200 ${
-                  form.printMode ? "bg-amber-500" : "bg-zinc-200"
+                className={`relative inline-flex h-7 w-14 shrink-0 cursor-pointer rounded-lg border-[3px] border-black transition-all duration-150 neo-shadow-sm ${
+                  form.printMode ? "bg-lime-300" : "bg-white"
                 }`}
               >
                 <span
-                  className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition duration-200 mt-0.5 ${
-                    form.printMode ? "translate-x-5 ml-0.5" : "translate-x-0.5"
+                  className={`inline-block h-5 w-5 transform rounded-md border-2 border-black bg-amber-500 transition duration-150 mt-0.5 ${
+                    form.printMode ? "translate-x-7 ml-0.5" : "translate-x-0.5"
                   }`}
                 />
               </button>
             </div>
 
             {/* Prévia */}
-            <div className="bento-muted p-6 space-y-5">
-              <h3 className="label-field mb-0">Prévia</h3>
-              <div className="bento p-5 space-y-5 !shadow-none">
+            <div className="neo-card-muted p-6 space-y-5">
+              <h3 className="label-field mb-0">Prévia ao vivo</h3>
+              <div className="neo-card-white p-5 space-y-5 !shadow-[4px_4px_0_0_#000]">
                 <div className="bento-image !min-h-[200px] !max-h-[220px] max-w-[200px] mx-auto">
                   {form.photoPreview ? (
                     <AdImage
@@ -393,8 +396,8 @@ export function HomeView({
               </div>
             </div>
 
-            <button type="submit" id="btn-submit-generate" disabled={isSubmitting} className="btn-primary w-full min-h-[52px]">
-              {isSubmitting ? "Gerando anúncio…" : "Gerar anúncio grátis"}
+            <button type="submit" id="btn-submit-generate" disabled={isSubmitting} className="btn-primary">
+              {isSubmitting ? "Gerando…" : "⚡ Gerar anúncio grátis"}
             </button>
           </form>
         </div>

@@ -29,7 +29,7 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
   return (
     <motion.article
       key="ad-screen"
-      initial={{ opacity: 0, y: 4 }}
+      initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2 }}
@@ -40,7 +40,6 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
       <div className="bento-page">
         <AdSenseSlot slot="topo" ready={adsenseReady} />
 
-        {/* Bento: imagem */}
         <div className="bento-image">
           <AdImage
             src={ad.img}
@@ -52,19 +51,16 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
           />
         </div>
 
-        {/* Bento: título + preço */}
-        <div className="bento space-y-4">
+        <div className="neo-card space-y-4 neo-interactive cursor-default">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="chip-accent">Disponível</span>
-            {ad.billingType === "recorrente" && (
-              <span className="chip">Recorrente</span>
-            )}
+            <span className="chip !bg-black !text-amber-400">Disponível</span>
+            {ad.billingType === "recorrente" && <span className="chip">Recorrente</span>}
           </div>
-          <h1 className="text-display text-2xl sm:text-[1.75rem] leading-tight font-bold" itemProp="name">
+          <h1 className="text-display text-2xl sm:text-3xl leading-tight" itemProp="name">
             {ad.title}
           </h1>
           <p
-            className="text-price text-3xl sm:text-4xl font-extrabold min-h-[44px]"
+            className="text-price text-4xl sm:text-5xl min-h-[48px] bg-black text-amber-400 inline-block px-3 py-1 border-[3px] border-black neo-shadow-sm -rotate-1"
             itemProp="offers"
             itemScope
             itemType="https://schema.org/Offer"
@@ -74,31 +70,26 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
           </p>
         </div>
 
-        {/* Bento: descrição */}
-        <section className="bento bento-desc space-y-3">
+        <section className="neo-card-white bento-desc space-y-3">
           <h2 className="label-field mb-0">Descrição</h2>
-          <p
-            className="text-sm leading-relaxed whitespace-pre-wrap font-normal text-zinc-600"
-            itemProp="description"
-          >
+          <p className="text-sm leading-relaxed whitespace-pre-wrap font-medium text-black" itemProp="description">
             {ad.desc}
           </p>
         </section>
 
         <AdSenseSlot slot="meio" ready={adsenseReady} />
 
-        {/* Bento: pagamento — máximo destaque */}
         {(hasPayment || ad.phone) && (
-          <section className="bento bento-actions space-y-4" aria-label="Ações de contato e pagamento">
+          <section className="neo-card-white bento-actions space-y-4" aria-label="Ações de contato e pagamento">
             {hasPayment && (
               <>
-                <div className="space-y-1">
-                  <h2 className="text-sm font-semibold text-zinc-900 tracking-tight">Finalizar compra</h2>
-                  <p className="text-xs font-normal text-zinc-500">Escolha como deseja pagar</p>
+                <div className="rounded-lg border-[3px] border-black bg-amber-500 px-4 py-3 neo-shadow-sm">
+                  <h2 className="text-base font-black uppercase text-black">Finalizar compra</h2>
+                  <p className="text-xs font-bold text-black/70 mt-0.5">Escolha como pagar</p>
                 </div>
 
                 {ad.pix && ad.cardLink ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <button
                       type="button"
                       onClick={handleCopyPix}
@@ -106,7 +97,7 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
                       aria-live="polite"
                       className={pixBtnClass}
                     >
-                      {pixCopied ? "Pix copiado" : "Copiar chave Pix"}
+                      {pixCopied ? "✓ Pix copiado" : "Copiar chave Pix"}
                     </button>
                     <a
                       href={ad.cardLink}
@@ -126,7 +117,7 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
                     aria-live="polite"
                     className={pixBtnClass}
                   >
-                    {pixCopied ? "Chave Pix copiada" : "Copiar chave Pix"}
+                    {pixCopied ? "✓ Chave Pix copiada" : "Copiar chave Pix"}
                   </button>
                 ) : (
                   <a
@@ -152,13 +143,13 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
                 id="btn-wa-buyer-contact"
                 className="btn-whatsapp"
               >
-                Conversar no WhatsApp
+                WhatsApp com vendedor
               </a>
             )}
 
             {hasPayment && (
-              <p className="text-[11px] text-zinc-400 text-center font-normal leading-relaxed pt-1">
-                Transação direta entre comprador e vendedor. Sem intermediação.
+              <p className="text-[11px] font-bold text-zinc-600 text-center uppercase tracking-wide">
+                Pagamento direto · Sem intermediação
               </p>
             )}
           </section>
@@ -166,12 +157,10 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
 
         <AdSenseSlot slot="rodape" ready={adsenseReady} />
 
-        <aside className="bento-muted text-center space-y-4 py-8">
-          <h3 className="text-sm font-semibold text-zinc-900 tracking-tight">Anuncie em segundos</h3>
-          <p className="text-xs text-zinc-500 font-normal max-w-xs mx-auto leading-relaxed">
-            Grátis, sem cadastro. Pix e link compartilhável.
-          </p>
-          <button type="button" onClick={onCreateOwn} id="btn-buyer-create-own-ad" className="btn-accent">
+        <aside className="neo-card-muted text-center space-y-4 py-8">
+          <h3 className="text-base font-black uppercase text-black">Venda em segundos</h3>
+          <p className="text-sm font-bold text-black/70 max-w-xs mx-auto">Grátis. Sem cadastro. Só mostarda e raio.</p>
+          <button type="button" onClick={onCreateOwn} id="btn-buyer-create-own-ad" className="btn-accent text-base !py-4 !px-8">
             Criar meu anúncio
           </button>
         </aside>
