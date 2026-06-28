@@ -9,6 +9,8 @@ import { formatBRL, formatPhoneNumber, isValidPaymentUrl } from "../lib/formatte
 import { DEFAULT_CROP, type CropTransform } from "../lib/imageCrop";
 import { validateImageFile, ImageCompressorError, compressCroppedImage } from "../lib/imageCompressor";
 import { MAX_DESC_LENGTH, MAX_PIX_LENGTH, MAX_TITLE_LENGTH, SITE_NAME } from "../lib/constants";
+import { TOOLTIP_COPY } from "../lib/tooltipCopy";
+import { ActionButtonWithHint, FieldLabelWithHint } from "./HelpTooltip";
 
 interface HomeViewProps {
   form: AdFormState;
@@ -196,9 +198,9 @@ export function HomeView({
 
             <div>
               <div className="flex justify-between items-center mb-2">
-                <label htmlFor="title-input" className="label-field mb-0">
+                <FieldLabelWithHint htmlFor="title-input" hint={TOOLTIP_COPY.title}>
                   Título <span className="text-red-500">*</span>
-                </label>
+                </FieldLabelWithHint>
                 <span className="text-[11px] text-zinc-400 tabular-nums" aria-live="polite">
                   {form.title.length}/{MAX_TITLE_LENGTH}
                 </span>
@@ -217,9 +219,9 @@ export function HomeView({
             </div>
 
             <div>
-              <label htmlFor="price-input" className="label-field">
+              <FieldLabelWithHint htmlFor="price-input" hint={TOOLTIP_COPY.price} className="mb-2">
                 {getPriceLabel()} <span className="text-red-500">*</span>
-              </label>
+              </FieldLabelWithHint>
               <input
                 type="text"
                 id="price-input"
@@ -234,9 +236,9 @@ export function HomeView({
 
             <div>
               <div className="flex justify-between items-center mb-2">
-                <label htmlFor="desc-input" className="label-field mb-0">
+                <FieldLabelWithHint htmlFor="desc-input" hint={TOOLTIP_COPY.description}>
                   Descrição <span className="text-red-500">*</span>
-                </label>
+                </FieldLabelWithHint>
                 <span className="text-[11px] text-zinc-400 tabular-nums">
                   {form.description.length}/{MAX_DESC_LENGTH}
                 </span>
@@ -268,7 +270,9 @@ export function HomeView({
 
             <div>
               <div className="flex justify-between items-center mb-2">
-                <label htmlFor="pix-input" className="label-field mb-0">Pix copia e cola (opcional)</label>
+                <FieldLabelWithHint htmlFor="pix-input" hint={TOOLTIP_COPY.pix}>
+                  Pix copia e cola (opcional)
+                </FieldLabelWithHint>
                 <span className="text-[11px] text-zinc-400 tabular-nums">{form.pix.length}/{MAX_PIX_LENGTH}</span>
               </div>
               <textarea
@@ -295,7 +299,9 @@ export function HomeView({
             </div>
 
             <div>
-              <label htmlFor="photo-upload-input" className="label-field">Foto (opcional)</label>
+              <FieldLabelWithHint htmlFor="photo-upload-input" hint={TOOLTIP_COPY.photo} className="mb-2">
+                Foto (opcional)
+              </FieldLabelWithHint>
               {form.imageError && (
                 <p role="alert" className="mb-3 text-xs font-medium text-red-600">{form.imageError.message}</p>
               )}
@@ -413,9 +419,16 @@ export function HomeView({
               </div>
             </div>
 
-            <button type="submit" id="btn-submit-generate" disabled={isSubmitting} className="btn-primary">
+            <ActionButtonWithHint
+              hint={TOOLTIP_COPY.generateAd}
+              hintVariant="on-dark"
+              type="submit"
+              id="btn-submit-generate"
+              disabled={isSubmitting}
+              className="btn-primary"
+            >
               {isSubmitting ? "Gerando…" : "⚡ Gerar anúncio grátis"}
-            </button>
+            </ActionButtonWithHint>
           </form>
         </div>
       </div>

@@ -3,7 +3,9 @@ import { Download } from "lucide-react";
 import { QRCodeCanvas } from "qrcode.react";
 import type { AdData } from "../types/ad";
 import { isQrUrlSafe } from "../lib/qrShareUrl";
+import { TOOLTIP_COPY } from "../lib/tooltipCopy";
 import { downloadBlob, renderSocialCard, slugifyFilename } from "../lib/socialCardRenderer";
+import { ActionButtonWithHint } from "./HelpTooltip";
 
 const TYPE_LABEL: Record<AdData["t"], string> = {
   venda: "Venda",
@@ -15,12 +17,14 @@ interface AdSocialCardDownloadProps {
   ad: AdData;
   qrUrl: string;
   triggerClassName?: string;
+  hintVariant?: "default" | "on-dark";
 }
 
 export function AdSocialCardDownload({
   ad,
   qrUrl,
   triggerClassName = "btn-share-card",
+  hintVariant = "default",
 }: AdSocialCardDownloadProps) {
   const qrRef = useRef<HTMLCanvasElement>(null);
   const [generating, setGenerating] = useState(false);
@@ -74,8 +78,9 @@ export function AdSocialCardDownload({
         </div>
       )}
 
-      <button
-        type="button"
+      <ActionButtonWithHint
+        hint={TOOLTIP_COPY.socialCard}
+        hintVariant={hintVariant}
         onClick={handleDownload}
         disabled={generating || !qrSafe}
         id="btn-download-social-card"
@@ -84,7 +89,7 @@ export function AdSocialCardDownload({
       >
         <Download className="h-5 w-5 shrink-0" strokeWidth={2} aria-hidden="true" />
         {generating ? "Gerando card…" : "Baixar Card para Postagem"}
-      </button>
+      </ActionButtonWithHint>
 
       {error && (
         <p role="alert" className="text-xs font-medium text-red-600 text-center">

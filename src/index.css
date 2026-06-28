@@ -487,6 +487,79 @@
   cursor: not-allowed;
 }
 
+/* ——— Tooltips de instrução (a11y) ——— */
+.help-tooltip__trigger {
+  @apply inline-flex h-5 w-5 items-center justify-center rounded-full border border-zinc-900 bg-amber-200/90 text-[11px] font-black leading-none text-zinc-900 cursor-help;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+.help-tooltip__trigger:hover,
+.help-tooltip__trigger:focus-visible {
+  @apply bg-amber-400 outline-none;
+  transform: scale(1.05);
+}
+
+.help-tooltip__trigger--on-dark {
+  @apply border-white/80 bg-amber-400/95 text-zinc-900;
+}
+
+.help-tooltip__bubble {
+  @apply absolute z-50 w-[min(16rem,calc(100vw-2.5rem))] rounded-lg border border-zinc-900 bg-white px-3 py-2.5 text-left text-xs font-medium leading-snug text-zinc-800 shadow-[3px_3px_0_0_#18181b];
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.12s ease, visibility 0.12s ease;
+}
+
+.help-tooltip__bubble--top {
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.help-tooltip__bubble--bottom {
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.help-tooltip__bubble--on-dark {
+  @apply border-zinc-700 bg-zinc-900 text-zinc-100 shadow-lg;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .help-tooltip:hover .help-tooltip__bubble,
+  .help-tooltip:focus-within .help-tooltip__bubble {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+.help-tooltip--open .help-tooltip__bubble {
+  opacity: 1;
+  visibility: visible;
+}
+
+.action-btn-hint__icon {
+  @apply absolute top-2 right-2 z-10;
+  pointer-events: auto;
+}
+
+.action-btn-hint__icon .help-tooltip__bubble--top {
+  right: 0;
+  left: auto;
+  transform: none;
+}
+
+@media (max-width: 640px) {
+  .action-btn-hint__icon .help-tooltip__bubble {
+    right: 0;
+    left: auto;
+    transform: none;
+    width: min(14rem, calc(100vw - 3rem));
+  }
+}
+
 /* ——— Editor de recorte (Home) ——— */
 .crop-editor__zoom-btn {
   @apply flex h-9 w-9 shrink-0 items-center justify-center rounded-md border-2 border-zinc-900 bg-white shadow-[2px_2px_0_0_#18181b] disabled:opacity-40;

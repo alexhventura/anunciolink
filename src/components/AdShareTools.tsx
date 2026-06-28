@@ -51,11 +51,13 @@ export function AdShareTools({ ad, variant = "checkout" }: AdShareToolsProps) {
           ad={ad}
           qrUrl={qrUrl}
           triggerClassName={isCheckout ? "btn-share-print-soft" : "btn-share-print"}
+          hintVariant={isCheckout ? "default" : "on-dark"}
         />
         <AdSocialCardDownload
           ad={ad}
           qrUrl={qrUrl}
           triggerClassName={isCheckout ? "btn-share-card-soft" : "btn-share-card"}
+          hintVariant={isCheckout ? "on-dark" : "default"}
         />
       </div>
     </section>

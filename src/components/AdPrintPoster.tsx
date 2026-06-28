@@ -2,7 +2,9 @@ import { Printer } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import type { AdData } from "../types/ad";
 import { isQrUrlSafe } from "../lib/qrShareUrl";
+import { TOOLTIP_COPY } from "../lib/tooltipCopy";
 import { BrandMark } from "./BrandMark";
+import { ActionButtonWithHint } from "./HelpTooltip";
 import { SITE_DOMAIN } from "../lib/constants";
 
 const TYPE_LABEL: Record<AdData["t"], string> = {
@@ -15,9 +17,15 @@ interface AdPrintPosterProps {
   ad: AdData;
   qrUrl: string;
   triggerClassName?: string;
+  hintVariant?: "default" | "on-dark";
 }
 
-export function AdPrintPoster({ ad, qrUrl, triggerClassName = "btn-share-print" }: AdPrintPosterProps) {
+export function AdPrintPoster({
+  ad,
+  qrUrl,
+  triggerClassName = "btn-share-print",
+  hintVariant = "on-dark",
+}: AdPrintPosterProps) {
   const priceLabel = ad.price + (ad.billingType === "recorrente" ? " /mês" : "");
   const qrSafe = isQrUrlSafe(qrUrl);
 
@@ -29,8 +37,9 @@ export function AdPrintPoster({ ad, qrUrl, triggerClassName = "btn-share-print" 
 
   return (
     <>
-      <button
-        type="button"
+      <ActionButtonWithHint
+        hint={TOOLTIP_COPY.printPoster}
+        hintVariant={hintVariant}
         onClick={handlePrint}
         id="btn-print-a4-poster"
         className={triggerClassName}
@@ -38,7 +47,7 @@ export function AdPrintPoster({ ad, qrUrl, triggerClassName = "btn-share-print" 
       >
         <Printer className="h-5 w-5 shrink-0" strokeWidth={2} aria-hidden="true" />
         Gerar Cartaz para Imprimir (A4)
-      </button>
+      </ActionButtonWithHint>
 
       {qrSafe && (
         <div className="a4-poster" aria-hidden="true">
