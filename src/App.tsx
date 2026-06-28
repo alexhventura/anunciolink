@@ -94,7 +94,7 @@ export default function App() {
     <div className="min-h-screen bg-zinc-50 font-sans selection:bg-amber-100 selection:text-zinc-950 antialiased">
       <Header showNewAdButton={currentView !== "home"} onResetHome={handleResetHome} />
 
-      <main className="mx-auto max-w-4xl px-4 py-8 md:py-12">
+      <main className="mx-auto max-w-3xl px-5 py-10 md:py-16">
         <AnimatePresence mode="wait">
           {currentView === "home" && (
             <HomeView

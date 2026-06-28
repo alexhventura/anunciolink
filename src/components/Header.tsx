@@ -7,31 +7,26 @@ interface HeaderProps {
 
 export function Header({ showNewAdButton, onResetHome }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-40 border-b border-zinc-100/80 bg-white/95 px-6 py-4 backdrop-blur-md shadow-soft-premium no-print">
-      <div className="mx-auto flex max-w-4xl items-center justify-between">
+    <header className="sticky top-0 z-40 border-b border-zinc-200/80 bg-white/90 px-6 py-4 backdrop-blur-sm no-print">
+      <div className="mx-auto flex max-w-3xl items-center justify-between">
         <button
           type="button"
           onClick={onResetHome}
-          className="flex cursor-pointer items-center gap-2 group select-none border-0 bg-transparent p-0"
+          className="flex cursor-pointer items-center gap-2.5 border-0 bg-transparent p-0"
           aria-label={`${SITE_NAME} — voltar ao início`}
         >
-          <span className="text-2xl transition-transform group-hover:scale-110 duration-300" aria-hidden="true">
-            ⚡
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500 text-sm font-bold text-zinc-950">
+            A
           </span>
-          <span className="font-display text-xl font-extrabold tracking-tight text-zinc-950">
+          <span className="font-display text-lg font-bold tracking-tight text-zinc-950">
             anuncio<span className="text-amber-600">link</span>
-            <span className="text-zinc-400 font-medium text-xs">.{SITE_DOMAIN.replace("www.", "")}</span>
+            <span className="text-zinc-400 font-normal text-xs ml-0.5">.{SITE_DOMAIN.replace("www.", "")}</span>
           </span>
         </button>
 
         {showNewAdButton && (
-          <button
-            type="button"
-            onClick={onResetHome}
-            id="btn-create-new-header"
-            className="cursor-pointer inline-flex items-center gap-1.5 rounded-full border border-zinc-100 bg-amber-500 px-4 py-2 text-xs font-bold text-zinc-950 hover:bg-amber-400 transition-all active:scale-95 shadow-soft-premium"
-          >
-            ➕ Novo Anúncio
+          <button type="button" onClick={onResetHome} id="btn-create-new-header" className="btn-accent text-xs">
+            Novo anúncio
           </button>
         )}
       </div>

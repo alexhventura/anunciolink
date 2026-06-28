@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap");
 @import "tailwindcss";
 
 @theme {
@@ -9,53 +9,99 @@
 
 @layer base {
   body {
-    @apply font-sans bg-zinc-50 text-slate-800 antialiased selection:bg-amber-100 selection:text-slate-900;
+    @apply font-sans bg-zinc-50 text-zinc-700 antialiased selection:bg-amber-100 selection:text-zinc-900;
+    letter-spacing: -0.01em;
   }
 
   img {
     max-width: 100%;
     height: auto;
   }
+
+  h1, h2, h3 {
+    letter-spacing: -0.02em;
+  }
+}
+
+/* Superfícies */
+@utility card {
+  @apply rounded-xl border border-zinc-200/90 bg-white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+@utility card-muted {
+  @apply rounded-xl border border-zinc-200/80 bg-zinc-50/80;
 }
 
 @utility shadow-soft-premium {
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(0, 0, 0, 0.03);
-}
-
-@utility shadow-inner-soft {
-  box-shadow: inset 0 2px 10px 0 rgba(0, 0, 0, 0.04);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 24px rgba(0, 0, 0, 0.03);
 }
 
 @utility shadow-soft-green {
-  box-shadow: 0 15px 30px -10px rgba(37, 211, 102, 0.4);
+  box-shadow: 0 2px 12px rgba(37, 211, 102, 0.2);
 }
 
-/* AdSense — slots com altura reservada para zerar CLS */
+/* Formulário */
+@utility label-field {
+  @apply block text-xs font-medium uppercase text-zinc-500 mb-2.5;
+  letter-spacing: 0.05em;
+}
+
+@utility input-field {
+  @apply w-full rounded-lg border border-zinc-200 bg-zinc-100/60 px-4 py-3.5 text-sm font-medium text-zinc-900 transition-all duration-200;
+  letter-spacing: -0.01em;
+  @apply placeholder:text-zinc-400 placeholder:font-normal;
+  @apply focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/12;
+}
+
+/* Botões */
+@utility btn-primary {
+  @apply inline-flex items-center justify-center rounded-lg bg-zinc-950 px-6 py-3.5 text-sm font-semibold text-white transition-all duration-200;
+  @apply hover:bg-zinc-800 active:scale-[0.99] disabled:opacity-50 disabled:pointer-events-none;
+}
+
+@utility btn-accent {
+  @apply inline-flex items-center justify-center rounded-lg bg-amber-500 px-5 py-2.5 text-sm font-semibold text-zinc-950 transition-all duration-200;
+  @apply hover:bg-amber-400 active:scale-[0.99];
+}
+
+@utility btn-ghost {
+  @apply inline-flex items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 py-2.5 text-sm font-medium text-zinc-800 transition-all duration-200;
+  @apply hover:bg-zinc-50 hover:border-zinc-300;
+}
+
+@utility btn-whatsapp {
+  @apply flex w-full items-center justify-center rounded-lg bg-[#25D366] py-4 px-6 text-sm font-semibold text-white transition-all duration-200 min-h-[52px];
+  @apply hover:bg-[#20bd5c] active:scale-[0.99];
+}
+
+@utility btn-payment-pix {
+  @apply flex items-center justify-center rounded-lg border border-zinc-200 bg-white py-4 px-5 text-sm font-semibold text-zinc-900 transition-all duration-200 min-h-[52px];
+  @apply hover:border-amber-400 hover:bg-amber-50/40 active:scale-[0.99];
+}
+
+@utility btn-payment-card {
+  @apply flex items-center justify-center rounded-lg bg-zinc-950 py-4 px-5 text-sm font-semibold text-white transition-all duration-200 min-h-[52px];
+  @apply hover:bg-zinc-800 active:scale-[0.99];
+}
+
+@utility chip {
+  @apply inline-flex items-center rounded-md bg-amber-50 px-2.5 py-1 text-[11px] font-medium text-amber-900 border border-amber-100/80;
+}
+
+/* AdSense — CLS */
 .adsense-slot {
   contain: layout style;
   width: 100%;
 }
 
-.adsense-slot--topo {
-  min-height: 90px;
-}
-
-.adsense-slot--meio {
-  min-height: 280px;
-}
-
-.adsense-slot--rodape {
-  min-height: 250px;
-}
+.adsense-slot--topo { min-height: 90px; }
+.adsense-slot--meio { min-height: 280px; }
+.adsense-slot--rodape { min-height: 250px; }
 
 .adsense-slot__placeholder {
   min-height: inherit;
   width: 100%;
-}
-
-/* Página do anúncio — blocos com dimensões estáveis */
-.ad-card__header {
-  min-height: 72px;
 }
 
 .ad-card__image {
@@ -63,26 +109,14 @@
   min-height: 280px;
 }
 
-.ad-card__body {
-  min-height: 180px;
-}
-
-.ad-actions {
-  min-height: 80px;
-}
+.ad-card__body { min-height: 160px; }
+.ad-actions { min-height: 80px; }
 
 @media print {
-  body {
-    background: white !important;
-    color: black !important;
-  }
-
-  .no-print {
-    display: none !important;
-  }
-
+  body { background: white !important; color: black !important; }
+  .no-print { display: none !important; }
   .print-container {
-    border: 4px solid #d97706 !important;
+    border: 2px solid #d97706 !important;
     box-shadow: none !important;
     padding: 2rem !important;
     margin: 0 !important;
@@ -90,9 +124,5 @@
     max-width: 100% !important;
     page-break-inside: avoid;
   }
-
-  header,
-  footer {
-    display: none !important;
-  }
+  header, footer { display: none !important; }
 }
