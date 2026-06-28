@@ -110,17 +110,17 @@ export function HomeView({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2 }}
-      className="space-y-16"
+      className="space-y-20"
     >
       {/* Hero */}
-      <div className="text-center max-w-xl mx-auto space-y-6 px-2">
-        <span className="chip">Sem cadastro · Grátis</span>
-        <h1 className="font-display text-4xl sm:text-5xl font-bold text-zinc-950 leading-[1.1]">
-          Seu anúncio pronto em{" "}
+      <div className="text-center max-w-lg mx-auto space-y-5 px-2">
+        <span className="chip-accent">Sem cadastro · Grátis</span>
+        <h1 className="text-display text-4xl sm:text-[2.75rem] font-extrabold leading-[1.08]">
+          Anúncio pronto em{" "}
           <span className="text-amber-600">segundos</span>
         </h1>
-        <p className="text-base text-zinc-500 font-normal leading-relaxed max-w-md mx-auto">
-          Foto, preço e Pix em um link compartilhável. Rápido, direto e sem intermediação — {SITE_NAME}.
+        <p className="text-[15px] text-zinc-500 font-normal leading-relaxed max-w-md mx-auto">
+          Foto, preço e Pix em um link. Rápido e direto — {SITE_NAME}.
         </p>
       </div>
 
@@ -128,13 +128,13 @@ export function HomeView({
 
       {/* Formulário */}
       <div className="max-w-xl mx-auto w-full">
-        <div className="card p-8 md:p-10">
+        <div className="bento p-8 md:p-10">
           <header className="mb-10 pb-6 border-b border-zinc-100">
-            <h2 className="font-display text-xl font-bold text-zinc-950">Dados do anúncio</h2>
-            <p className="mt-2 text-sm text-zinc-500 font-normal">Campos com * são obrigatórios</p>
+            <h2 className="text-display text-lg font-bold">Novo anúncio</h2>
+            <p className="mt-1.5 text-sm text-zinc-500 font-normal">Campos com * são obrigatórios</p>
           </header>
 
-          <form onSubmit={handleSubmit} className="space-y-8" noValidate>
+          <form onSubmit={handleSubmit} className="space-y-9" noValidate>
             {form.submitError && (
               <div role="alert" className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-800">
                 {form.submitError}
@@ -366,10 +366,10 @@ export function HomeView({
             </div>
 
             {/* Prévia */}
-            <div className="card-muted p-6 space-y-5">
-              <h3 className="text-xs font-medium uppercase text-zinc-400 tracking-wide">Prévia</h3>
-              <div className="card p-5 space-y-5">
-                <div className="aspect-square w-full max-w-[200px] mx-auto rounded-lg overflow-hidden border border-zinc-200 bg-zinc-100 min-h-[200px]">
+            <div className="bento-muted p-6 space-y-5">
+              <h3 className="label-field mb-0">Prévia</h3>
+              <div className="bento p-5 space-y-5 !shadow-none">
+                <div className="bento-image !min-h-[200px] !max-h-[220px] max-w-[200px] mx-auto">
                   {form.photoPreview ? (
                     <AdImage
                       src={form.photoPreview}
@@ -383,11 +383,11 @@ export function HomeView({
                   )}
                 </div>
                 <div className="space-y-2 text-center sm:text-left">
-                  <p className="text-lg font-bold text-amber-600 min-h-[28px]">
+                  <p className="text-price text-xl font-bold min-h-[28px]">
                     {form.price || "—"}
                     {form.price && form.billingType === "recorrente" ? " /mês" : ""}
                   </p>
-                  <h4 className="font-display font-bold text-zinc-950 line-clamp-2">{form.title || "Título do anúncio"}</h4>
+                  <h4 className="text-display text-base font-bold line-clamp-2">{form.title || "Título do anúncio"}</h4>
                   <p className="text-sm text-zinc-500 line-clamp-3 font-normal">{form.description || "Descrição aparecerá aqui."}</p>
                 </div>
               </div>

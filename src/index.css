@@ -1,16 +1,17 @@
-@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap");
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Outfit", sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
 @layer base {
   body {
-    @apply font-sans bg-zinc-50 text-zinc-700 antialiased selection:bg-amber-100 selection:text-zinc-900;
-    letter-spacing: -0.01em;
+    @apply font-sans bg-zinc-50 text-zinc-600 antialiased selection:bg-amber-100 selection:text-zinc-900;
+    letter-spacing: -0.011em;
+    font-feature-settings: "cv11", "ss01";
   }
 
   img {
@@ -19,77 +20,113 @@
   }
 
   h1, h2, h3 {
-    letter-spacing: -0.02em;
+    @apply text-zinc-950;
+    letter-spacing: -0.025em;
   }
 }
 
-/* Superfícies */
+/* ——— Superfícies Bento ——— */
+@utility bento {
+  @apply rounded-xl border border-zinc-200 bg-white p-6;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+@utility bento-muted {
+  @apply rounded-xl border border-zinc-200/90 bg-zinc-50/70 p-6;
+}
+
 @utility card {
-  @apply rounded-xl border border-zinc-200/90 bg-white;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  @apply rounded-xl border border-zinc-200 bg-white;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
 }
 
 @utility card-muted {
-  @apply rounded-xl border border-zinc-200/80 bg-zinc-50/80;
+  @apply rounded-xl border border-zinc-200/90 bg-zinc-50/70;
 }
 
-@utility shadow-soft-premium {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 24px rgba(0, 0, 0, 0.03);
+/* ——— Tipografia ——— */
+@utility text-display {
+  @apply font-semibold text-zinc-950;
+  letter-spacing: -0.03em;
 }
 
-@utility shadow-soft-green {
-  box-shadow: 0 2px 12px rgba(37, 211, 102, 0.2);
+@utility text-price {
+  @apply font-bold text-amber-600 tabular-nums;
+  letter-spacing: -0.03em;
 }
 
-/* Formulário */
 @utility label-field {
-  @apply block text-xs font-medium uppercase text-zinc-500 mb-2.5;
-  letter-spacing: 0.05em;
+  @apply block text-[11px] font-medium uppercase text-zinc-500 mb-2;
+  letter-spacing: 0.06em;
 }
 
 @utility input-field {
-  @apply w-full rounded-lg border border-zinc-200 bg-zinc-100/60 px-4 py-3.5 text-sm font-medium text-zinc-900 transition-all duration-200;
+  @apply w-full rounded-lg border border-zinc-200 bg-zinc-100/50 px-4 py-3 text-sm font-normal text-zinc-900 transition-all duration-200;
   letter-spacing: -0.01em;
-  @apply placeholder:text-zinc-400 placeholder:font-normal;
-  @apply focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/12;
+  @apply placeholder:text-zinc-400;
+  @apply hover:border-zinc-300 hover:bg-zinc-100/80;
+  @apply focus:border-amber-500 focus:bg-white focus:outline-none focus:ring-[3px] focus:ring-amber-500/10;
 }
 
-/* Botões */
+/* ——— Botões ——— */
 @utility btn-primary {
-  @apply inline-flex items-center justify-center rounded-lg bg-zinc-950 px-6 py-3.5 text-sm font-semibold text-white transition-all duration-200;
-  @apply hover:bg-zinc-800 active:scale-[0.99] disabled:opacity-50 disabled:pointer-events-none;
+  @apply inline-flex items-center justify-center rounded-lg bg-zinc-950 px-6 py-3 text-sm font-semibold text-white transition-all duration-200;
+  letter-spacing: -0.01em;
+  @apply hover:bg-zinc-800 disabled:opacity-50 disabled:pointer-events-none;
 }
 
 @utility btn-accent {
   @apply inline-flex items-center justify-center rounded-lg bg-amber-500 px-5 py-2.5 text-sm font-semibold text-zinc-950 transition-all duration-200;
-  @apply hover:bg-amber-400 active:scale-[0.99];
+  @apply hover:bg-amber-400;
 }
 
 @utility btn-ghost {
-  @apply inline-flex items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 py-2.5 text-sm font-medium text-zinc-800 transition-all duration-200;
+  @apply inline-flex items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 py-2.5 text-sm font-medium text-zinc-700 transition-all duration-200;
   @apply hover:bg-zinc-50 hover:border-zinc-300;
 }
 
 @utility btn-whatsapp {
-  @apply flex w-full items-center justify-center rounded-lg bg-[#25D366] py-4 px-6 text-sm font-semibold text-white transition-all duration-200 min-h-[52px];
-  @apply hover:bg-[#20bd5c] active:scale-[0.99];
+  @apply flex w-full items-center justify-center rounded-lg border border-zinc-200 bg-white py-3.5 px-5 text-sm font-medium text-zinc-800 transition-all duration-200 min-h-[52px];
+  @apply hover:bg-zinc-50 hover:border-zinc-300;
 }
 
 @utility btn-payment-pix {
-  @apply flex items-center justify-center rounded-lg border border-zinc-200 bg-white py-4 px-5 text-sm font-semibold text-zinc-900 transition-all duration-200 min-h-[52px];
-  @apply hover:border-amber-400 hover:bg-amber-50/40 active:scale-[0.99];
+  @apply flex w-full items-center justify-center gap-2 rounded-lg bg-amber-500 py-4 px-5 text-sm font-semibold text-zinc-950 transition-all duration-200 min-h-[56px];
+  letter-spacing: -0.01em;
+  @apply hover:bg-amber-400;
+}
+
+@utility btn-payment-pix-copied {
+  @apply flex w-full items-center justify-center gap-2 rounded-lg border border-amber-300 bg-amber-50 py-4 px-5 text-sm font-semibold text-amber-900 transition-all duration-200 min-h-[56px];
 }
 
 @utility btn-payment-card {
-  @apply flex items-center justify-center rounded-lg bg-zinc-950 py-4 px-5 text-sm font-semibold text-white transition-all duration-200 min-h-[52px];
-  @apply hover:bg-zinc-800 active:scale-[0.99];
+  @apply flex w-full items-center justify-center gap-2 rounded-lg bg-zinc-950 py-4 px-5 text-sm font-semibold text-white transition-all duration-200 min-h-[56px];
+  letter-spacing: -0.01em;
+  @apply hover:bg-zinc-800;
 }
 
 @utility chip {
-  @apply inline-flex items-center rounded-md bg-amber-50 px-2.5 py-1 text-[11px] font-medium text-amber-900 border border-amber-100/80;
+  @apply inline-flex items-center rounded-md border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-[11px] font-medium text-zinc-600;
 }
 
-/* AdSense — CLS */
+@utility chip-accent {
+  @apply inline-flex items-center rounded-md border border-amber-200/80 bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-800;
+}
+
+/* ——— Layout página do anúncio (CLS) ——— */
+.bento-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .bento-page {
+    gap: 1.25rem;
+  }
+}
+
 .adsense-slot {
   contain: layout style;
   width: 100%;
@@ -104,13 +141,22 @@
   width: 100%;
 }
 
-.ad-card__image {
+.bento-image {
   aspect-ratio: 1 / 1;
-  min-height: 280px;
+  min-height: 300px;
+  max-height: 420px;
+  width: 100%;
+  overflow: hidden;
+  @apply rounded-xl border border-zinc-200 bg-zinc-100;
 }
 
-.ad-card__body { min-height: 160px; }
-.ad-actions { min-height: 80px; }
+.bento-desc {
+  min-height: 120px;
+}
+
+.bento-actions {
+  min-height: 88px;
+}
 
 @media print {
   body { background: white !important; color: black !important; }

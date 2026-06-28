@@ -52,13 +52,13 @@ export function SuccessView({
       transition={{ duration: 0.2 }}
       className="max-w-xl mx-auto space-y-10"
     >
-      <div className="card p-8 md:p-10 text-center space-y-8 no-print">
+      <div className="bento p-8 md:p-10 text-center space-y-8 no-print">
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-lg bg-amber-500 text-lg font-bold text-zinc-950">
           ✓
         </div>
 
         <div className="space-y-2">
-          <h2 className="font-display text-2xl font-bold text-zinc-950">Anúncio publicado</h2>
+          <h2 className="text-display text-2xl font-bold">Anúncio publicado</h2>
           <p className="text-sm text-zinc-500 font-normal max-w-sm mx-auto">
             Copie o link e compartilhe com seus compradores.
           </p>
@@ -128,7 +128,7 @@ export function SuccessView({
         </div>
       </div>
 
-      <div className="print-container card p-8 space-y-6 text-left border-amber-500/30">
+      <div className="print-container bento p-8 space-y-6 text-left">
         <div className="flex items-start justify-between border-b border-zinc-100 pb-5 gap-4">
           <div>
             <span className="chip mb-2">{typeLabel[form.adType]}</span>
@@ -183,8 +183,8 @@ export function SuccessView({
 
       <div className="no-print max-w-lg mx-auto space-y-6">
         <AdSenseSlot slot="topo" ready={adsenseReady} />
-        <div className="card overflow-hidden">
-          <div className="ad-card__image w-full bg-zinc-100">
+        <div className="card overflow-hidden border border-zinc-200">
+          <div className="bento-image !rounded-none !border-0 !min-h-[280px]">
             {form.photoPreview ? (
               <AdImage src={form.photoPreview} alt={form.title} type={form.adType} title={form.title} printMode={form.printMode} />
             ) : (

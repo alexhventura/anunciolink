@@ -28,10 +28,10 @@ export function MyAdsPanel({ onOpenAd }: MyAdsPanelProps) {
   };
 
   return (
-    <section className="max-w-2xl mx-auto w-full card p-8" aria-labelledby="my-ads-heading">
+    <section className="max-w-xl mx-auto w-full bento p-8" aria-labelledby="my-ads-heading">
       <div className="mb-6 flex items-end justify-between border-b border-zinc-100 pb-4">
         <div>
-          <h2 id="my-ads-heading" className="font-display text-lg font-bold text-zinc-950">
+          <h2 id="my-ads-heading" className="text-display text-base font-bold">
             Meus anúncios
           </h2>
           <p className="mt-1 text-xs text-zinc-500 font-normal">Salvos neste dispositivo</p>

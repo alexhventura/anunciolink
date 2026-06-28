@@ -7,25 +7,25 @@ interface HeaderProps {
 
 export function Header({ showNewAdButton, onResetHome }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-40 border-b border-zinc-200/80 bg-white/90 px-6 py-4 backdrop-blur-sm no-print">
-      <div className="mx-auto flex max-w-3xl items-center justify-between">
+    <header className="sticky top-0 z-40 border-b border-zinc-200 bg-white/80 px-5 py-3.5 backdrop-blur-md no-print">
+      <div className="mx-auto flex max-w-xl items-center justify-between">
         <button
           type="button"
           onClick={onResetHome}
-          className="flex cursor-pointer items-center gap-2.5 border-0 bg-transparent p-0"
+          className="flex items-center gap-2.5 border-0 bg-transparent p-0 cursor-pointer"
           aria-label={`${SITE_NAME} — voltar ao início`}
         >
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500 text-sm font-bold text-zinc-950">
+          <span className="flex h-7 w-7 items-center justify-center rounded-md bg-zinc-950 text-[11px] font-bold text-white">
             A
           </span>
-          <span className="font-display text-lg font-bold tracking-tight text-zinc-950">
+          <span className="text-[15px] font-semibold tracking-tight text-zinc-950">
             anuncio<span className="text-amber-600">link</span>
-            <span className="text-zinc-400 font-normal text-xs ml-0.5">.{SITE_DOMAIN.replace("www.", "")}</span>
+            <span className="text-zinc-400 font-normal text-xs">.{SITE_DOMAIN.replace("www.", "")}</span>
           </span>
         </button>
 
         {showNewAdButton && (
-          <button type="button" onClick={onResetHome} id="btn-create-new-header" className="btn-accent text-xs">
+          <button type="button" onClick={onResetHome} id="btn-create-new-header" className="btn-ghost text-xs !py-2">
             Novo anúncio
           </button>
         )}
