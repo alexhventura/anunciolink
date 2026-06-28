@@ -8,7 +8,7 @@ interface HeaderProps {
 
 export function Header({ onResetHome }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-40 border-b-[3px] border-black bg-amber-500 px-5 py-4 no-print">
+    <header className="site-header sticky top-0 z-40 px-5 py-4 no-print">
       <div className="mx-auto max-w-xl">
         <button
           type="button"
@@ -16,7 +16,7 @@ export function Header({ onResetHome }: HeaderProps) {
           className="flex items-center gap-2 border-0 bg-transparent p-0 cursor-pointer group"
           aria-label={`${SITE_NAME} — voltar ao início`}
         >
-          <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border-[3px] border-black bg-amber-400 neo-shadow-sm transition-transform duration-150 group-hover:translate-x-[2px] group-hover:translate-y-[2px] group-hover:shadow-[1px_1px_0_0_#000]">
+          <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-lg site-header__logo">
             <span className="font-black text-xl leading-none text-black select-none" aria-hidden="true">
               A
             </span>

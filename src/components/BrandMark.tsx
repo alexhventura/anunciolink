@@ -2,6 +2,7 @@ import { Zap } from "lucide-react";
 
 interface BrandMarkProps {
   size?: "sm" | "md" | "lg";
+  variant?: "bold" | "soft";
   className?: string;
 }
 
@@ -12,19 +13,25 @@ const sizes = {
 };
 
 /** Assinatura visual AnúncioLink — A com raio */
-export function BrandMark({ size = "md", className = "" }: BrandMarkProps) {
+export function BrandMark({ size = "md", variant = "bold", className = "" }: BrandMarkProps) {
   const s = sizes[size];
+  const isSoft = variant === "soft";
+
   return (
     <span
-      className={`relative inline-flex shrink-0 items-center justify-center rounded-md border-[3px] border-black bg-amber-400 ${s.box} ${className}`}
+      className={`relative inline-flex shrink-0 items-center justify-center rounded-md ${
+        isSoft
+          ? "border border-zinc-300 bg-white shadow-sm"
+          : "border-2 border-zinc-900 bg-amber-400 shadow-[2px_2px_0_0_#18181b]"
+      } ${s.box} ${className}`}
       aria-label="AnúncioLink"
     >
-      <span className={`font-black leading-none text-black select-none ${s.letter}`}>A</span>
+      <span className={`font-black leading-none text-zinc-900 select-none ${s.letter}`}>A</span>
       <Zap
         className={`absolute ${s.zap}`}
-        fill="#fbbf24"
-        stroke="#000"
-        strokeWidth={2.5}
+        fill="#f59e0b"
+        stroke={isSoft ? "#52525b" : "#18181b"}
+        strokeWidth={isSoft ? 2 : 2.5}
         aria-hidden="true"
       />
     </span>

@@ -36,6 +36,7 @@ export default function App() {
   const isAdView = currentView === "anuncio";
   const showAdsense = isAdView || currentView === "success";
   const { adsenseReady } = useAdSenseLoader(showAdsense);
+  const themeClass = isAdView ? "theme-checkout" : "theme-create";
 
   useDocumentMeta(decodedAd, isAdView);
 
@@ -86,7 +87,7 @@ export default function App() {
   );
 
   return (
-    <div className="min-h-screen bg-amber-50/40 font-sans antialiased">
+    <div className={`min-h-screen font-sans antialiased ${themeClass}`}>
       <Header showNewAdButton={currentView !== "home"} onResetHome={handleResetHome} />
 
       <main className="mx-auto max-w-xl px-5 py-12 md:py-16">

@@ -131,7 +131,7 @@ export function SuccessView({
             Compartilhar no WhatsApp
           </a>
 
-          <AdShareTools ad={adSnapshot} adUrl={generatedLink} />
+          <AdShareTools ad={adSnapshot} variant="create" />
         </div>
 
         <div className="flex flex-col sm:flex-row items-stretch justify-center gap-3 border-t-[3px] border-black pt-8">

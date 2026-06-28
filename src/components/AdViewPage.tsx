@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "motion/react";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, ShieldCheck } from "lucide-react";
 import type { AdData } from "../types/ad";
 import { AdSenseSlot } from "./AdSenseSlot";
 import { AdImage } from "./AdImage";
@@ -15,7 +15,6 @@ interface AdViewPageProps {
 
 export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
   const [pixCopied, setPixCopied] = useState(false);
-  const adUrl = window.location.href;
 
   const handleCopyPix = async () => {
     if (!ad.pix) return;
@@ -27,12 +26,12 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
   };
 
   const hasPayment = Boolean(ad.pix || ad.cardLink);
-  const pixBtnClass = pixCopied ? "btn-payment-pix-copied" : "btn-payment-pix";
+  const pixBtnClass = pixCopied ? "btn-checkout-pix-copied" : "btn-checkout-pix";
 
   return (
     <motion.article
       key="ad-screen"
-      initial={{ opacity: 0, y: 6 }}
+      initial={{ opacity: 0, y: 4 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2 }}
@@ -40,10 +39,10 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
       itemScope
       itemType="https://schema.org/Product"
     >
-      <div className="bento-page">
+      <div className="checkout-page">
         <AdSenseSlot slot="topo" ready={adsenseReady} />
 
-        <div className="bento-image">
+        <div className="checkout-image">
           <AdImage
             src={ad.img}
             alt={ad.title}
@@ -54,47 +53,55 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
           />
         </div>
 
-        <div className="neo-card space-y-4 neo-interactive cursor-default">
+        <div className="checkout-card space-y-4">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="chip !bg-black !text-amber-400">Disponível</span>
-            {ad.billingType === "recorrente" && <span className="chip">Recorrente</span>}
+            <span className="checkout-badge">Disponível</span>
+            {ad.billingType === "recorrente" && (
+              <span className="checkout-badge checkout-badge-muted">Recorrente</span>
+            )}
           </div>
-          <h1 className="text-display text-2xl sm:text-3xl leading-tight" itemProp="name">
+          <h1 className="text-xl sm:text-2xl font-semibold text-zinc-900 tracking-tight leading-snug" itemProp="name">
             {ad.title}
           </h1>
           <p
-            className="text-price text-4xl sm:text-5xl min-h-[48px] bg-black text-amber-400 inline-block px-3 py-1 border-[3px] border-black neo-shadow-sm -rotate-1"
+            className="checkout-price"
             itemProp="offers"
             itemScope
             itemType="https://schema.org/Offer"
           >
             <span itemProp="price">{ad.price}</span>
+            {ad.billingType === "recorrente" && (
+              <span className="text-lg font-semibold text-zinc-500"> /mês</span>
+            )}
             <meta itemProp="priceCurrency" content="BRL" />
           </p>
         </div>
 
-        <section className="neo-card-white bento-desc space-y-3">
-          <h2 className="label-field mb-0">Descrição</h2>
-          <p className="text-sm leading-relaxed whitespace-pre-wrap font-medium text-black" itemProp="description">
+        <section className="checkout-card space-y-3">
+          <h2 className="checkout-label">Descrição</h2>
+          <p className="text-sm leading-relaxed whitespace-pre-wrap text-zinc-600" itemProp="description">
             {ad.desc}
           </p>
         </section>
 
-        <AdShareTools ad={ad} adUrl={adUrl} />
+        <AdShareTools ad={ad} variant="checkout" />
 
         <AdSenseSlot slot="meio" ready={adsenseReady} />
 
         {(hasPayment || ad.phone) && (
-          <section className="neo-card-white bento-actions space-y-4" aria-label="Ações de contato e pagamento">
+          <section className="checkout-card space-y-4" aria-label="Pagamento seguro">
             {hasPayment && (
               <>
-                <div className="rounded-lg border-[3px] border-black bg-amber-500 px-4 py-3 neo-shadow-sm">
-                  <h2 className="text-base font-black uppercase text-black">Finalizar compra</h2>
-                  <p className="text-xs font-bold text-black/70 mt-0.5">Escolha como pagar</p>
+                <div className="flex items-start gap-3 pb-1">
+                  <ShieldCheck className="h-5 w-5 text-zinc-400 shrink-0 mt-0.5" strokeWidth={2} aria-hidden="true" />
+                  <div>
+                    <h2 className="text-sm font-semibold text-zinc-900 tracking-tight">Finalizar compra</h2>
+                    <p className="text-xs text-zinc-500 mt-0.5">Ambiente seguro · Pagamento direto ao vendedor</p>
+                  </div>
                 </div>
 
                 {ad.pix && ad.cardLink ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <button
                       type="button"
                       onClick={handleCopyPix}
@@ -109,7 +116,7 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
                       target="_blank"
                       rel="noopener noreferrer"
                       id="link-buyer-card-split"
-                      className="btn-payment-card"
+                      className="btn-checkout-card"
                     >
                       Pagar com cartão
                     </a>
@@ -130,7 +137,7 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
                     target="_blank"
                     rel="noopener noreferrer"
                     id="link-buyer-card-full"
-                    className="btn-payment-card"
+                    className="btn-checkout-card"
                   >
                     Pagar com cartão
                   </a>
@@ -146,16 +153,16 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
                 target="_blank"
                 rel="noopener noreferrer"
                 id="btn-wa-buyer-contact"
-                className="btn-whatsapp"
+                className="btn-checkout-whatsapp"
               >
-                <MessageCircle className="h-6 w-6 shrink-0" strokeWidth={2.5} aria-hidden="true" />
+                <MessageCircle className="h-5 w-5 shrink-0" strokeWidth={2} aria-hidden="true" />
                 WhatsApp com vendedor
               </a>
             )}
 
             {hasPayment && (
-              <p className="text-[11px] font-bold text-zinc-600 text-center uppercase tracking-wide">
-                Pagamento direto · Sem intermediação
+              <p className="text-[11px] text-zinc-400 text-center">
+                Transação direta entre comprador e vendedor
               </p>
             )}
           </section>
@@ -163,10 +170,10 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
 
         <AdSenseSlot slot="rodape" ready={adsenseReady} />
 
-        <aside className="neo-card-muted text-center space-y-4 py-8">
-          <h3 className="text-base font-black uppercase text-black">Venda em segundos</h3>
-          <p className="text-sm font-bold text-black/70 max-w-xs mx-auto">Grátis. Sem cadastro. Só mostarda e raio.</p>
-          <button type="button" onClick={onCreateOwn} id="btn-buyer-create-own-ad" className="btn-accent text-base !py-4 !px-8">
+        <aside className="checkout-card-muted text-center space-y-3 py-6">
+          <h3 className="text-sm font-semibold text-zinc-800">Anuncie em segundos</h3>
+          <p className="text-xs text-zinc-500 max-w-xs mx-auto">Grátis, sem cadastro.</p>
+          <button type="button" onClick={onCreateOwn} id="btn-buyer-create-own-ad" className="btn-checkout-ghost">
             Criar meu anúncio
           </button>
         </aside>
