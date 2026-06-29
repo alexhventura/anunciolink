@@ -9,6 +9,7 @@ import { ImageFallback } from "./ImageFallback";
 import { AdShareTools } from "./AdShareTools";
 import { AdBrandedSurface } from "./AdBrandedSurface";
 import { copyToClipboard } from "../lib/formatters";
+import { buildWhatsAppShareMessage, buildWhatsAppShareUrl } from "../lib/whatsappShare";
 
 interface SuccessViewProps {
   form: AdFormState;
@@ -37,8 +38,11 @@ export function SuccessView({
 }: SuccessViewProps) {
   const [linkCopied, setLinkCopied] = useState(false);
 
+  const shareMessage = buildWhatsAppShareMessage(form.title, form.price, generatedLink);
+  const whatsAppShareUrl = buildWhatsAppShareUrl(form.title, form.price, generatedLink);
+
   const handleCopyLink = async () => {
-    const ok = await copyToClipboard(generatedLink);
+    const ok = await copyToClipboard(shareMessage);
     if (ok) {
       setLinkCopied(true);
       window.setTimeout(() => setLinkCopied(false), 2500);
@@ -82,7 +86,7 @@ export function SuccessView({
             </h2>
           </div>
           <p className="text-sm font-bold text-black max-w-sm mx-auto">
-            Copie o link e compartilhe com seus compradores.
+            Compartilhe com a mensagem pronta — quem receber já verá título, preço e link.
           </p>
         </div>
 
@@ -107,15 +111,15 @@ export function SuccessView({
         <div className="space-y-6 text-left">
           <div>
             <label htmlFor="generated-link-input" className="label-field">
-              Link do anúncio
+              Mensagem para compartilhar
             </label>
             <div className="flex flex-col sm:flex-row items-stretch gap-3 rounded-lg border-[3px] border-black bg-amber-50 p-3 neo-shadow-sm">
-              <input
+              <textarea
                 id="generated-link-input"
-                type="text"
                 readOnly
-                value={generatedLink}
-                className="input-field !shadow-none flex-1 !py-2.5 text-xs font-mono truncate"
+                rows={4}
+                value={shareMessage}
+                className="input-field !shadow-none flex-1 !py-2.5 text-xs font-medium resize-none min-h-[96px]"
               />
               <button
                 type="button"
@@ -126,15 +130,13 @@ export function SuccessView({
                   linkCopied ? "btn-payment-pix-copied !min-h-[52px]" : "btn-accent !min-h-[52px]"
                 }`}
               >
-                {linkCopied ? "✓ Copiado" : "Copiar"}
+                {linkCopied ? "✓ Copiado" : "Copiar texto"}
               </button>
             </div>
           </div>
 
           <a
-            href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
-              `Veja meu anúncio "${form.title}" no Anuncio Link: ${generatedLink}`
-            )}`}
+            href={whatsAppShareUrl}
             target="_blank"
             rel="noopener noreferrer"
             id="btn-whatsapp-share-success"

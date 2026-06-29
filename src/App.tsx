@@ -38,7 +38,7 @@ export default function App() {
   const isAdView = currentView === "anuncio";
   const showAdsense = isAdView || currentView === "success";
   const { adsenseReady } = useAdSenseLoader(showAdsense);
-  const themeClass = isAdView ? "theme-checkout" : "theme-create";
+  const themeClass = "theme-create";
 
   useDocumentMeta(decodedAd, isAdView);
 
