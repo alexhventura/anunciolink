@@ -1,14 +1,10 @@
-import type { AdType } from "../types/ad";
+import type { AdType, AdThemeId } from "../types/ad";
 import { resolveAdIcon } from "./adIcons";
-import { loadExternalImageElement } from "./externalImageUrl";
-import { isExternalImageUrl, resolveRenderableImageSrc } from "./imageUtils";
+import { resolveAdTheme, type AdThemeDefinition } from "./adThemes";
 import { formatPhoneNumber } from "./formatters";
-import { DEFAULT_CROP, getCropSourceRect, loadImageElement } from "./imageCrop";
 
 const INK = "#18181b";
 const AMBER_500 = "#f59e0b";
-const AMBER_400 = "#fbbf24";
-const AMBER_100 = "#fef3c7";
 const WHITE = "#ffffff";
 
 const TYPE_LABEL: Record<AdType, string> = {
@@ -17,13 +13,29 @@ const TYPE_LABEL: Record<AdType, string> = {
   vaquinha: "Vaquinha",
 };
 
+const THEME_GRADIENT: Record<AdThemeId, [string, string]> = {
+  amber: ["#fbbf24", "#fffbeb"],
+  midnight: ["#0f172a", "#334155"],
+  sunset: ["#ea580c", "#fb923c"],
+  purple: ["#7c3aed", "#c084fc"],
+  minimal: ["#d4d4d8", "#fafafa"],
+};
+
+const THEME_HERO_TEXT: Record<AdThemeId, string> = {
+  amber: INK,
+  midnight: "#ffffff",
+  sunset: "#ffffff",
+  purple: "#ffffff",
+  minimal: INK,
+};
+
 export interface PreviewCardCanvasInput {
   adType: AdType;
   title: string;
   price: string;
   description: string;
   icon?: string;
-  imageSrc?: string;
+  theme?: AdThemeId;
   billingRecorrente?: boolean;
   phone?: string;
   width?: number;
@@ -78,90 +90,72 @@ function wrapParagraph(
   return cy;
 }
 
-function drawEmojiIcon(
+function drawBentoHero(
   ctx: CanvasRenderingContext2D,
-  emoji: string,
   x: number,
   y: number,
-  size: number
+  w: number,
+  h: number,
+  theme: AdThemeDefinition,
+  themeId: AdThemeId,
+  emoji: string,
+  title: string,
+  priceLabel: string
 ) {
-  drawRect(ctx, x, y, size, size);
-  const gradient = ctx.createLinearGradient(x, y, x + size, y + size);
-  gradient.addColorStop(0, AMBER_100);
-  gradient.addColorStop(1, WHITE);
+  const [c1, c2] = THEME_GRADIENT[themeId];
+  const gradient = ctx.createLinearGradient(x, y, x + w, y + h);
+  gradient.addColorStop(0, c1);
+  gradient.addColorStop(1, c2);
   ctx.fillStyle = gradient;
-  ctx.fillRect(x + 3, y + 3, size - 6, size - 6);
+  ctx.fillRect(x, y, w, h);
+  ctx.strokeStyle = INK;
+  ctx.lineWidth = 3;
+  ctx.strokeRect(x + 1.5, y + 1.5, w - 3, h - 3);
 
-  ctx.font = `${Math.round(size * 0.48)}px "Apple Color Emoji", "Segoe UI Emoji", sans-serif`;
+  ctx.font = `${Math.round(w * 0.2)}px "Apple Color Emoji", "Segoe UI Emoji", sans-serif`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillText(emoji, x + size / 2, y + size / 2 + 4);
+  ctx.fillText(emoji, x + w / 2, y + h * 0.38);
+
+  const textColor = THEME_HERO_TEXT[themeId];
+  ctx.fillStyle = textColor;
+  ctx.font = "900 28px system-ui, sans-serif";
+  ctx.textBaseline = "top";
+  wrapParagraph(ctx, title || "Título", x + 24, y + h * 0.58, w - 48, 34, 2);
+
+  ctx.font = "900 26px system-ui, sans-serif";
+  ctx.fillText(priceLabel || "—", x + 24, y + h - 56);
 }
 
-async function drawHeroVisual(
-  ctx: CanvasRenderingContext2D,
-  input: PreviewCardCanvasInput,
-  x: number,
-  y: number,
-  size: number
-) {
-  const resolved = resolveRenderableImageSrc(input.imageSrc);
-  if (resolved) {
-    drawRect(ctx, x, y, size, size);
-    ctx.save();
-    ctx.beginPath();
-    ctx.rect(x + 3, y + 3, size - 6, size - 6);
-    ctx.clip();
-    try {
-      const img = isExternalImageUrl(resolved)
-        ? await loadExternalImageElement(resolved)
-        : await loadImageElement(resolved);
-      const { srcX, srcY, srcSize } = getCropSourceRect(img, DEFAULT_CROP, 150);
-      ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = "high";
-      ctx.drawImage(img, srcX, srcY, srcSize, srcSize, x + 3, y + 3, size - 6, size - 6);
-      ctx.restore();
-      return;
-    } catch {
-      ctx.restore();
-    }
-  }
-  drawEmojiIcon(ctx, resolveAdIcon(input.icon, input.adType), x, y, size);
-}
-
-/** Renderiza o card idêntico ao AdPreviewCard (neo-brutalist) em canvas */
+/** Renderiza card Bento idêntico ao AdPreviewCard em canvas */
 export async function renderPreviewCardCanvas(input: PreviewCardCanvasInput): Promise<HTMLCanvasElement> {
   const canvasW = input.width ?? 1080;
   const pad = 48;
   const cardW = canvasW - pad * 2;
-  const iconSize = Math.round(Math.min(220, cardW * 0.38));
   const innerPad = 36;
   const contentW = cardW - innerPad * 2;
 
+  const themeId = input.theme ?? "amber";
+  const themeDef = resolveAdTheme(themeId);
+  const emoji = resolveAdIcon(input.icon, input.adType);
   const priceLabel = input.price + (input.billingRecorrente ? " /mês" : "");
   const typeLabel = TYPE_LABEL[input.adType].toUpperCase();
   const phoneDisplay = input.phone ? formatPhoneNumber(input.phone) : "";
 
   const measureCanvas = document.createElement("canvas");
   const mctx = measureCanvas.getContext("2d")!;
-
-  mctx.font = "900 30px system-ui, sans-serif";
-  const titleLines = Math.min(4, Math.ceil(mctx.measureText(input.title || "Título").width / contentW) + 1);
-
   mctx.font = "500 17px system-ui, sans-serif";
   const descLineCount = Math.min(
     14,
     Math.max(2, Math.ceil((input.description || "").length / Math.max(1, Math.floor(contentW / 9))))
   );
 
-  const heroH = innerPad + iconSize + innerPad;
+  const heroH = 320;
   const chipH = 34;
-  const titleH = titleLines * 36;
-  const priceH = 56;
   const descH = descLineCount * 24 + 16;
-  const bodyH = innerPad + chipH + 14 + titleH + 16 + priceH + 16 + descH + innerPad;
+  const bodyH = innerPad + chipH + 14 + descH + innerPad;
   const footerH = input.qrCanvas ? (phoneDisplay ? 220 : 190) : phoneDisplay ? 56 : 0;
-  const canvasH = pad + heroH + 3 + bodyH + footerH + pad;
+  const canvasH = pad + heroH + bodyH + footerH + pad;
 
   const canvas = document.createElement("canvas");
   canvas.width = canvasW;
@@ -173,7 +167,7 @@ export async function renderPreviewCardCanvas(input: PreviewCardCanvasInput): Pr
 
   let y = pad;
   const cardX = pad;
-  const cardH = heroH + 3 + bodyH + footerH;
+  const cardH = heroH + bodyH + footerH;
 
   ctx.fillStyle = WHITE;
   ctx.shadowColor = INK;
@@ -185,15 +179,9 @@ export async function renderPreviewCardCanvas(input: PreviewCardCanvasInput): Pr
   ctx.lineWidth = 3;
   ctx.strokeRect(cardX, y, cardW, cardH);
 
-  const iconX = cardX + (cardW - iconSize) / 2;
-  const iconY = y + innerPad;
-  await drawHeroVisual(ctx, input, iconX, iconY, iconSize);
+  drawBentoHero(ctx, cardX, y, cardW, heroH, themeDef, themeId, emoji, input.title, priceLabel);
 
   y += heroH;
-  ctx.fillStyle = INK;
-  ctx.fillRect(cardX, y, cardW, 3);
-
-  y += 3;
   ctx.fillStyle = AMBER_500;
   ctx.fillRect(cardX + 3, y, cardW - 6, bodyH - 3);
 
@@ -204,30 +192,15 @@ export async function renderPreviewCardCanvas(input: PreviewCardCanvasInput): Pr
   ctx.font = "800 13px system-ui, sans-serif";
   const chipW = ctx.measureText(typeLabel).width + 28;
   ctx.fillRect(cx, cy, chipW, chipH);
-  ctx.fillStyle = AMBER_400;
+  ctx.fillStyle = "#fbbf24";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText(typeLabel, cx + chipW / 2, cy + chipH / 2);
 
   cy += chipH + 14;
-  ctx.fillStyle = INK;
-  ctx.font = "900 30px system-ui, sans-serif";
-  ctx.textAlign = "left";
-  ctx.textBaseline = "top";
-  wrapParagraph(ctx, input.title || "Título do anúncio", cx, cy, contentW, 36, 4);
-
-  cy += titleH + 8;
-  ctx.font = "900 28px system-ui, sans-serif";
-  const priceTextW = Math.min(ctx.measureText(priceLabel || "—").width + 36, contentW);
-  ctx.fillStyle = WHITE;
-  drawRect(ctx, cx, cy, priceTextW, priceH);
-  ctx.fillStyle = INK;
-  ctx.textBaseline = "middle";
-  ctx.fillText(priceLabel || "—", cx + 18, cy + priceH / 2);
-
-  cy += priceH + 16;
   ctx.font = "500 17px system-ui, sans-serif";
   ctx.fillStyle = "rgba(24,24,27,0.85)";
+  ctx.textAlign = "left";
   ctx.textBaseline = "top";
   wrapParagraph(ctx, input.description || "Descrição aparecerá aqui.", cx, cy, contentW, 24, descLineCount);
 

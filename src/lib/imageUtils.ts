@@ -1,40 +1,4 @@
-import {
-  decodeExternalImageUrl,
-  encodeExternalImageUrl,
-  isEmbeddedImageData,
-  isExternalImageUrl,
-  normalizeExternalImageUrl,
-} from "./externalImageUrl";
-
-const DATA_URL_IMAGE = /^data:image\/(jpeg|jpg|png|webp|gif|bmp|heic|heif|x-ms-bmp|avif);/i;
-
-/** Verifica se a string é uma URL de imagem suportada para renderização */
-export function isRenderableImageSrc(src: string): boolean {
-  if (!src?.trim()) return false;
-  const trimmed = src.trim();
-  if (DATA_URL_IMAGE.test(trimmed)) return true;
-  if (trimmed.startsWith("blob:")) return true;
-  if (trimmed.startsWith("w:") || trimmed.startsWith("j:") || trimmed.startsWith("u:")) return true;
-  if (isExternalImageUrl(trimmed)) return Boolean(normalizeExternalImageUrl(trimmed));
-  return false;
-}
-
-export function resolveRenderableImageSrc(src: string | undefined): string | undefined {
-  if (!src?.trim()) return undefined;
-  const trimmed = src.trim();
-  if (trimmed.startsWith("u:")) {
-    return decodeExternalImageUrl(trimmed) ?? undefined;
-  }
-  if (isExternalImageUrl(trimmed)) {
-    return normalizeExternalImageUrl(trimmed);
-  }
-  if (DATA_URL_IMAGE.test(trimmed) || trimmed.startsWith("blob:")) return trimmed;
-  if (trimmed.startsWith("w:") || trimmed.startsWith("j:")) return trimmed;
-  if (trimmed.startsWith("data:image/")) return trimmed;
-  return undefined;
-}
-
-export { isEmbeddedImageData, isExternalImageUrl };
+/** Helpers legados para wire de imagem embutida (anúncios antigos) */
 
 const ALLOWED_IMAGE_MIME = new Set([
   "image/jpeg",
@@ -52,9 +16,19 @@ export function isAllowedImageFile(file: File): boolean {
   return /\.(jpe?g|png|webp|gif|bmp|heic|heif)$/i.test(file.name);
 }
 
+export function isEmbeddedImageData(value: string): boolean {
+  if (!value?.trim()) return false;
+  return (
+    value.startsWith("data:image/") ||
+    value.startsWith("w:") ||
+    value.startsWith("j:") ||
+    value.startsWith("u:") ||
+    value.startsWith("blob:")
+  );
+}
+
 export function stripImageForWire(value: string): string {
   if (value.startsWith("u:") || value.startsWith("w:") || value.startsWith("j:")) return value;
-  if (isExternalImageUrl(value)) return encodeExternalImageUrl(value);
   const webpMatch = value.match(/^data:image\/webp;base64,(.+)$/);
   if (webpMatch) return `w:${webpMatch[1]}`;
   const jpegMatch = value.match(/^data:image\/(?:jpeg|jpg);base64,(.+)$/);
@@ -65,13 +39,19 @@ export function stripImageForWire(value: string): string {
 
 export function expandImageFromWire(compact: string): string {
   if (compact.startsWith("u:")) {
-    const decoded = decodeExternalImageUrl(compact);
-    if (decoded) return decoded;
-    return compact;
+    try {
+      let normalized = compact.slice(2).replace(/-/g, "+").replace(/_/g, "/");
+      while (normalized.length % 4) normalized += "=";
+      const bin = atob(normalized);
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      return new TextDecoder().decode(bytes);
+    } catch {
+      return compact;
+    }
   }
   if (compact.startsWith("w:")) return `data:image/webp;base64,${compact.slice(2)}`;
   if (compact.startsWith("j:")) return `data:image/jpeg;base64,${compact.slice(2)}`;
   if (compact.startsWith("data:image/")) return compact;
-  if (isExternalImageUrl(compact)) return compact;
   return `data:image/jpeg;base64,${compact}`;
 }

@@ -1,4 +1,5 @@
-import type { AdData, AdType, BillingType, CropTransform } from "../types/ad";
+import type { AdData, AdType, AdThemeId, BillingType, CropTransform } from "../types/ad";
+import { isValidAdTheme } from "./adThemes";
 import { computeExpiresAt } from "./adExpiry";
 import { DEFAULT_CROP, isDefaultCrop } from "./imageCrop";
 import { expandImageFromWire, stripImageForWire } from "./imageUtils";
@@ -17,6 +18,8 @@ export interface CompactAdWire {
   i?: string;
   /** emoji do produto */
   e?: string;
+  /** tema visual */
+  th?: string;
   cz?: number;
   cx?: number;
   cy?: number;
@@ -55,6 +58,7 @@ export function toCompactWire(ad: AdData): CompactAdWire {
   if (ad.pix) wire.x = ad.pix;
   if (ad.cardLink) wire.c = ad.cardLink;
   if (ad.icon) wire.e = ad.icon;
+  if (ad.theme && ad.theme !== "amber") wire.th = ad.theme;
   if (ad.img) wire.i = stripImageForWire(ad.img);
   const cropFields = ad.crop ? encodeCrop(ad.crop) : undefined;
   if (cropFields) Object.assign(wire, cropFields);
@@ -73,6 +77,7 @@ export function fromCompactWire(wire: CompactAdWire): AdData {
     pix: wire.x,
     cardLink: wire.c,
     icon: wire.e,
+    theme: wire.th && isValidAdTheme(wire.th) ? (wire.th as AdThemeId) : undefined,
     img: wire.i ? expandImageFromWire(wire.i) : undefined,
     crop: decodeCrop(wire),
     timestamp: wire.ts,
@@ -110,6 +115,10 @@ export function normalizeLegacyAd(parsed: Record<string, unknown>): AdData | nul
     cardLink: legacy.cardLink,
     img: legacy.img,
     icon: typeof legacy.icon === "string" ? legacy.icon : undefined,
+    theme:
+      typeof legacy.theme === "string" && isValidAdTheme(legacy.theme)
+        ? legacy.theme
+        : undefined,
     crop: legacy.crop ?? DEFAULT_CROP,
     timestamp,
     expiresAt: expiresAt && Number.isFinite(expiresAt) ? expiresAt : computeExpiresAt(timestamp),

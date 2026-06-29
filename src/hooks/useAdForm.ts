@@ -1,8 +1,8 @@
 import { useCallback, useReducer } from "react";
-import type { AdData, AdType, BillingType } from "../types/ad";
+import type { AdData, AdType, AdThemeId, BillingType } from "../types/ad";
 import { computeExpiresAt } from "../lib/adExpiry";
 import { ALL_AD_ICONS, DEFAULT_AD_ICON, resolveAdIcon } from "../lib/adIcons";
-import { normalizeExternalImageUrl } from "../lib/externalImageUrl";
+import { DEFAULT_AD_THEME } from "../lib/adThemes";
 import { sanitizePhone } from "../lib/formatters";
 import { sanitizeAdData } from "../lib/sanitizeAd";
 
@@ -15,8 +15,8 @@ export interface AdFormState {
   phone: string;
   pix: string;
   cardLink: string;
-  imageUrl: string;
   icon: string;
+  theme: AdThemeId;
   submitError: string | null;
 }
 
@@ -34,8 +34,8 @@ const initialState: AdFormState = {
   phone: "",
   pix: "",
   cardLink: "",
-  imageUrl: "",
   icon: DEFAULT_AD_ICON.venda,
+  theme: DEFAULT_AD_THEME,
   submitError: null,
 };
 
@@ -87,7 +87,7 @@ export function useAdForm() {
       pix: state.pix.trim() || undefined,
       cardLink: state.cardLink.trim() || undefined,
       icon: resolveAdIcon(state.icon, state.adType),
-      img: normalizeExternalImageUrl(state.imageUrl),
+      theme: state.theme,
       timestamp: now,
       expiresAt: computeExpiresAt(now),
     });

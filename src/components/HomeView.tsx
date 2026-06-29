@@ -2,12 +2,11 @@ import { type FormEvent } from "react";
 import type { AdFormState } from "../hooks/useAdForm";
 import { AdPreviewCard } from "./AdPreviewCard";
 import { EmojiPicker } from "./EmojiPicker";
-import { ImageUrlField } from "./ImageUrlField";
+import { ThemePicker } from "./ThemePicker";
 import { MyAdsPanel } from "./MyAdsPanel";
 import { AdSenseSlot } from "./AdSenseSlot";
 import { ViewEnter } from "./ViewEnter";
 import { formatBRL, formatPhoneNumber, isValidPaymentUrl } from "../lib/formatters";
-import { isValidExternalImageUrl } from "../lib/externalImageUrl";
 import { MAX_DESC_LENGTH, MAX_PIX_LENGTH, MAX_TITLE_LENGTH, SITE_NAME } from "../lib/constants";
 import { TOOLTIP_COPY } from "../lib/tooltipCopy";
 import { ActionButtonWithHint, FieldLabelWithHint, FieldLegendWithHint } from "./HelpTooltip";
@@ -61,10 +60,6 @@ export function HomeView({
       onSubmitError("Informe um link de pagamento válido (http ou https).");
       return;
     }
-    if (form.imageUrl.trim() && !isValidExternalImageUrl(form.imageUrl)) {
-      onSubmitError("Informe um link de imagem válido (https://…/foto.jpg) ou deixe em branco.");
-      return;
-    }
 
     onSubmit();
   };
@@ -80,14 +75,14 @@ export function HomeView({
 
         <div className="neo-hero-banner mx-auto max-w-md">
           <h1 className="text-display text-3xl sm:text-4xl font-black leading-[1.05] text-black uppercase">
-            Anúncio pronto
+            Landing page
             <br />
             <span className="text-white bg-black px-2 py-0.5 inline-block mt-1 -rotate-1">em segundos</span>
           </h1>
         </div>
 
         <p className="text-base font-semibold text-black max-w-md mx-auto leading-snug">
-          Foto via link + Pix + link compartilhável.
+          Emoji + tema + Pix + QR Code personalizado.
           <span className="block text-sm font-medium text-zinc-700 mt-1">Rápido como raio — {SITE_NAME}.</span>
         </p>
       </div>
@@ -99,8 +94,8 @@ export function HomeView({
       <div className="max-w-xl mx-auto w-full">
         <div className="neo-card-white p-8 md:p-10">
           <header className="mb-10 pb-6 border-b-[3px] border-black">
-            <h2 className="text-display text-xl font-black uppercase">Novo anúncio</h2>
-            <p className="mt-2 text-sm font-bold text-zinc-700">Preencha e gere seu link *</p>
+            <h2 className="text-display text-xl font-black uppercase">Nova página de venda</h2>
+            <p className="mt-2 text-sm font-bold text-zinc-700">Preencha e gere seu link + QR Code *</p>
           </header>
 
           <form onSubmit={handleSubmit} className="space-y-9" noValidate>
@@ -254,16 +249,13 @@ export function HomeView({
               />
             </div>
 
-            <ImageUrlField
-              value={form.imageUrl}
-              onChange={(url) => onFieldChange("imageUrl", url)}
-            />
-
             <EmojiPicker
               adType={form.adType}
               value={form.icon}
               onChange={(icon) => onFieldChange("icon", icon)}
             />
+
+            <ThemePicker value={form.theme} onChange={(theme) => onFieldChange("theme", theme)} />
 
             <div className="neo-card-muted p-6 space-y-5">
               <h3 className="label-field mb-0">Prévia ao vivo</h3>
@@ -273,7 +265,7 @@ export function HomeView({
                 price={form.price}
                 description={form.description}
                 icon={form.icon}
-                image={form.imageUrl.trim() || undefined}
+                theme={form.theme}
                 billingType={form.billingType}
                 premium
               />
@@ -287,9 +279,9 @@ export function HomeView({
               id="btn-submit-generate"
               disabled={isSubmitting}
               className="btn-primary"
-              aria-label={isSubmitting ? "Gerando anúncio" : "Gerar anúncio grátis"}
+              aria-label={isSubmitting ? "Gerando página" : "Gerar landing page grátis"}
             >
-              {isSubmitting ? "Gerando…" : "⚡ Gerar anúncio grátis"}
+              {isSubmitting ? "Gerando…" : "⚡ Gerar landing page grátis"}
             </ActionButtonWithHint>
           </form>
         </div>

@@ -22,7 +22,7 @@ export function EmojiPicker({ adType, value, onChange }: EmojiPickerProps) {
   return (
     <div className="emoji-picker space-y-3">
       <FieldLabelWithHint hint={TOOLTIP_COPY.icon} className="mb-0">
-        <span>Ícone do anúncio — se não usar foto</span>
+        <span>Ícone do produto</span>
       </FieldLabelWithHint>
 
       <div className="emoji-picker__preview" aria-live="polite">

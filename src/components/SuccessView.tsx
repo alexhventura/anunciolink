@@ -5,19 +5,18 @@ import type { AdData } from "../types/ad";
 import { AdSenseSlot } from "./AdSenseSlot";
 import { AdPreviewCard } from "./AdPreviewCard";
 import { AdShareTools } from "./AdShareTools";
+import { AdQrCodeSection } from "./AdQrCodeSection";
 import { ViewEnter } from "./ViewEnter";
 import { ActionButtonWithHint, FieldLabelWithHint } from "./HelpTooltip";
 import { copyToClipboard } from "../lib/formatters";
 import { buildWhatsAppShareMessage, buildWhatsAppShareUrl } from "../lib/whatsappShare";
 import { useNativeShare } from "../hooks/useNativeShare";
-import { normalizeExternalImageUrl } from "../lib/externalImageUrl";
 import { TOOLTIP_COPY } from "../lib/tooltipCopy";
 
 interface SuccessViewProps {
   form: AdFormState;
   generatedLink: string;
   adsenseReady: boolean;
-  imageStrippedWarning?: boolean;
   textOptimizedWarning?: boolean;
   onBackToEdit: () => void;
   onResetHome: () => void;
@@ -27,7 +26,6 @@ export function SuccessView({
   form,
   generatedLink,
   adsenseReady,
-  imageStrippedWarning,
   textOptimizedWarning,
   onBackToEdit,
   onResetHome,
@@ -81,7 +79,7 @@ export function SuccessView({
     pix: form.pix || undefined,
     cardLink: form.cardLink || undefined,
     icon: form.icon,
-    img: normalizeExternalImageUrl(form.imageUrl),
+    theme: form.theme,
     timestamp: Date.now(),
   };
 
@@ -102,18 +100,9 @@ export function SuccessView({
             </h2>
           </div>
           <p className="text-sm font-bold text-black max-w-sm mx-auto">
-            Copie o texto abaixo e divulgue. Card offline e panfleto A4 ficam disponíveis aqui.
+            Copie o link, baixe o QR Code e divulgue. Panfleto A4 e card offline também estão aqui.
           </p>
         </div>
-
-        {imageStrippedWarning && (
-          <div
-            role="alert"
-            className="rounded-lg border-[3px] border-black bg-amber-400 px-4 py-3 text-xs font-bold text-black text-left neo-shadow-sm"
-          >
-            O link da foto foi omitido por limite de tamanho do URL. Encurte a descrição ou use um link de imagem mais curto.
-          </div>
-        )}
 
         {textOptimizedWarning && (
           <div
@@ -236,6 +225,8 @@ export function SuccessView({
             </a>
           )}
 
+          <AdQrCodeSection url={generatedLink} theme={form.theme} deferMs={200} />
+
           <AdShareTools ad={adSnapshot} />
         </div>
 
@@ -278,7 +269,7 @@ export function SuccessView({
           price={form.price}
           description={form.description}
           icon={form.icon}
-          image={form.imageUrl.trim() || undefined}
+          theme={form.theme}
           billingType={form.billingType}
           premium
         />

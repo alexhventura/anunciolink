@@ -6,6 +6,7 @@ import { AdSenseSlot } from "./AdSenseSlot";
 import { AdPreviewCard } from "./AdPreviewCard";
 import { AdBrandedSurface } from "./AdBrandedSurface";
 import { AdExpiredBanner } from "./AdExpiredBanner";
+import { AdQrCodeSection } from "./AdQrCodeSection";
 import { SecurityBadge } from "./SecurityBadge";
 import { ViewEnter } from "./ViewEnter";
 import { PixPaymentSection } from "./PixPaymentSection";
@@ -20,10 +21,15 @@ interface AdViewPageProps {
 export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
   const [pixCopied, setPixCopied] = useState(false);
   const [isExpired, setIsExpired] = useState(false);
+  const [pageUrl, setPageUrl] = useState("");
 
   useEffect(() => {
     setIsExpired(isAdExpired(ad));
   }, [ad]);
+
+  useEffect(() => {
+    setPageUrl(window.location.href);
+  }, []);
 
   const handleCopyPix = async () => {
     if (!ad.pix || isExpired) return;
@@ -55,13 +61,16 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
           price={ad.price}
           description={ad.desc}
           icon={ad.icon}
-          image={ad.img}
+          theme={ad.theme}
           billingType={ad.billingType}
-          priority
           showSecurityBadge
           premium
           className={isExpired ? "opacity-95" : ""}
         />
+
+        {!isExpired && pageUrl && (
+          <AdQrCodeSection url={pageUrl} theme={ad.theme} deferMs={180} />
+        )}
 
         {isExpired ? (
           <div className="view-enter-delayed">
@@ -77,7 +86,7 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
                 <span className="block text-xs font-bold uppercase opacity-80">
                   Quer vender algo rápido assim também?
                 </span>
-                <span className="block font-black">Criar meu Anúncio Grátis no AnúncioLink</span>
+                <span className="block font-black">Criar minha Landing Page Grátis</span>
               </span>
             </button>
           </div>
@@ -163,9 +172,9 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
               onClick={onCreateOwn}
               id="btn-buyer-create-own-ad"
               className="btn-ghost"
-              aria-label="Criar meu próprio anúncio grátis"
+              aria-label="Criar minha landing page grátis"
             >
-              Criar meu anúncio
+              Criar minha página
             </button>
           </aside>
         )}

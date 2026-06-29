@@ -2,8 +2,14 @@ import { createRoot } from "react-dom/client";
 import { createElement } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 
-/** Gera canvas PNG do QR Code para exportação offline */
-export async function renderQrToCanvas(value: string, size: number): Promise<HTMLCanvasElement> {
+const QR_LOGO_SRC = "/qr-logo.svg";
+
+/** Gera canvas PNG do QR Code com logo AnúncioLink */
+export async function renderQrToCanvas(
+  value: string,
+  size: number,
+  fgColor = "#18181b"
+): Promise<HTMLCanvasElement> {
   const container = document.createElement("div");
   container.style.position = "fixed";
   container.style.left = "-9999px";
@@ -11,16 +17,25 @@ export async function renderQrToCanvas(value: string, size: number): Promise<HTM
   document.body.appendChild(container);
 
   const root = createRoot(container);
+  const logoSize = Math.round(size * 0.22);
 
   try {
     root.render(
       createElement(QRCodeCanvas, {
         value,
         size,
-        level: "M",
-        includeMargin: false,
+        level: "H",
+        includeMargin: true,
         bgColor: "#ffffff",
-        fgColor: "#18181b",
+        fgColor,
+        marginSize: 2,
+        imageSettings: {
+          src: QR_LOGO_SRC,
+          height: logoSize,
+          width: logoSize,
+          excavate: true,
+          crossOrigin: "anonymous",
+        },
       })
     );
 

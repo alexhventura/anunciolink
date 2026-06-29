@@ -1,6 +1,7 @@
 import { Printer } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import type { AdData } from "../types/ad";
+import { resolveAdTheme } from "../lib/adThemes";
 import { isQrUrlSafe } from "../lib/qrShareUrl";
 import { TOOLTIP_COPY } from "../lib/tooltipCopy";
 import { AdPreviewCard } from "./AdPreviewCard";
@@ -20,6 +21,7 @@ export function AdPrintPoster({
   hintVariant = "on-dark",
 }: AdPrintPosterProps) {
   const qrSafe = isQrUrlSafe(qrUrl);
+  const themeDef = resolveAdTheme(ad.theme);
 
   const handlePrint = () => {
     document.documentElement.classList.add("printing-a4");
@@ -32,10 +34,16 @@ export function AdPrintPoster({
       <QRCodeSVG
         value={qrUrl}
         size={140}
-        level="M"
-        includeMargin={false}
+        level="H"
+        includeMargin
         bgColor="#ffffff"
-        fgColor="#18181b"
+        fgColor={themeDef.qrFg}
+        imageSettings={{
+          src: "/qr-logo.svg",
+          height: 32,
+          width: 32,
+          excavate: true,
+        }}
         aria-label="QR Code do anúncio"
       />
       <p className="ad-preview-card__qr-label">Escaneie para ver o anúncio completo</p>
@@ -74,7 +82,7 @@ export function AdPrintPoster({
                 price={ad.price}
                 description={ad.desc}
                 icon={ad.icon}
-                image={ad.img}
+                theme={ad.theme}
                 billingType={ad.billingType}
                 phone={ad.phone}
                 showSecurityBadge

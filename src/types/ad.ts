@@ -1,5 +1,6 @@
 export type AdType = "venda" | "servico" | "vaquinha";
 export type BillingType = "unico" | "recorrente";
+export type AdThemeId = "amber" | "midnight" | "sunset" | "purple" | "minimal";
 export type AdSenseSlot = "topo" | "meio" | "rodape";
 export type AppView =
   | "home"
@@ -25,9 +26,11 @@ export interface AdData {
   phone: string;
   pix?: string;
   cardLink?: string;
-  /** Emoji escolhido pelo criador (substitui foto) */
+  /** Emoji do produto/serviço */
   icon?: string;
-  /** URL externa (https) ou data URL legada embutida */
+  /** Tema visual Bento */
+  theme?: AdThemeId;
+  /** Legado — ignorado em novos anúncios */
   img?: string;
   crop?: CropTransform;
   timestamp: number;
@@ -37,8 +40,4 @@ export interface AdData {
 export interface ImageUploadError {
   code: "INVALID_TYPE" | "FILE_TOO_LARGE" | "READ_FAILED" | "COMPRESS_FAILED";
   message: string;
-}
-
-export interface AdImagePayload {
-  icon?: string;
 }

@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import { Download } from "lucide-react";
 import type { AdData } from "../types/ad";
+import { resolveAdTheme } from "../lib/adThemes";
 import { TOOLTIP_COPY } from "../lib/tooltipCopy";
 import { renderPreviewCardBlob } from "../lib/adPreviewCardCanvas";
 import { renderQrToCanvas } from "../lib/qrCanvas";
@@ -22,6 +23,7 @@ export function AdSocialCardDownload({
 }: AdSocialCardDownloadProps) {
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const themeDef = resolveAdTheme(ad.theme);
 
   const handleDownload = useCallback(async () => {
     setGenerating(true);
@@ -30,14 +32,14 @@ export function AdSocialCardDownload({
     try {
       await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
 
-      const qrCanvas = await renderQrToCanvas(qrUrl, 120);
+      const qrCanvas = await renderQrToCanvas(qrUrl, 120, themeDef.qrFg);
       const blob = await renderPreviewCardBlob({
         adType: ad.t,
         title: ad.title,
         price: ad.price,
         description: ad.desc,
         icon: ad.icon,
-        imageSrc: ad.img,
+        theme: ad.theme,
         billingRecorrente: ad.billingType === "recorrente",
         phone: ad.phone,
         qrCanvas,
@@ -47,10 +49,8 @@ export function AdSocialCardDownload({
       downloadBlob(blob, `anunciolink-${slugifyFilename(ad.title)}.png`);
     } catch {
       setError("Não foi possível gerar o card. Tente novamente.");
-    } finally {
-      setGenerating(false);
     }
-  }, [ad, qrUrl]);
+  }, [ad, qrUrl, themeDef.qrFg]);
 
   return (
     <>
