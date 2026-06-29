@@ -42,6 +42,9 @@ function applyCommonSocialMeta(title: string, description: string, url: string, 
   upsertMeta("og:site_name", SITE_NAME, "property");
   upsertMeta("og:locale", "pt_BR", "property");
   upsertMeta("og:image", DEFAULT_OG_IMAGE, "property");
+  upsertMeta("og:image:width", "1200", "property");
+  upsertMeta("og:image:height", "630", "property");
+  upsertMeta("og:image:type", "image/jpeg", "property");
   upsertMeta("og:image:alt", `${SITE_NAME} — anúncio com foto, Pix e WhatsApp`, "property");
   upsertMeta("twitter:card", "summary_large_image");
   upsertMeta("twitter:title", title);

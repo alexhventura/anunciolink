@@ -34,7 +34,6 @@ export default defineConfig(({ mode }) => {
       rollupOptions: {
         output: {
           manualChunks(id) {
-            if (id.includes("node_modules/motion")) return "motion";
             if (id.includes("node_modules/lucide-react")) return "icons";
             if (id.includes("node_modules/fflate")) return "codec";
             if (id.includes("node_modules/react-dom")) return "react-dom";

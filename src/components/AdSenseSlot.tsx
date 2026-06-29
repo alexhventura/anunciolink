@@ -10,13 +10,22 @@ interface AdSenseSlotProps {
 
 export function AdSenseSlot({ slot, ready }: AdSenseSlotProps) {
   const pushedRef = useRef(false);
+  const insRef = useRef<HTMLElement | null>(null);
   const config = ADSENSE_SLOTS[slot];
   const hasRealSlot = Boolean(ADSENSE_CLIENT && config.slotId);
 
-  useEffect(() => {
-    if (!ready || !hasRealSlot || pushedRef.current) return;
+  const tryPush = () => {
+    if (!ready || !hasRealSlot || pushedRef.current || !insRef.current) return;
     pushedRef.current = true;
     pushAdSenseSlot();
+  };
+
+  useEffect(() => {
+    pushedRef.current = false;
+  }, [slot, hasRealSlot]);
+
+  useEffect(() => {
+    tryPush();
   }, [ready, hasRealSlot]);
 
   return (
@@ -27,6 +36,7 @@ export function AdSenseSlot({ slot, ready }: AdSenseSlotProps) {
     >
       {hasRealSlot ? (
         <ins
+          ref={insRef}
           className="adsbygoogle block w-full"
           style={{ display: "block", minHeight: config.minHeight }}
           data-ad-client={ADSENSE_CLIENT}
@@ -37,6 +47,7 @@ export function AdSenseSlot({ slot, ready }: AdSenseSlotProps) {
       ) : (
         <div
           className="adsense-slot__placeholder flex items-center justify-center text-[10px] font-bold uppercase text-zinc-500"
+          style={{ minHeight: config.minHeight }}
           aria-hidden="true"
         >
           Patrocinado

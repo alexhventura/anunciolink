@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
-import { motion } from "motion/react";
 import type { AppView } from "../types/ad";
 import { AdSenseSlot } from "./AdSenseSlot";
+import { ViewEnter } from "./ViewEnter";
 import { getPathForInstitutionalView, isInstitutionalView } from "../lib/siteRoutes";
 
 interface SiteNavLinkProps {
@@ -49,14 +49,7 @@ export function InstitutionalPageLayout({
   children,
 }: InstitutionalPageLayoutProps) {
   return (
-    <motion.div
-      key={title}
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -6 }}
-      transition={{ duration: 0.22 }}
-      className="space-y-8"
-    >
+    <ViewEnter className="space-y-8">
       <AdSenseSlot slot="topo" ready={adsenseReady} />
 
       <header className="neo-card-white text-center">
@@ -70,7 +63,7 @@ export function InstitutionalPageLayout({
 
       <AdSenseSlot slot="meio" ready={adsenseReady} />
       <AdSenseSlot slot="rodape" ready={adsenseReady} />
-    </motion.div>
+    </ViewEnter>
   );
 }
 

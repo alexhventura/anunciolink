@@ -4,7 +4,6 @@
  */
 
 import { Suspense, lazy, useCallback, useState } from "react";
-import { AnimatePresence } from "motion/react";
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
 import { HomeView } from "./components/HomeView";
@@ -67,7 +66,7 @@ export default function App() {
   const isAdView = currentView === "anuncio";
   const showAdsense =
     currentView === "home" || isAdView || currentView === "success" || isInstitutionalView;
-  const { adsenseReady } = useAdSenseLoader(showAdsense);
+  const { adsenseReady } = useAdSenseLoader(showAdsense, { eager: isAdView });
   const themeClass = "theme-create";
 
   useDocumentMeta(decodedAd, currentView);
@@ -131,7 +130,7 @@ export default function App() {
         aria-label="Conteúdo principal do Anuncio Link"
         className={`mx-auto px-5 py-12 md:py-16 ${isInstitutionalView ? "max-w-2xl" : "max-w-xl"}`}
       >
-        <AnimatePresence mode="wait">
+        <div key={currentView}>
           {currentView === "home" && (
             <HomeView
               form={form}
@@ -185,7 +184,7 @@ export default function App() {
               <TermsPage adsenseReady={adsenseReady} />
             </Suspense>
           )}
-        </AnimatePresence>
+        </div>
       </main>
 
       <Footer onNavigate={navigateToPage} />

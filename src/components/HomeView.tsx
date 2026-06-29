@@ -1,11 +1,11 @@
 import { useCallback, useRef, useState, type FormEvent } from "react";
-import { motion } from "motion/react";
 import type { AdFormState } from "../hooks/useAdForm";
 import type { AdImagePayload } from "../types/ad";
 import { AdPreviewCard } from "./AdPreviewCard";
 import { AdProductThumb } from "./AdProductThumb";
 import { MyAdsPanel } from "./MyAdsPanel";
 import { AdSenseSlot } from "./AdSenseSlot";
+import { ViewEnter } from "./ViewEnter";
 import { formatBRL, formatPhoneNumber, isValidPaymentUrl } from "../lib/formatters";
 import { validateImageFile, ImageCompressorError, compressImageOnUpload } from "../lib/imageCompressor";
 import { MAX_DESC_LENGTH, MAX_PIX_LENGTH, MAX_TITLE_LENGTH, SITE_NAME } from "../lib/constants";
@@ -116,14 +116,7 @@ export function HomeView({
   const segmentIdle = "neo-segment-idle";
 
   return (
-    <motion.div
-      key="home-screen"
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.2 }}
-      className="space-y-20"
-    >
+    <ViewEnter className="space-y-20">
       {/* Hero */}
       <div className="text-center max-w-lg mx-auto space-y-6 px-2">
         <span className="chip-accent">Sem cadastro · 100% grátis</span>
@@ -450,6 +443,6 @@ export function HomeView({
           </form>
         </div>
       </div>
-    </motion.div>
+    </ViewEnter>
   );
 }

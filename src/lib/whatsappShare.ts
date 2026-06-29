@@ -1,6 +1,6 @@
 import { sanitizePlainText } from "./sanitize";
 
-export const DEFAULT_OG_IMAGE_PATH = "/og-default.svg";
+export const DEFAULT_OG_IMAGE_PATH = "/og-default.jpg";
 
 /** Garante prefixo único R$ para exibição na mensagem */
 export function formatPriceForShare(price: string): string {

@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { motion } from "motion/react";
 import { Check, Lightbulb, MessageCircle, Share2, Zap } from "lucide-react";
 import type { AdFormState } from "../hooks/useAdForm";
 import type { AdData } from "../types/ad";
 import { AdSenseSlot } from "./AdSenseSlot";
 import { AdPreviewCard } from "./AdPreviewCard";
 import { AdShareTools } from "./AdShareTools";
+import { ViewEnter } from "./ViewEnter";
 import { ActionButtonWithHint, FieldLabelWithHint } from "./HelpTooltip";
 import { copyToClipboard } from "../lib/formatters";
 import { buildWhatsAppShareMessage, buildWhatsAppShareUrl } from "../lib/whatsappShare";
@@ -86,14 +86,7 @@ export function SuccessView({
   };
 
   return (
-    <motion.div
-      key="success-screen"
-      initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.2 }}
-      className="max-w-xl mx-auto space-y-10"
-    >
+    <ViewEnter className="max-w-xl mx-auto space-y-10">
       <AdSenseSlot slot="topo" ready={adsenseReady} />
 
       <div className="neo-card-white p-8 md:p-10 text-center space-y-8 no-print">
@@ -244,7 +237,7 @@ export function SuccessView({
             </a>
           )}
 
-          <AdShareTools ad={adSnapshot} variant="create" />
+          <AdShareTools ad={adSnapshot} />
         </div>
 
         <div className="flex flex-col sm:flex-row items-stretch justify-center gap-3 border-t-[3px] border-black pt-8">
@@ -290,6 +283,6 @@ export function SuccessView({
         />
         <AdSenseSlot slot="meio" ready={adsenseReady} />
       </div>
-    </motion.div>
+    </ViewEnter>
   );
 }

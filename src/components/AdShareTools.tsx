@@ -7,37 +7,19 @@ import { AdSocialCardDownload } from "./AdSocialCardDownload";
 
 interface AdShareToolsProps {
   ad: AdData;
-  variant?: "create" | "checkout";
 }
 
-export function AdShareTools({ ad, variant = "checkout" }: AdShareToolsProps) {
+export function AdShareTools({ ad }: AdShareToolsProps) {
   const qrUrl = useMemo(() => buildQrShareUrl(ad), [ad]);
-  const isCheckout = variant === "checkout";
 
   return (
-    <section
-      className={isCheckout ? "checkout-card space-y-5" : "neo-card-white space-y-5"}
-      aria-labelledby="share-tools-heading"
-    >
+    <section className="neo-card-white space-y-5" aria-labelledby="share-tools-heading">
       <div className="flex items-start gap-3">
-        <span
-          className={
-            isCheckout
-              ? "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-zinc-50"
-              : "flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border-2 border-zinc-900 bg-amber-100 shadow-[2px_2px_0_0_#18181b]"
-          }
-        >
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border-2 border-zinc-900 bg-amber-100 shadow-[2px_2px_0_0_#18181b]">
           <Share2 className="h-5 w-5 text-zinc-700" strokeWidth={2} aria-hidden="true" />
         </span>
         <div>
-          <h2
-            id="share-tools-heading"
-            className={
-              isCheckout
-                ? "text-base font-semibold text-zinc-900 tracking-tight"
-                : "text-display text-lg font-black uppercase"
-            }
-          >
+          <h2 id="share-tools-heading" className="text-display text-lg font-black uppercase">
             Divulgue offline e online
           </h2>
           <p className="mt-1 text-xs font-medium text-zinc-500 leading-snug">
@@ -47,18 +29,8 @@ export function AdShareTools({ ad, variant = "checkout" }: AdShareToolsProps) {
       </div>
 
       <div className="grid grid-cols-1 gap-3">
-        <AdPrintPoster
-          ad={ad}
-          qrUrl={qrUrl}
-          triggerClassName={isCheckout ? "btn-share-print-soft" : "btn-share-print"}
-          hintVariant={isCheckout ? "default" : "on-dark"}
-        />
-        <AdSocialCardDownload
-          ad={ad}
-          qrUrl={qrUrl}
-          triggerClassName={isCheckout ? "btn-share-card-soft" : "btn-share-card"}
-          hintVariant={isCheckout ? "on-dark" : "default"}
-        />
+        <AdPrintPoster ad={ad} qrUrl={qrUrl} triggerClassName="btn-share-print" hintVariant="on-dark" />
+        <AdSocialCardDownload ad={ad} qrUrl={qrUrl} triggerClassName="btn-share-card" hintVariant="default" />
       </div>
     </section>
   );

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { motion } from "motion/react";
 import { MessageCircle, Zap } from "lucide-react";
 import type { AdData } from "../types/ad";
 import { isAdExpired } from "../lib/adExpiry";
@@ -8,6 +7,7 @@ import { AdPreviewCard } from "./AdPreviewCard";
 import { AdBrandedSurface } from "./AdBrandedSurface";
 import { AdExpiredBanner } from "./AdExpiredBanner";
 import { SecurityBadge } from "./SecurityBadge";
+import { ViewEnter } from "./ViewEnter";
 import { copyToClipboard } from "../lib/formatters";
 
 interface AdViewPageProps {
@@ -38,12 +38,8 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
   const safeCardLink = ad.cardLink;
 
   return (
-    <motion.article
-      key="ad-screen"
-      initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.2 }}
+    <ViewEnter
+      as="article"
       className="max-w-xl mx-auto pb-8"
       itemScope
       itemType="https://schema.org/Product"
@@ -68,11 +64,7 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
         <AdSenseSlot slot="meio" ready={adsenseReady} />
 
         {isExpired ? (
-          <motion.div
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, delay: 0.05 }}
-          >
+          <div className="view-enter-delayed">
             <button
               type="button"
               onClick={onCreateOwn}
@@ -88,7 +80,7 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
                 <span className="block font-black">Criar meu Anúncio Grátis no AnúncioLink</span>
               </span>
             </button>
-          </motion.div>
+          </div>
         ) : (
           (hasPayment || ad.phone) && (
             <section className="neo-card-white p-6 md:p-8 space-y-4" aria-label="Pagamento e contato do vendedor">
@@ -179,7 +171,7 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
             type="button"
             disabled
             id="btn-buyer-ad-closed"
-            className="btn-checkout-closed w-full"
+            className="btn-ad-closed w-full"
             aria-disabled="true"
             aria-label="Anúncio encerrado"
           >
@@ -205,6 +197,6 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
           </aside>
         )}
       </AdBrandedSurface>
-    </motion.article>
+    </ViewEnter>
   );
 }
