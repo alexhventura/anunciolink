@@ -4,7 +4,7 @@ import { MessageCircle, Zap } from "lucide-react";
 import type { AdData } from "../types/ad";
 import { isAdExpired } from "../lib/adExpiry";
 import { AdSenseSlot } from "./AdSenseSlot";
-import { AdImage } from "./AdImage";
+import { AdProductThumb } from "./AdProductThumb";
 import { AdBrandedSurface } from "./AdBrandedSurface";
 import { AdExpiredBanner } from "./AdExpiredBanner";
 import { copyToClipboard } from "../lib/formatters";
@@ -59,19 +59,19 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
         {isExpired && <AdExpiredBanner />}
 
         <div className={`neo-card-white overflow-hidden ${isExpired ? "opacity-95" : ""}`}>
-          <div className="bento-image !rounded-none !border-x-0 !border-t-0 !shadow-none">
-            <AdImage
+          <div className="px-6 pt-8 pb-4 text-center border-b-[3px] border-black bg-white">
+            <AdProductThumb
               src={ad.img}
-              crop={ad.crop}
               alt={ad.title}
               type={ad.t}
               title={ad.title}
               priority
-              variant="create"
+              size="md"
+              className="mx-auto"
             />
           </div>
 
-          <div className="p-6 md:p-8 space-y-4 border-t-[3px] border-black bg-amber-500">
+          <div className="p-6 md:p-8 space-y-4 bg-amber-500">
             <div className="flex flex-wrap items-center gap-2">
               <span className="chip !bg-black !text-amber-400">{TYPE_LABEL[ad.t]}</span>
               {isExpired ? (
@@ -135,8 +135,6 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
             {ad.desc}
           </p>
         </section>
-
-        <AdSenseSlot slot="meio" ready={adsenseReady} />
 
         {(hasPayment || ad.phone) && (
           <section

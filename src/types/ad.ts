@@ -35,5 +35,4 @@ export interface ImageUploadError {
 
 export interface AdImagePayload {
   image?: string;
-  crop?: CropTransform;
 }

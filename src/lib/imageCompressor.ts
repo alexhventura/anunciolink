@@ -1,11 +1,6 @@
 import { MAX_IMAGE_BYTES } from "./constants";
-import type { CropTransform, ImageUploadError } from "../types/ad";
-import {
-  CROP_VIEWPORT,
-  DEFAULT_CROP,
-  exportCropToDataUrl,
-  loadImageElement,
-} from "./imageCrop";
+import type { ImageUploadError } from "../types/ad";
+import { loadImageElement } from "./imageCrop";
 
 export class ImageCompressorError extends Error {
   code: ImageUploadError["code"];
@@ -22,24 +17,19 @@ export interface ImageCompressionStep {
   quality: number;
 }
 
-/** Primeira passagem ao selecionar foto — preview rápido no editor */
-export const UPLOAD_COMPRESSION_STEPS: ImageCompressionStep[] = [
-  { maxEdge: 400, quality: 0.58 },
-  { maxEdge: 360, quality: 0.52 },
-  { maxEdge: 320, quality: 0.48 },
-];
+/** Upload automático — 300px max, JPEG agressivo */
+export const UPLOAD_COMPRESSION: ImageCompressionStep = { maxEdge: 300, quality: 0.45 };
 
-/** Passos progressivos até caber na URL (WhatsApp / mobile) */
+/** Passos progressivos até caber na URL (WhatsApp ≤ 2048) */
 export const URL_FIT_COMPRESSION_STEPS: ImageCompressionStep[] = [
-  { maxEdge: 400, quality: 0.58 },
-  { maxEdge: 360, quality: 0.54 },
-  { maxEdge: 320, quality: 0.5 },
-  { maxEdge: 280, quality: 0.48 },
-  { maxEdge: 240, quality: 0.45 },
-  { maxEdge: 200, quality: 0.42 },
-  { maxEdge: 168, quality: 0.4 },
-  { maxEdge: 140, quality: 0.38 },
-  { maxEdge: 120, quality: 0.36 },
+  { maxEdge: 300, quality: 0.45 },
+  { maxEdge: 280, quality: 0.43 },
+  { maxEdge: 260, quality: 0.42 },
+  { maxEdge: 240, quality: 0.4 },
+  { maxEdge: 200, quality: 0.38 },
+  { maxEdge: 168, quality: 0.36 },
+  { maxEdge: 140, quality: 0.35 },
+  { maxEdge: 120, quality: 0.34 },
 ];
 
 export function validateImageFile(file: File): ImageUploadError | null {
@@ -71,7 +61,6 @@ function drawScaledSource(img: HTMLImageElement, maxEdge: number): HTMLCanvasEle
   return canvas;
 }
 
-/** JPEG para payload na URL — menor e previsível que WebP em base64 */
 function encodeCanvasJpeg(canvas: HTMLCanvasElement, quality: number): string {
   const jpeg = canvas.toDataURL("image/jpeg", quality);
   if (!jpeg || !jpeg.startsWith("data:image/jpeg") || jpeg.length < 100) {
@@ -90,8 +79,8 @@ export async function compressImageAtStep(
 }
 
 /**
- * Compacta ao selecionar/tirar foto — Canvas max ~400px, JPEG 0.48–0.58.
- * Roda na memória do aparelho antes de qualquer geração de link.
+ * Compacta ao selecionar da galeria — 300px, JPEG ~0.45.
+ * Processo 100% automático, invisível ao usuário.
  */
 export async function compressImageOnUpload(file: File): Promise<string> {
   const validation = validateImageFile(file);
@@ -102,16 +91,8 @@ export async function compressImageOnUpload(file: File): Promise<string> {
   const objectUrl = URL.createObjectURL(file);
   try {
     const img = await loadImageElement(objectUrl);
-    for (const step of UPLOAD_COMPRESSION_STEPS) {
-      try {
-        const canvas = drawScaledSource(img, step.maxEdge);
-        return encodeCanvasJpeg(canvas, step.quality);
-      } catch {
-        continue;
-      }
-    }
-    const canvas = drawScaledSource(img, 280);
-    return encodeCanvasJpeg(canvas, 0.45);
+    const canvas = drawScaledSource(img, UPLOAD_COMPRESSION.maxEdge);
+    return encodeCanvasJpeg(canvas, UPLOAD_COMPRESSION.quality);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Falha ao processar a imagem.";
     throw new ImageCompressorError("COMPRESS_FAILED", message);
@@ -120,39 +101,8 @@ export async function compressImageOnUpload(file: File): Promise<string> {
   }
 }
 
-/** @deprecated Alias — use compressImageOnUpload */
 export async function compressSourceImage(imageSrc: string): Promise<string> {
-  try {
-    const img = await loadImageElement(imageSrc);
-    for (const step of UPLOAD_COMPRESSION_STEPS) {
-      const canvas = drawScaledSource(img, step.maxEdge);
-      return encodeCanvasJpeg(canvas, step.quality);
-    }
-    const canvas = drawScaledSource(img, 280);
-    return encodeCanvasJpeg(canvas, 0.45);
-  } catch (err) {
-    const message = err instanceof Error ? err.message : "Falha ao processar a imagem.";
-    throw new ImageCompressorError("COMPRESS_FAILED", message);
-  }
-}
-
-/** Recorte baked — apenas export offline (card/impressão) */
-export async function compressCroppedImage(
-  imageSrc: string,
-  crop: CropTransform = DEFAULT_CROP,
-  isPrintMode = false
-): Promise<string> {
-  try {
-    return await exportCropToDataUrl(imageSrc, crop, {
-      viewportSize: CROP_VIEWPORT,
-      outputSize: isPrintMode ? 520 : 480,
-      quality: isPrintMode ? 0.72 : 0.68,
-      fillWhite: isPrintMode,
-    });
-  } catch (err) {
-    const message = err instanceof Error ? err.message : "Falha ao processar o recorte.";
-    throw new ImageCompressorError("COMPRESS_FAILED", message);
-  }
+  return compressImageAtStep(imageSrc, UPLOAD_COMPRESSION);
 }
 
 export function compressImage(file: File): Promise<string> {

@@ -2,12 +2,9 @@ import { useCallback, useRef, useState, type FormEvent } from "react";
 import { motion } from "motion/react";
 import type { AdFormState } from "../hooks/useAdForm";
 import type { AdImagePayload } from "../types/ad";
-import { ImageFallback } from "./ImageFallback";
-import { AdImage } from "./AdImage";
-import { ImageCropEditor } from "./ImageCropEditor";
+import { AdProductThumb } from "./AdProductThumb";
 import { MyAdsPanel } from "./MyAdsPanel";
 import { formatBRL, formatPhoneNumber, isValidPaymentUrl } from "../lib/formatters";
-import { DEFAULT_CROP } from "../lib/imageCrop";
 import { validateImageFile, ImageCompressorError, compressImageOnUpload } from "../lib/imageCompressor";
 import { MAX_DESC_LENGTH, MAX_PIX_LENGTH, MAX_TITLE_LENGTH, SITE_NAME } from "../lib/constants";
 import { TOOLTIP_COPY } from "../lib/tooltipCopy";
@@ -74,7 +71,6 @@ export function HomeView({
       setIsCompressingPhoto(true);
       try {
         const compressed = await compressImageOnUpload(file);
-        onFieldChange("photoCrop", DEFAULT_CROP);
         onPhotoChange(file, compressed);
       } catch (err) {
         const message =
@@ -86,7 +82,7 @@ export function HomeView({
         setIsCompressingPhoto(false);
       }
     },
-    [onFieldChange, onImageError, onPhotoChange]
+    [onImageError, onPhotoChange]
   );
 
   const handleSubmit = async (e: FormEvent) => {
@@ -104,7 +100,7 @@ export function HomeView({
 
     let imagePayload: AdImagePayload | undefined;
     if (form.photoPreview) {
-      imagePayload = { image: form.photoPreview, crop: form.photoCrop };
+      imagePayload = { image: form.photoPreview };
     }
 
     onSubmit(imagePayload);
@@ -356,15 +352,22 @@ export function HomeView({
                   </div>
               </div>
               ) : (
-                <div className="space-y-4 rounded-lg border-2 border-zinc-900 bg-white p-5 shadow-[3px_3px_0_0_#18181b]">
-                  <ImageCropEditor
+                <div className="space-y-4 rounded-lg border-2 border-zinc-900 bg-white p-6 shadow-[3px_3px_0_0_#18181b] text-center">
+                  <AdProductThumb
                     src={form.photoPreview}
-                    crop={form.photoCrop}
-                    onCropChange={(c) => onFieldChange("photoCrop", c)}
-                    fillWhite={form.printMode}
+                    alt={form.title || "Foto do produto"}
+                    type={form.adType}
+                    title={form.title}
+                    size="md"
+                    className="mx-auto"
                   />
-                  <div className="flex items-center justify-between gap-3 pt-1">
-                    <span className="text-xs font-medium text-zinc-500 truncate">{form.photoFile?.name ?? "Foto selecionada"}</span>
+                  <p className="text-xs font-medium text-zinc-500">
+                    Foto otimizada automaticamente para o link do WhatsApp.
+                  </p>
+                  <div className="flex items-center justify-center gap-3 pt-1">
+                    <span className="text-xs font-medium text-zinc-500 truncate max-w-[200px]">
+                      {form.photoFile?.name ?? "Foto selecionada"}
+                    </span>
                     <button
                       type="button"
                       id="btn-remove-photo"
@@ -372,7 +375,6 @@ export function HomeView({
                       onClick={() => {
                         if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
                         previewUrlRef.current = null;
-                        onFieldChange("photoCrop", DEFAULT_CROP);
                         onPhotoChange(null, "");
                         if (fileInputRef.current) fileInputRef.current.value = "";
                       }}
@@ -417,18 +419,24 @@ export function HomeView({
             <div className="neo-card-muted p-6 space-y-5">
               <h3 className="label-field mb-0">Prévia ao vivo</h3>
               <div className="neo-card-white p-5 space-y-5 !shadow-[4px_4px_0_0_#000]">
-                <div className="bento-image !min-h-[200px] !max-h-[220px] max-w-[200px] mx-auto">
+                <div className="text-center">
                   {form.photoPreview ? (
-                    <AdImage
+                    <AdProductThumb
                       src={form.photoPreview}
-                      crop={form.photoCrop}
                       alt={form.title || "Prévia"}
                       type={form.adType}
                       title={form.title}
-                      variant="create"
+                      size="md"
+                      className="mx-auto"
                     />
                   ) : (
-                    <ImageFallback title={form.title} type={form.adType} />
+                    <AdProductThumb
+                      alt={form.title || "Prévia"}
+                      type={form.adType}
+                      title={form.title}
+                      size="md"
+                      className="mx-auto"
+                    />
                   )}
                 </div>
                 <div className="space-y-2 text-center sm:text-left">

@@ -4,8 +4,7 @@ import { Check, MessageCircle, Zap } from "lucide-react";
 import type { AdFormState } from "../hooks/useAdForm";
 import type { AdData } from "../types/ad";
 import { AdSenseSlot } from "./AdSenseSlot";
-import { AdImage } from "./AdImage";
-import { ImageFallback } from "./ImageFallback";
+import { AdProductThumb } from "./AdProductThumb";
 import { AdShareTools } from "./AdShareTools";
 import { AdBrandedSurface } from "./AdBrandedSurface";
 import { copyToClipboard } from "../lib/formatters";
@@ -59,7 +58,6 @@ export function SuccessView({
     pix: form.pix || undefined,
     cardLink: form.cardLink || undefined,
     img: form.photoPreview || undefined,
-    crop: form.photoCrop,
     timestamp: Date.now(),
     printMode: form.printMode,
   };
@@ -175,22 +173,17 @@ export function SuccessView({
           className="neo-card-white overflow-hidden min-h-[380px]"
           contentClassName="flex flex-col flex-1"
         >
-          <div className="bento-image !rounded-none !border-x-0 !border-t-0 !shadow-none !min-h-[280px]">
-            {form.photoPreview ? (
-              <AdImage
-                src={form.photoPreview}
-                crop={form.photoCrop}
-                alt={form.title}
-                type={form.adType}
-                title={form.title}
-                printMode={form.printMode}
-                variant="create"
-              />
-            ) : (
-              <ImageFallback title={form.title} type={form.adType} />
-            )}
+          <div className="px-6 pt-6 pb-4 text-center bg-white border-b-[3px] border-black">
+            <AdProductThumb
+              src={form.photoPreview}
+              alt={form.title}
+              type={form.adType}
+              title={form.title}
+              size="md"
+              className="mx-auto"
+            />
           </div>
-          <div className="p-8 space-y-3 border-t-[3px] border-black bg-amber-500 flex-1">
+          <div className="p-8 space-y-3 bg-amber-500 flex-1">
             <span className="chip !bg-black !text-amber-400">{typeLabel[form.adType]}</span>
             <h3 className="text-xl font-black text-black">{form.title}</h3>
             <p className="text-3xl font-black text-black bg-white border-[3px] border-black inline-block px-3 py-1 neo-shadow-sm">

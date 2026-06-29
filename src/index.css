@@ -299,6 +299,24 @@
   contain: layout style paint;
 }
 
+.ad-product-thumb {
+  overflow: hidden;
+  flex-shrink: 0;
+  @apply rounded-lg border-[3px] border-black bg-white;
+  box-shadow: 3px 3px 0 0 #000;
+  contain: layout style paint;
+}
+
+.ad-product-thumb--empty {
+  @apply flex items-center justify-center bg-amber-50;
+}
+
+.theme-create .ad-product-thumb {
+  border-width: 2px;
+  border-color: #18181b;
+  box-shadow: 3px 3px 0 0 #18181b;
+}
+
 .bento-desc { min-height: 120px; }
 .bento-actions { min-height: 96px; }
 

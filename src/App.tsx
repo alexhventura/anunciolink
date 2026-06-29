@@ -58,7 +58,7 @@ export default function App() {
       setTextOptimizedWarning(false);
 
       try {
-        const rawAd = toAdData(payload?.image, payload?.crop);
+        const rawAd = toAdData(payload?.image);
         const { ad: adObject, hash: hashResult, imageStripped, textOptimized } =
           await fitAdToUrlLength(rawAd, encodeAdData);
 

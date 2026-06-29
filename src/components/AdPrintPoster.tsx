@@ -5,7 +5,6 @@ import { isQrUrlSafe } from "../lib/qrShareUrl";
 import { TOOLTIP_COPY } from "../lib/tooltipCopy";
 import { BrandMark } from "./BrandMark";
 import { AdBrandedSurface } from "./AdBrandedSurface";
-import { CroppedAdImage } from "./CroppedAdImage";
 import { ActionButtonWithHint } from "./HelpTooltip";
 
 const TYPE_LABEL: Record<AdData["t"], string> = {
@@ -69,15 +68,12 @@ export function AdPrintPoster({
 
               <div className="a4-poster__photo-zone">
                 {ad.img ? (
-                  <CroppedAdImage
+                  <img
                     src={ad.img}
-                    crop={ad.crop}
                     alt={ad.title}
-                    type={ad.t}
-                    title={ad.title}
-                    fixedContainerSize={600}
-                    className="a4-poster__photo"
-                    variant="create"
+                    className="a4-poster__photo object-cover"
+                    width={600}
+                    height={600}
                   />
                 ) : (
                   <div className="a4-poster__photo-placeholder">{ad.title}</div>

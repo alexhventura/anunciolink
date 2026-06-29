@@ -7,7 +7,7 @@ export const TOOLTIP_COPY = {
   description:
     "Detalhe o estado do produto e informações importantes. Menos texto ajuda a manter o design do panfleto limpo.",
   photo:
-    "Suba uma foto nítida. Use os controles para dar zoom e arrastar o produto exatamente para o centro do quadro.",
+    "Selecione uma foto da galeria. O AnúncioLink redimensiona e otimiza automaticamente para caber no link do WhatsApp.",
   pix:
     "Sua chave Pix serve para gerar o pagamento direto. Ela fica salva com total privacidade apenas na URL do link.",
   adType:

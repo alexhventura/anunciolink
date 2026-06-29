@@ -1,6 +1,5 @@
 import { useCallback, useReducer } from "react";
-import type { AdData, AdType, BillingType, CropTransform, ImageUploadError } from "../types/ad";
-import { DEFAULT_CROP, isDefaultCrop } from "../lib/imageCrop";
+import type { AdData, AdType, BillingType, ImageUploadError } from "../types/ad";
 import { computeExpiresAt } from "../lib/adExpiry";
 import { sanitizePhone } from "../lib/formatters";
 
@@ -15,7 +14,6 @@ export interface AdFormState {
   cardLink: string;
   photoFile: File | null;
   photoPreview: string;
-  photoCrop: CropTransform;
   printMode: boolean;
   imageError: ImageUploadError | null;
   submitError: string | null;
@@ -39,7 +37,6 @@ const initialState: AdFormState = {
   cardLink: "",
   photoFile: null,
   photoPreview: "",
-  photoCrop: DEFAULT_CROP,
   printMode: false,
   imageError: null,
   submitError: null,
@@ -54,7 +51,6 @@ function adFormReducer(state: AdFormState, action: AdFormAction): AdFormState {
         ...state,
         photoFile: action.file,
         photoPreview: action.preview,
-        photoCrop: DEFAULT_CROP,
         imageError: null,
       };
     case "SET_IMAGE_ERROR":
@@ -92,7 +88,7 @@ export function useAdForm() {
   }, []);
 
   const toAdData = useCallback(
-    (compressedImage?: string, crop?: CropTransform): AdData => {
+    (compressedImage?: string): AdData => {
       const now = Date.now();
       return {
         t: state.adType,
@@ -104,7 +100,6 @@ export function useAdForm() {
         pix: state.pix.trim() || undefined,
         cardLink: state.cardLink.trim() || undefined,
         img: compressedImage,
-        crop: crop && !isDefaultCrop(crop) ? crop : undefined,
         timestamp: now,
         expiresAt: computeExpiresAt(now),
         printMode: state.printMode || undefined,
