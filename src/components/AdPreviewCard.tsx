@@ -37,7 +37,7 @@ export function AdPreviewCard({
   const priceLabel = price + (billingType === "recorrente" ? " /mês" : "");
 
   return (
-    <div className={`neo-card-white overflow-hidden ${className}`}>
+    <div className={`neo-card-white overflow-hidden min-w-0 ${className}`}>
       {showSecurityBadge && (
         <div className="flex justify-center px-4 pt-4 pb-0 bg-white">
           <SecurityBadge />
@@ -59,13 +59,16 @@ export function AdPreviewCard({
           </p>
         )}
       </div>
-      <div className="p-6 sm:p-8 space-y-3 bg-amber-500">
+      <div className="p-6 sm:p-8 space-y-3 bg-amber-500 min-w-0">
         <span className="chip !bg-black !text-amber-400">{TYPE_LABEL[adType]}</span>
-        <h3 className="text-xl font-black text-black leading-snug" itemProp="name">
+        <h3
+          className="text-xl font-black text-black leading-snug break-words [overflow-wrap:anywhere]"
+          itemProp="name"
+        >
           {title || "Título do anúncio"}
         </h3>
         <p
-          className="text-2xl sm:text-3xl font-black text-black bg-white border-[3px] border-black inline-block px-3 py-1 neo-shadow-sm tabular-nums"
+          className="text-xl sm:text-2xl md:text-3xl font-black text-black bg-white border-[3px] border-black inline-block max-w-full px-3 py-1 neo-shadow-sm tabular-nums break-words [overflow-wrap:anywhere]"
           itemProp="offers"
           itemScope
           itemType="https://schema.org/Offer"
@@ -74,7 +77,7 @@ export function AdPreviewCard({
           <meta itemProp="priceCurrency" content="BRL" />
         </p>
         <p
-          className="text-sm text-black/80 font-medium whitespace-pre-wrap line-clamp-6"
+          className="text-sm text-black/80 font-medium whitespace-pre-wrap break-words [overflow-wrap:anywhere] leading-relaxed"
           itemProp="description"
         >
           {description || "Descrição aparecerá aqui."}

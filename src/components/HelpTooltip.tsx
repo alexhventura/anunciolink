@@ -1,16 +1,95 @@
-import { useId, useState, type MouseEvent, type PointerEvent, type ReactNode } from "react";
+import {
+  useCallback,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type MouseEvent,
+  type PointerEvent,
+  type ReactNode,
+} from "react";
+import { createPortal } from "react-dom";
 
 interface HelpTooltipProps {
   text: string;
-  /** Posição do balão em relação ao ícone */
   placement?: "top" | "bottom";
-  /** Variante visual para fundos escuros (botões) */
   variant?: "default" | "on-dark";
+}
+
+const VIEWPORT_PAD = 12;
+const GAP = 8;
+const MAX_BUBBLE_W = 250;
+
+function clampBubbleLeft(centerX: number, bubbleWidth: number): number {
+  const half = bubbleWidth / 2;
+  const min = VIEWPORT_PAD + half;
+  const max = window.innerWidth - VIEWPORT_PAD - half;
+  return Math.max(min, Math.min(max, centerX));
 }
 
 export function HelpTooltip({ text, placement = "top", variant = "default" }: HelpTooltipProps) {
   const [open, setOpen] = useState(false);
+  const [bubbleStyle, setBubbleStyle] = useState<CSSProperties>({});
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const bubbleRef = useRef<HTMLSpanElement>(null);
   const tooltipId = useId();
+
+  const reposition = useCallback(() => {
+    const trigger = triggerRef.current;
+    const bubble = bubbleRef.current;
+    if (!trigger || !bubble) return;
+
+    const rect = trigger.getBoundingClientRect();
+    const bubbleWidth = Math.min(MAX_BUBBLE_W, window.innerWidth - VIEWPORT_PAD * 2);
+    const centerX = clampBubbleLeft(rect.left + rect.width / 2, bubbleWidth);
+    const bubbleRect = bubble.getBoundingClientRect();
+    const bubbleH = bubbleRect.height || 80;
+
+    if (placement === "bottom") {
+      let top = rect.bottom + GAP;
+      if (top + bubbleH > window.innerHeight - VIEWPORT_PAD) {
+        top = rect.top - GAP - bubbleH;
+      }
+      setBubbleStyle({
+        position: "fixed",
+        top: Math.max(VIEWPORT_PAD, top),
+        left: centerX,
+        transform: "translateX(-50%)",
+        width: bubbleWidth,
+        maxWidth: `min(${MAX_BUBBLE_W}px, calc(100vw - ${VIEWPORT_PAD * 2}px))`,
+        zIndex: 200,
+      });
+      return;
+    }
+
+    let top = rect.top - GAP - bubbleH;
+    if (top < VIEWPORT_PAD) {
+      top = rect.bottom + GAP;
+    }
+    setBubbleStyle({
+      position: "fixed",
+      top: Math.max(VIEWPORT_PAD, Math.min(top, window.innerHeight - bubbleH - VIEWPORT_PAD)),
+      left: centerX,
+      transform: "translateX(-50%)",
+      width: bubbleWidth,
+      maxWidth: `min(${MAX_BUBBLE_W}px, calc(100vw - ${VIEWPORT_PAD * 2}px))`,
+      zIndex: 200,
+    });
+  }, [placement]);
+
+  useLayoutEffect(() => {
+    if (!open) return;
+    reposition();
+    const raf = requestAnimationFrame(() => reposition());
+    window.addEventListener("resize", reposition);
+    window.addEventListener("scroll", reposition, true);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", reposition);
+      window.removeEventListener("scroll", reposition, true);
+    };
+  }, [open, reposition, text]);
 
   const toggle = (e: MouseEvent | PointerEvent) => {
     e.preventDefault();
@@ -18,11 +97,13 @@ export function HelpTooltip({ text, placement = "top", variant = "default" }: He
     setOpen((v) => !v);
   };
 
+  const bubbleClass =
+    variant === "on-dark" ? "help-tooltip__bubble help-tooltip__bubble--on-dark" : "help-tooltip__bubble";
+
   return (
-    <span
-      className={`help-tooltip group/hint relative inline-flex shrink-0 ${open ? "help-tooltip--open" : ""}`}
-    >
+    <span className={`help-tooltip group/hint relative inline-flex shrink-0 ${open ? "help-tooltip--open" : ""}`}>
       <button
+        ref={triggerRef}
         type="button"
         className={`help-tooltip__trigger ${variant === "on-dark" ? "help-tooltip__trigger--on-dark" : ""}`}
         aria-label="Ver instrução"
@@ -34,15 +115,20 @@ export function HelpTooltip({ text, placement = "top", variant = "default" }: He
       >
         <span aria-hidden="true">!</span>
       </button>
-      <span
-        id={tooltipId}
-        role="tooltip"
-        className={`help-tooltip__bubble help-tooltip__bubble--${placement} ${
-          variant === "on-dark" ? "help-tooltip__bubble--on-dark" : ""
-        }`}
-      >
-        {text}
-      </span>
+
+      {open &&
+        createPortal(
+          <span
+            ref={bubbleRef}
+            id={tooltipId}
+            role="tooltip"
+            className={bubbleClass}
+            style={{ ...bubbleStyle, opacity: 1, visibility: "visible", pointerEvents: "none" }}
+          >
+            {text}
+          </span>,
+          document.body
+        )}
     </span>
   );
 }
@@ -55,7 +141,6 @@ interface FieldLabelWithHintProps {
   children: ReactNode;
 }
 
-/** Label de formulário com ícone de instrução ao lado */
 export function FieldLabelWithHint({
   htmlFor,
   hint,
@@ -82,7 +167,6 @@ interface FieldLegendWithHintProps {
   children: ReactNode;
 }
 
-/** Legenda de fieldset com ícone de instrução ao lado */
 export function FieldLegendWithHint({ hint, children }: FieldLegendWithHintProps) {
   return (
     <legend className="label-field inline-flex items-center gap-1.5 flex-wrap w-full mb-0">
@@ -106,7 +190,6 @@ interface ActionButtonWithHintProps {
   "aria-label"?: string;
 }
 
-/** Botão de ação com tooltip no canto — toque no ! não dispara o clique principal */
 export function ActionButtonWithHint({
   hint,
   hintVariant = "on-dark",

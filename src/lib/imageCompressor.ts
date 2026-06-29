@@ -1,6 +1,7 @@
 import { MAX_IMAGE_BYTES } from "./constants";
 import type { ImageUploadError } from "../types/ad";
 import { loadImageElement } from "./imageCrop";
+import { isAllowedImageFile } from "./imageUtils";
 
 export class ImageCompressorError extends Error {
   code: ImageUploadError["code"];
@@ -30,8 +31,11 @@ export const URL_FIT_COMPRESSION_STEPS: ImageCompressionStep[] = [
 ];
 
 export function validateImageFile(file: File): ImageUploadError | null {
-  if (!file.type.startsWith("image/")) {
-    return { code: "INVALID_TYPE", message: "Selecione apenas arquivos de imagem (JPG, PNG, WebP)." };
+  if (!isAllowedImageFile(file)) {
+    return {
+      code: "INVALID_TYPE",
+      message: "Use JPG, PNG ou WebP (até 5 MB). Outros formatos podem não funcionar no link.",
+    };
   }
   if (file.size > MAX_IMAGE_BYTES) {
     return { code: "FILE_TOO_LARGE", message: "A imagem deve ter no máximo 5 MB." };

@@ -90,6 +90,7 @@ function stripImageDataUrl(dataUrl: string): string {
 function expandImageDataUrl(compact: string): string {
   if (compact.startsWith("w:")) return `data:image/webp;base64,${compact.slice(2)}`;
   if (compact.startsWith("j:")) return `data:image/jpeg;base64,${compact.slice(2)}`;
+  if (compact.startsWith("data:image/")) return compact;
   return `data:image/jpeg;base64,${compact}`;
 }
 

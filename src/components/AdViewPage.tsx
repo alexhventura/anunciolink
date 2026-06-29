@@ -8,6 +8,7 @@ import { AdBrandedSurface } from "./AdBrandedSurface";
 import { AdExpiredBanner } from "./AdExpiredBanner";
 import { SecurityBadge } from "./SecurityBadge";
 import { ViewEnter } from "./ViewEnter";
+import { PixPaymentSection } from "./PixPaymentSection";
 import { copyToClipboard } from "../lib/formatters";
 
 interface AdViewPageProps {
@@ -34,7 +35,6 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
   };
 
   const hasPayment = Boolean(ad.pix || ad.cardLink);
-  const pixBtnClass = pixCopied ? "btn-payment-pix-copied" : "btn-payment-pix";
   const safeCardLink = ad.cardLink;
 
   return (
@@ -60,8 +60,6 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
           showSecurityBadge
           className={isExpired ? "opacity-95" : ""}
         />
-
-        <AdSenseSlot slot="meio" ready={adsenseReady} />
 
         {isExpired ? (
           <div className="view-enter-delayed">
@@ -89,54 +87,27 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
               </div>
 
               {hasPayment && (
-                <div className="space-y-3">
-                  {ad.pix && safeCardLink ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <button
-                        type="button"
-                        onClick={handleCopyPix}
-                        id="btn-buyer-pix-split"
-                        aria-live="polite"
-                        aria-label={pixCopied ? "Chave Pix copiada" : "Copiar chave Pix do vendedor"}
-                        className={pixBtnClass}
-                      >
-                        {pixCopied ? "✓ Pix copiado" : "Copiar chave Pix"}
-                      </button>
-                      <a
-                        href={safeCardLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        id="link-buyer-card-split"
-                        className="btn-payment-card"
-                        aria-label="Pagar com cartão em site externo do vendedor"
-                      >
-                        Pagar com cartão
-                      </a>
-                    </div>
-                  ) : ad.pix ? (
-                    <button
-                      type="button"
-                      onClick={handleCopyPix}
-                      id="btn-buyer-pix-full"
-                      aria-live="polite"
-                      aria-label={pixCopied ? "Chave Pix copiada" : "Copiar chave Pix do vendedor"}
-                      className={`${pixBtnClass} w-full`}
+                <div className="space-y-4">
+                  {ad.pix && (
+                    <PixPaymentSection
+                      pixCode={ad.pix}
+                      copied={pixCopied}
+                      onCopy={handleCopyPix}
+                      layout={safeCardLink ? "split" : "full"}
+                    />
+                  )}
+
+                  {safeCardLink && (
+                    <a
+                      href={safeCardLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      id={ad.pix ? "link-buyer-card-split" : "link-buyer-card-full"}
+                      className="btn-payment-card w-full"
+                      aria-label="Pagar com cartão em site externo do vendedor"
                     >
-                      {pixCopied ? "✓ Chave Pix copiada" : "Copiar chave Pix"}
-                    </button>
-                  ) : (
-                    safeCardLink && (
-                      <a
-                        href={safeCardLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        id="link-buyer-card-full"
-                        className="btn-payment-card w-full"
-                        aria-label="Pagar com cartão em site externo do vendedor"
-                      >
-                        Pagar com cartão
-                      </a>
-                    )
+                      Pagar com cartão
+                    </a>
                   )}
                 </div>
               )}

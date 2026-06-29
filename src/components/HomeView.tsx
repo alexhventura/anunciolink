@@ -9,7 +9,6 @@ import { ViewEnter } from "./ViewEnter";
 import { formatBRL, formatPhoneNumber, isValidPaymentUrl } from "../lib/formatters";
 import { validateImageFile, ImageCompressorError, compressImageOnUpload } from "../lib/imageCompressor";
 import { MAX_DESC_LENGTH, MAX_PIX_LENGTH, MAX_TITLE_LENGTH, SITE_NAME } from "../lib/constants";
-import { sanitizePlainText } from "../lib/sanitize";
 import { TOOLTIP_COPY } from "../lib/tooltipCopy";
 import { ActionButtonWithHint, FieldLabelWithHint, FieldLegendWithHint } from "./HelpTooltip";
 
@@ -207,7 +206,7 @@ export function HomeView({
                 required
                 maxLength={MAX_TITLE_LENGTH}
                 value={form.title}
-                onChange={(e) => onFieldChange("title", sanitizePlainText(e.target.value, MAX_TITLE_LENGTH))}
+                onChange={(e) => onFieldChange("title", e.target.value)}
                 placeholder={getPlaceholderTitle()}
                 autoComplete="off"
                 className="input-field"
@@ -245,7 +244,7 @@ export function HomeView({
                 maxLength={MAX_DESC_LENGTH}
                 rows={5}
                 value={form.description}
-                onChange={(e) => onFieldChange("description", sanitizePlainText(e.target.value, MAX_DESC_LENGTH))}
+                onChange={(e) => onFieldChange("description", e.target.value)}
                 placeholder="Descreva o produto ou serviço com clareza."
                 className="input-field resize-y min-h-[120px]"
               />

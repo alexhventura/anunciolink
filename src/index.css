@@ -466,16 +466,17 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .help-tooltip:hover .help-tooltip__bubble,
-  .help-tooltip:focus-within .help-tooltip__bubble {
+  .help-tooltip:not(.help-tooltip--open):hover .help-tooltip__bubble,
+  .help-tooltip:not(.help-tooltip--open):focus-within .help-tooltip__bubble {
     opacity: 1;
     visibility: visible;
   }
 }
 
+/* Balão aberto: renderizado via portal (HelpTooltip.tsx) — esconde placeholder local */
 .help-tooltip--open .help-tooltip__bubble {
-  opacity: 1;
-  visibility: visible;
+  opacity: 0;
+  visibility: hidden;
 }
 
 .action-btn-hint__icon {
@@ -487,30 +488,6 @@
   right: 0;
   left: auto;
   transform: none;
-}
-
-@media (max-width: 640px) {
-  .help-tooltip--open .help-tooltip__bubble {
-    position: fixed;
-    left: 50% !important;
-    right: auto !important;
-    bottom: max(1rem, env(safe-area-inset-bottom, 0px));
-    top: auto !important;
-    transform: translateX(-50%) !important;
-    width: min(250px, calc(100vw - 2rem));
-    max-width: 85vw;
-    white-space: normal;
-    word-break: break-word;
-    z-index: 100;
-  }
-
-  .action-btn-hint__icon .help-tooltip__bubble {
-    right: auto;
-    left: 50%;
-    transform: translateX(-50%);
-    width: min(250px, calc(100vw - 2rem));
-    max-width: 85vw;
-  }
 }
 
 /* ——— Navegação institucional ——— */
@@ -546,6 +523,24 @@
 
 .institutional-content strong {
   @apply font-black text-zinc-900;
+}
+
+/* ——— Pagamento Pix (QR + copiar) ——— */
+.pix-payment__qr-block {
+  @apply rounded-lg border-[3px] border-zinc-900 bg-amber-50 p-4;
+  box-shadow: 3px 3px 0 0 #000;
+}
+
+.pix-payment__qr-label {
+  @apply text-xs font-black uppercase text-zinc-900 text-center mb-3 tracking-wide;
+}
+
+.pix-payment__qr-wrap {
+  @apply flex items-center justify-center rounded-lg border-2 border-zinc-900 bg-white p-3 shadow-[2px_2px_0_0_#18181b];
+}
+
+.pix-payment__qr-hint {
+  @apply mt-3 max-w-xs mx-auto leading-snug;
 }
 
 .security-badge {
@@ -691,8 +686,13 @@
   width: 210mm;
   height: 297mm;
   margin: 0;
-  padding: 0;
+  padding: 10mm 12mm;
   background: #fffbeb;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8mm;
   overflow: hidden;
   font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
   color: #18181b;
@@ -700,124 +700,45 @@
   print-color-adjust: exact;
 }
 
-
-.a4-poster__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-shrink: 0;
-}
-
-.a4-poster__chip {
-  display: inline-block;
-  padding: 1.5mm 4mm;
-  border: 0.6mm solid #18181b;
-  background: #18181b;
-  color: #fbbf24;
-  font-size: 8pt;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  box-shadow: 1.5mm 1.5mm 0 0 #18181b;
-}
-
-.a4-poster__banner {
-  flex-shrink: 0;
-  background: #18181b;
-  border: 0.8mm solid #18181b;
-  padding: 4mm 5mm;
-  box-shadow: 2mm 2mm 0 0 #f59e0b;
-}
-
-.a4-poster__title {
-  margin: 0;
-  font-size: 20pt;
-  font-weight: 800;
-  line-height: 1.1;
-  color: #fbbf24;
-  letter-spacing: -0.03em;
-  word-break: break-word;
-}
-
-.a4-poster__photo-zone {
+.a4-poster__card-wrap {
+  width: 100%;
+  max-width: 170mm;
   flex: 1 1 auto;
   min-height: 0;
-  max-height: 148mm;
-  border: 1.2mm solid #18181b;
-  background: #ffffff;
-  box-shadow: 2.5mm 2.5mm 0 0 rgba(24, 24, 27, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
 }
 
-.a4-poster__photo {
+.a4-poster__card-wrap .neo-card-white {
   width: 100%;
-  height: 100%;
-  display: block;
-  aspect-ratio: 1 / 1;
+  transform: scale(1.35);
+  transform-origin: center center;
 }
 
-.a4-poster__photo-placeholder {
-  font-size: 14pt;
-  font-weight: 700;
-  color: #71717a;
-  text-align: center;
-  padding: 10mm;
+.a4-poster__card-wrap .ad-product-thumb {
+  width: 200px !important;
+  height: 200px !important;
 }
 
-.a4-poster__base {
+.a4-poster__scan-row {
   flex-shrink: 0;
-  display: grid;
-  grid-template-columns: 0.85fr 1.15fr;
-  gap: 5mm;
-  align-items: stretch;
-}
-
-.a4-poster__price-box {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  background: #ffffff;
-  border: 1mm solid #18181b;
-  padding: 5mm 6mm;
-  box-shadow: 2mm 2mm 0 0 #f59e0b;
-}
-
-.a4-poster__price-label {
-  font-size: 8pt;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  color: #71717a;
-  margin-bottom: 2mm;
-}
-
-.a4-poster__price {
-  margin: 0;
-  font-size: 28pt;
-  font-weight: 900;
-  line-height: 1;
-  color: #d97706;
-  letter-spacing: -0.025em;
-}
-
-.a4-poster__qr-block {
+  width: 100%;
+  max-width: 170mm;
   display: flex;
   align-items: center;
-  gap: 4mm;
+  gap: 6mm;
+  padding: 5mm 6mm;
   background: #ffffff;
-  border: 1mm solid #18181b;
-  padding: 4mm 5mm;
-  box-shadow: 2mm 2mm 0 0 rgba(24, 24, 27, 0.12);
+  border: 0.8mm solid #18181b;
+  box-shadow: 2mm 2mm 0 0 #18181b;
 }
 
 .a4-poster__qr-wrap {
   flex-shrink: 0;
-  width: 44mm;
-  height: 44mm;
-  padding: 1.5mm;
+  width: 42mm;
+  height: 42mm;
+  padding: 2mm;
   border: 0.6mm solid #18181b;
   background: #fff;
   display: flex;
@@ -830,21 +751,36 @@
   height: 100% !important;
 }
 
-.a4-poster__cta-headline {
-  margin: 0 0 1.5mm;
-  font-size: 10pt;
-  font-weight: 800;
-  color: #18181b;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
+.a4-poster__scan-copy {
+  flex: 1;
+  min-width: 0;
 }
 
-.a4-poster__cta-body {
+.a4-poster__scan-title {
   margin: 0 0 2mm;
+  font-size: 11pt;
+  font-weight: 900;
+  color: #18181b;
+  line-height: 1.2;
+}
+
+.a4-poster__scan-body {
+  margin: 0;
   font-size: 9pt;
-  font-weight: 500;
+  font-weight: 600;
   color: #52525b;
-  line-height: 1.35;
+  line-height: 1.4;
+}
+
+.a4-poster__brand {
+  flex-shrink: 0;
+  margin: 0;
+  font-size: 8pt;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #71717a;
+  text-align: center;
 }
 
 @media print {
@@ -887,8 +823,7 @@
     overflow: hidden;
   }
 
-  html.printing-a4 .a4-poster__sheet,
-  html.printing-a4 .ad-branded-surface--print {
+  html.printing-a4 .a4-poster__sheet {
     width: 210mm !important;
     height: 297mm !important;
     max-height: 297mm !important;
