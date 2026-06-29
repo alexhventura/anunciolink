@@ -1,14 +1,10 @@
 import { useEffect } from "react";
-import type { AdData } from "../types/ad";
-import { applyAdDocumentMeta, applyHomeDocumentMeta } from "../lib/documentMeta";
+import type { AdData, AppView } from "../types/ad";
+import { applyDocumentMetaForView } from "../lib/documentMeta";
 
 /** Mantém <head> sincronizado quando a view React muda */
-export function useDocumentMeta(ad: AdData | null, isAdView: boolean) {
+export function useDocumentMeta(ad: AdData | null, currentView: AppView) {
   useEffect(() => {
-    if (isAdView && ad) {
-      applyAdDocumentMeta(ad);
-    } else {
-      applyHomeDocumentMeta();
-    }
-  }, [ad, isAdView]);
+    applyDocumentMetaForView(currentView, ad);
+  }, [ad, currentView]);
 }

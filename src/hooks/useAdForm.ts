@@ -2,6 +2,7 @@ import { useCallback, useReducer } from "react";
 import type { AdData, AdType, BillingType, ImageUploadError } from "../types/ad";
 import { computeExpiresAt } from "../lib/adExpiry";
 import { sanitizePhone } from "../lib/formatters";
+import { sanitizeAdData } from "../lib/sanitizeAd";
 
 export interface AdFormState {
   adType: AdType;
@@ -90,7 +91,7 @@ export function useAdForm() {
   const toAdData = useCallback(
     (compressedImage?: string): AdData => {
       const now = Date.now();
-      return {
+      return sanitizeAdData({
         t: state.adType,
         title: state.title.trim(),
         price: state.price.trim(),
@@ -103,7 +104,7 @@ export function useAdForm() {
         timestamp: now,
         expiresAt: computeExpiresAt(now),
         printMode: state.printMode || undefined,
-      };
+      });
     },
     [state]
   );

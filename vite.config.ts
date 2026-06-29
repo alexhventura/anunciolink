@@ -1,22 +1,51 @@
-import tailwindcss from '@tailwindcss/vite';
-import react from '@vitejs/plugin-react';
-import path from 'path';
-import {defineConfig} from 'vite';
+import tailwindcss from "@tailwindcss/vite";
+import react from "@vitejs/plugin-react";
+import { writeFileSync } from "fs";
+import path from "path";
+import { defineConfig, loadEnv, type Plugin } from "vite";
 
-export default defineConfig(() => {
+function adsTxtPlugin(clientId: string): Plugin {
   return {
-    plugins: [react(), tailwindcss()],
+    name: "ads-txt",
+    closeBundle() {
+      const pubId = clientId.replace(/^ca-/, "");
+      if (!pubId || pubId.includes("x")) return;
+      const line = `google.com, ${pubId}, DIRECT, f08c47fec0942fa0\n`;
+      writeFileSync(path.resolve("dist", "ads.txt"), line, "utf8");
+    },
+  };
+}
+
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), "");
+  const adsenseClient = env.VITE_ADSENSE_CLIENT_ID ?? "";
+
+  return {
+    plugins: [react(), tailwindcss(), adsTxtPlugin(adsenseClient)],
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, '.'),
+        "@": path.resolve(__dirname, "."),
+      },
+    },
+    build: {
+      target: "es2020",
+      cssMinify: true,
+      minify: "esbuild",
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes("node_modules/motion")) return "motion";
+            if (id.includes("node_modules/lucide-react")) return "icons";
+            if (id.includes("node_modules/fflate")) return "codec";
+            if (id.includes("node_modules/react-dom")) return "react-dom";
+            if (id.includes("node_modules/react/")) return "react";
+          },
+        },
       },
     },
     server: {
-      // HMR is disabled in AI Studio via DISABLE_HMR env var.
-      // Do not modifyâfile watching is disabled to prevent flickering during agent edits.
-      hmr: process.env.DISABLE_HMR !== 'true',
-      // Disable file watching when DISABLE_HMR is true to save CPU during agent edits.
-      watch: process.env.DISABLE_HMR === 'true' ? null : {},
+      hmr: process.env.DISABLE_HMR !== "true",
+      watch: process.env.DISABLE_HMR === "true" ? null : {},
     },
   };
 });

@@ -4,6 +4,7 @@ import { MAX_SHARE_URL_LENGTH, MAX_SHARE_URL_SAFE } from "./constants";
 import { fromCompactWire, normalizeLegacyAd, toCompactWire } from "./adWire";
 import { URL_FIT_COMPRESSION_STEPS, compressImageAtStep } from "./imageCompressor";
 import { estimateAdUrlLength } from "./adRoutes";
+import { sanitizeAdData } from "./sanitizeAd";
 
 export { buildAdUrl, buildAdPath, extractPayloadFromLocation } from "./adRoutes";
 export { MAX_SHARE_URL_LENGTH, MAX_SHARE_URL_SAFE } from "./constants";
@@ -86,11 +87,11 @@ export function decodeAdData(payload: string): AdData | null {
 
   if (trimmed.startsWith(V2_PREFIX)) {
     const ad = decompressV2Payload(trimmed.slice(V2_PREFIX.length));
-    if (ad && isValidAd(ad)) return ad;
+    if (ad && isValidAd(ad)) return sanitizeAdData(ad);
   }
 
   const legacy = legacyBase64Decode(trimmed);
-  if (legacy && isValidAd(legacy)) return legacy;
+  if (legacy && isValidAd(legacy)) return sanitizeAdData(legacy);
 
   return null;
 }

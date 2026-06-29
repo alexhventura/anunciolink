@@ -89,6 +89,8 @@ export function ImageCropEditor({
           <img
             src={src}
             alt=""
+            width={Math.round(previewStyle.width)}
+            height={Math.round(previewStyle.height)}
             draggable={false}
             className="absolute left-0 top-0 max-w-none select-none pointer-events-none"
             style={{

@@ -103,6 +103,7 @@ interface ActionButtonWithHintProps {
   onClick?: () => void;
   "aria-busy"?: boolean;
   "aria-live"?: "polite" | "off" | "assertive";
+  "aria-label"?: string;
 }
 
 /** Botão de ação com tooltip no canto — toque no ! não dispara o clique principal */
@@ -117,6 +118,7 @@ export function ActionButtonWithHint({
   onClick,
   "aria-busy": ariaBusy,
   "aria-live": ariaLive,
+  "aria-label": ariaLabel,
 }: ActionButtonWithHintProps) {
   return (
     <span className="action-btn-hint relative block w-full">
@@ -128,6 +130,7 @@ export function ActionButtonWithHint({
         onClick={onClick}
         aria-busy={ariaBusy}
         aria-live={ariaLive}
+        aria-label={ariaLabel}
       >
         {children}
       </button>

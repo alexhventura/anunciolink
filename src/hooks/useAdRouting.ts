@@ -8,7 +8,12 @@ import {
   navigateToHome,
   upgradeHashRouteToPath,
 } from "../lib/adRoutes";
-import { applyAdDocumentMeta, applyHomeDocumentMeta } from "../lib/documentMeta";
+import { applyDocumentMetaForView } from "../lib/documentMeta";
+import {
+  getInstitutionalViewFromPathname,
+  isInstitutionalView,
+  navigateToInstitutionalPage,
+} from "../lib/siteRoutes";
 
 function resolveRoute(): { view: AppView; ad: AdData | null; payload: string } {
   if (typeof window === "undefined") {
@@ -17,10 +22,17 @@ function resolveRoute(): { view: AppView; ad: AdData | null; payload: string } {
 
   upgradeHashRouteToPath();
   const payload = extractPayloadFromLocation();
-  if (!payload) return { view: "home", ad: null, payload: "" };
+  if (payload) {
+    const ad = decodeAdData(payload);
+    if (ad) return { view: "anuncio", ad, payload };
+    return { view: "home", ad: null, payload: "" };
+  }
 
-  const ad = decodeAdData(payload);
-  if (ad) return { view: "anuncio", ad, payload };
+  const institutionalView = getInstitutionalViewFromPathname(window.location.pathname);
+  if (institutionalView) {
+    return { view: institutionalView, ad: null, payload: "" };
+  }
+
   return { view: "home", ad: null, payload: "" };
 }
 
@@ -33,13 +45,19 @@ function applyRouteFromLocation(): { view: AppView; ad: AdData | null; payload: 
   if (payload) {
     const data = decodeAdData(payload);
     if (data) {
-      applyAdDocumentMeta(data);
+      applyDocumentMetaForView("anuncio", data);
       return { view: "anuncio", ad: data, payload };
     }
   }
 
+  const institutionalView = getInstitutionalViewFromPathname(window.location.pathname);
+  if (institutionalView) {
+    applyDocumentMetaForView(institutionalView, null);
+    return { view: institutionalView, ad: null, payload: "" };
+  }
+
   if (!isAdPathname(window.location.pathname)) {
-    applyHomeDocumentMeta();
+    applyDocumentMetaForView("home", null);
   }
 
   return { view: "home", ad: null, payload: "" };
@@ -55,6 +73,12 @@ export function useAdRouting() {
     setAdPayload(route.payload);
     setDecodedAd(route.ad);
     setCurrentView(route.view);
+  }, []);
+
+  useEffect(() => {
+    if (initialRoute.view !== "home" || initialRoute.ad) {
+      applyDocumentMetaForView(initialRoute.view, initialRoute.ad);
+    }
   }, []);
 
   useEffect(() => {
@@ -91,7 +115,7 @@ export function useAdRouting() {
 
   const resetToHome = useCallback(() => {
     navigateToHome(true);
-    applyHomeDocumentMeta();
+    applyDocumentMetaForView("home", null);
     setAdPayload("");
     setDecodedAd(null);
     setCurrentView("home");
@@ -99,7 +123,7 @@ export function useAdRouting() {
 
   const backToEdit = useCallback(() => {
     navigateToHome(true);
-    applyHomeDocumentMeta();
+    applyDocumentMetaForView("home", null);
     setCurrentView("home");
   }, []);
 
@@ -107,12 +131,28 @@ export function useAdRouting() {
     navigateToAdPath(payload, true);
     const ad = decodeAdData(payload);
     if (ad) {
-      applyAdDocumentMeta(ad);
+      applyDocumentMetaForView("anuncio", ad);
       setAdPayload(payload);
       setDecodedAd(ad);
       setCurrentView("anuncio");
     }
   }, []);
+
+  const navigateToPage = useCallback((view: AppView) => {
+    if (view === "anuncio" || view === "success") return;
+
+    if (view === "home") {
+      resetToHome();
+      return;
+    }
+
+    navigateToInstitutionalPage(view);
+    applyDocumentMetaForView(view, null);
+    setAdPayload("");
+    setDecodedAd(null);
+    setCurrentView(view);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [resetToHome]);
 
   return {
     currentView,
@@ -123,5 +163,7 @@ export function useAdRouting() {
     resetToHome,
     backToEdit,
     goToAd,
+    navigateToPage,
+    isInstitutionalView: isInstitutionalView(currentView),
   };
 }

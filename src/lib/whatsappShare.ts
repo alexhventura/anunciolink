@@ -1,4 +1,6 @@
-const DEFAULT_OG_IMAGE_PATH = "/og-default.jpg";
+import { sanitizePlainText } from "./sanitize";
+
+export const DEFAULT_OG_IMAGE_PATH = "/og-default.svg";
 
 /** Garante prefixo único R$ para exibição na mensagem */
 export function formatPriceForShare(price: string): string {
@@ -26,9 +28,9 @@ export function buildWhatsAppShareMessage(
   description: string,
   adUrl: string
 ): string {
-  const safeTitle = title.trim() || "Produto";
-  const safePrice = formatPriceForShare(price);
-  const safeDesc = shortenDescriptionForShare(description);
+  const safeTitle = sanitizePlainText(title, 100) || "Produto";
+  const safePrice = formatPriceForShare(sanitizePlainText(price, 32));
+  const safeDesc = shortenDescriptionForShare(sanitizePlainText(description, 500));
 
   return (
     `🛍️ *NOVO ANÚNCIO NO ANÚNCIOLINK*\n\n` +
@@ -50,5 +52,3 @@ export function buildWhatsAppShareUrl(
     buildWhatsAppShareMessage(title, price, description, adUrl)
   )}`;
 }
-
-export { DEFAULT_OG_IMAGE_PATH };

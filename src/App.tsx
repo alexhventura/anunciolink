@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useCallback, useState } from "react";
+import { Suspense, lazy, useCallback, useState } from "react";
 import { AnimatePresence } from "motion/react";
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
@@ -24,9 +24,38 @@ import {
 } from "./lib/adCodec";
 import { saveAdToHistory } from "./lib/adHistory";
 
+const HowItWorksPage = lazy(() =>
+  import("./components/pages/HowItWorksPage").then((m) => ({ default: m.HowItWorksPage }))
+);
+const AboutPage = lazy(() =>
+  import("./components/pages/AboutPage").then((m) => ({ default: m.AboutPage }))
+);
+const PrivacyPage = lazy(() =>
+  import("./components/pages/PrivacyPage").then((m) => ({ default: m.PrivacyPage }))
+);
+const TermsPage = lazy(() =>
+  import("./components/pages/TermsPage").then((m) => ({ default: m.TermsPage }))
+);
+
+function PageFallback() {
+  return (
+    <div className="neo-card-white p-10 text-center" role="status" aria-live="polite">
+      <p className="text-sm font-bold text-zinc-700">Carregando…</p>
+    </div>
+  );
+}
+
 export default function App() {
-  const { currentView, setCurrentView, decodedAd, openSavedAdUrl, resetToHome, backToEdit } =
-    useAdRouting();
+  const {
+    currentView,
+    setCurrentView,
+    decodedAd,
+    openSavedAdUrl,
+    resetToHome,
+    backToEdit,
+    navigateToPage,
+    isInstitutionalView,
+  } = useAdRouting();
   const { state: form, setField, setPhoto, setImageError, setSubmitError, reset: resetForm, toAdData } =
     useAdForm();
   const { refresh: refreshHistory } = useAdHistory();
@@ -36,11 +65,12 @@ export default function App() {
   const [textOptimizedWarning, setTextOptimizedWarning] = useState(false);
 
   const isAdView = currentView === "anuncio";
-  const showAdsense = isAdView || currentView === "success";
+  const showAdsense =
+    currentView === "home" || isAdView || currentView === "success" || isInstitutionalView;
   const { adsenseReady } = useAdSenseLoader(showAdsense);
   const themeClass = "theme-create";
 
-  useDocumentMeta(decodedAd, isAdView);
+  useDocumentMeta(decodedAd, currentView);
 
   const handleResetHome = useCallback(() => {
     resetForm();
@@ -91,14 +121,22 @@ export default function App() {
 
   return (
     <div className={`min-h-screen font-sans antialiased ${themeClass}`}>
-      <Header showNewAdButton={currentView !== "home"} onResetHome={handleResetHome} />
+      <a href="#conteudo-principal" className="skip-link">
+        Ir para o conteúdo principal
+      </a>
+      <Header onResetHome={handleResetHome} onNavigate={navigateToPage} />
 
-      <main className="mx-auto max-w-xl px-5 py-12 md:py-16">
+      <main
+        id="conteudo-principal"
+        aria-label="Conteúdo principal do Anuncio Link"
+        className={`mx-auto px-5 py-12 md:py-16 ${isInstitutionalView ? "max-w-2xl" : "max-w-xl"}`}
+      >
         <AnimatePresence mode="wait">
           {currentView === "home" && (
             <HomeView
               form={form}
               isSubmitting={isSubmitting}
+              adsenseReady={adsenseReady}
               onFieldChange={setField}
               onPhotoChange={setPhoto}
               onImageError={setImageError}
@@ -123,10 +161,34 @@ export default function App() {
           {currentView === "anuncio" && decodedAd && (
             <AdViewPage ad={decodedAd} adsenseReady={adsenseReady} onCreateOwn={handleResetHome} />
           )}
+
+          {currentView === "como-funciona" && (
+            <Suspense fallback={<PageFallback />}>
+              <HowItWorksPage adsenseReady={adsenseReady} />
+            </Suspense>
+          )}
+
+          {currentView === "sobre" && (
+            <Suspense fallback={<PageFallback />}>
+              <AboutPage adsenseReady={adsenseReady} />
+            </Suspense>
+          )}
+
+          {currentView === "privacidade" && (
+            <Suspense fallback={<PageFallback />}>
+              <PrivacyPage adsenseReady={adsenseReady} />
+            </Suspense>
+          )}
+
+          {currentView === "termos" && (
+            <Suspense fallback={<PageFallback />}>
+              <TermsPage adsenseReady={adsenseReady} />
+            </Suspense>
+          )}
         </AnimatePresence>
       </main>
 
-      <Footer />
+      <Footer onNavigate={navigateToPage} />
     </div>
   );
 }

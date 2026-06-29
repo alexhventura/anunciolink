@@ -5,15 +5,18 @@ import type { AdImagePayload } from "../types/ad";
 import { AdPreviewCard } from "./AdPreviewCard";
 import { AdProductThumb } from "./AdProductThumb";
 import { MyAdsPanel } from "./MyAdsPanel";
+import { AdSenseSlot } from "./AdSenseSlot";
 import { formatBRL, formatPhoneNumber, isValidPaymentUrl } from "../lib/formatters";
 import { validateImageFile, ImageCompressorError, compressImageOnUpload } from "../lib/imageCompressor";
 import { MAX_DESC_LENGTH, MAX_PIX_LENGTH, MAX_TITLE_LENGTH, SITE_NAME } from "../lib/constants";
+import { sanitizePlainText } from "../lib/sanitize";
 import { TOOLTIP_COPY } from "../lib/tooltipCopy";
 import { ActionButtonWithHint, FieldLabelWithHint, FieldLegendWithHint } from "./HelpTooltip";
 
 interface HomeViewProps {
   form: AdFormState;
   isSubmitting: boolean;
+  adsenseReady: boolean;
   onFieldChange: <K extends keyof AdFormState>(field: K, value: AdFormState[K]) => void;
   onPhotoChange: (file: File | null, preview: string) => void;
   onImageError: (error: { code: string; message: string } | null) => void;
@@ -31,6 +34,7 @@ const AD_TYPES = [
 export function HomeView({
   form,
   isSubmitting,
+  adsenseReady,
   onFieldChange,
   onPhotoChange,
   onImageError,
@@ -140,6 +144,8 @@ export function HomeView({
 
       <MyAdsPanel onOpenAd={onOpenSavedAd} />
 
+      <AdSenseSlot slot="topo" ready={adsenseReady} />
+
       {/* Formulário */}
       <div className="max-w-xl mx-auto w-full">
         <div className="neo-card-white p-8 md:p-10">
@@ -208,7 +214,7 @@ export function HomeView({
                 required
                 maxLength={MAX_TITLE_LENGTH}
                 value={form.title}
-                onChange={(e) => onFieldChange("title", e.target.value)}
+                onChange={(e) => onFieldChange("title", sanitizePlainText(e.target.value, MAX_TITLE_LENGTH))}
                 placeholder={getPlaceholderTitle()}
                 autoComplete="off"
                 className="input-field"
@@ -246,7 +252,7 @@ export function HomeView({
                 maxLength={MAX_DESC_LENGTH}
                 rows={5}
                 value={form.description}
-                onChange={(e) => onFieldChange("description", e.target.value)}
+                onChange={(e) => onFieldChange("description", sanitizePlainText(e.target.value, MAX_DESC_LENGTH))}
                 placeholder="Descreva o produto ou serviço com clareza."
                 className="input-field resize-y min-h-[120px]"
               />
@@ -427,6 +433,7 @@ export function HomeView({
                 image={form.photoPreview}
                 billingType={form.billingType}
               />
+              <AdSenseSlot slot="meio" ready={adsenseReady} />
             </div>
 
             <ActionButtonWithHint
@@ -436,6 +443,7 @@ export function HomeView({
               id="btn-submit-generate"
               disabled={isSubmitting || isCompressingPhoto}
               className="btn-primary"
+              aria-label={isSubmitting ? "Gerando anúncio" : "Gerar anúncio grátis"}
             >
               {isSubmitting ? "Gerando…" : "⚡ Gerar anúncio grátis"}
             </ActionButtonWithHint>

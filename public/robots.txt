@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Allow: /como-funciona
+Allow: /sobre
+Allow: /privacidade
+Allow: /termos
+Allow: /a/
+
+Sitemap: https://www.anunciolink.com.br/sitemap.xml

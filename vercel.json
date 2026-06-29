@@ -1,4 +1,21 @@
 {
-  "rewrites": [{ "source": "/a/(.*)", "destination": "/index.html" }],
-  "redirects": [{ "source": "/favicon.ico", "destination": "/favicon.svg", "permanent": true }]
+  "rewrites": [
+    { "source": "/a/(.*)", "destination": "/index.html" },
+    { "source": "/como-funciona", "destination": "/index.html" },
+    { "source": "/sobre", "destination": "/index.html" },
+    { "source": "/privacidade", "destination": "/index.html" },
+    { "source": "/termos", "destination": "/index.html" }
+  ],
+  "redirects": [{ "source": "/favicon.ico", "destination": "/favicon.svg", "permanent": true }],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
+      ]
+    }
+  ]
 }

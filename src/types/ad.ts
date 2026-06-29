@@ -1,7 +1,14 @@
 export type AdType = "venda" | "servico" | "vaquinha";
 export type BillingType = "unico" | "recorrente";
 export type AdSenseSlot = "topo" | "meio" | "rodape";
-export type AppView = "home" | "success" | "anuncio";
+export type AppView =
+  | "home"
+  | "success"
+  | "anuncio"
+  | "como-funciona"
+  | "sobre"
+  | "privacidade"
+  | "termos";
 
 export interface CropTransform {
   zoom: number;

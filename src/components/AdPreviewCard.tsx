@@ -1,5 +1,6 @@
 import type { AdType, BillingType } from "../types/ad";
 import { AdProductThumb } from "./AdProductThumb";
+import { SecurityBadge } from "./SecurityBadge";
 
 const TYPE_LABEL: Record<AdType, string> = {
   venda: "Venda",
@@ -16,6 +17,7 @@ interface AdPreviewCardProps {
   billingType?: BillingType;
   priority?: boolean;
   showPhotoCaption?: boolean;
+  showSecurityBadge?: boolean;
   className?: string;
 }
 
@@ -29,12 +31,18 @@ export function AdPreviewCard({
   billingType = "unico",
   priority = false,
   showPhotoCaption = true,
+  showSecurityBadge = false,
   className = "",
 }: AdPreviewCardProps) {
   const priceLabel = price + (billingType === "recorrente" ? " /mês" : "");
 
   return (
     <div className={`neo-card-white overflow-hidden ${className}`}>
+      {showSecurityBadge && (
+        <div className="flex justify-center px-4 pt-4 pb-0 bg-white">
+          <SecurityBadge />
+        </div>
+      )}
       <div className="px-6 pt-6 pb-4 text-center bg-white border-b-[3px] border-black">
         <AdProductThumb
           src={image}

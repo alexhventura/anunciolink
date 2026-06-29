@@ -94,6 +94,8 @@ export function SuccessView({
       transition={{ duration: 0.2 }}
       className="max-w-xl mx-auto space-y-10"
     >
+      <AdSenseSlot slot="topo" ready={adsenseReady} />
+
       <div className="neo-card-white p-8 md:p-10 text-center space-y-8 no-print">
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-lg border-[3px] border-black bg-lime-300 neo-shadow">
           <Check className="h-8 w-8 text-black" strokeWidth={3} aria-hidden="true" />
@@ -147,6 +149,7 @@ export function SuccessView({
                 onClick={handleCopyLink}
                 id="btn-copy-link-sucesso"
                 aria-live="polite"
+                aria-label={linkCopied ? "Texto do anúncio copiado" : "Copiar texto do anúncio para compartilhar"}
                 className={`shrink-0 min-h-[52px] !w-auto !min-w-[120px] ${
                   linkCopied ? "btn-payment-pix-copied !min-h-[52px]" : "btn-accent !min-h-[52px]"
                 }`}
@@ -208,6 +211,7 @@ export function SuccessView({
               id="btn-native-share-success"
               className="btn-primary gap-2"
               aria-live="polite"
+              aria-label={shareStatus ?? "Divulgar anúncio pelo compartilhamento nativo do celular"}
             >
               <Share2 className="h-5 w-5 shrink-0" strokeWidth={2.5} aria-hidden="true" />
               {shareStatus ?? "Divulgar anúncio"}
@@ -219,6 +223,7 @@ export function SuccessView({
               rel="noopener noreferrer"
               id="btn-whatsapp-share-success"
               className="btn-whatsapp"
+              aria-label="Compartilhar anúncio no WhatsApp em nova aba"
             >
               <MessageCircle className="h-6 w-6 shrink-0" strokeWidth={2.5} aria-hidden="true" />
               Compartilhar no WhatsApp
@@ -232,6 +237,7 @@ export function SuccessView({
               rel="noopener noreferrer"
               id="btn-whatsapp-share-fallback"
               className="btn-whatsapp"
+              aria-label="Compartilhar anúncio no WhatsApp em nova aba"
             >
               <MessageCircle className="h-6 w-6 shrink-0" strokeWidth={2.5} aria-hidden="true" />
               Compartilhar no WhatsApp
@@ -248,20 +254,32 @@ export function SuccessView({
             rel="noopener noreferrer"
             id="link-preview-direct"
             className="btn-primary !text-sm"
+            aria-label="Abrir página do anúncio em nova aba"
           >
             Abrir anúncio
           </a>
-          <button type="button" onClick={onBackToEdit} id="btn-edit-info" className="btn-accent !min-h-[64px]">
+          <button
+            type="button"
+            onClick={onBackToEdit}
+            id="btn-edit-info"
+            className="btn-accent !min-h-[64px]"
+            aria-label="Voltar e editar informações do anúncio"
+          >
             Editar
           </button>
-          <button type="button" onClick={onResetHome} id="btn-create-another-success" className="btn-ghost !min-h-[64px]">
+          <button
+            type="button"
+            onClick={onResetHome}
+            id="btn-create-another-success"
+            className="btn-ghost !min-h-[64px]"
+            aria-label="Criar um novo anúncio do zero"
+          >
             Novo anúncio
           </button>
         </div>
       </div>
 
       <div className="no-print max-w-lg mx-auto space-y-6">
-        <AdSenseSlot slot="topo" ready={adsenseReady} />
         <AdPreviewCard
           adType={form.adType}
           title={form.title}

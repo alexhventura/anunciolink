@@ -1,0 +1,4 @@
+# Substitua pub-XXXXXXXXXXXXXXXX pelo seu Publisher ID do AdSense (sem o prefixo ca-).
+# Ex.: VITE_ADSENSE_CLIENT_ID=ca-pub-1234567890123456 → pub-1234567890123456
+# O build de produção sobrescreve este arquivo automaticamente se a variável estiver definida.
+google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0
