@@ -35,7 +35,7 @@ export function buildWhatsAppShareMessage(
     `📦 *Produto:* ${safeTitle}\n` +
     `💰 *Preço:* ${safePrice}\n` +
     `📝 *Descrição:* ${safeDesc}\n\n` +
-    `🔗 _Clique no link seguro para ver a foto do produto e negociar direto com o vendedor:_\n` +
+    `🔗 _Clique no link seguro para ouvir o áudio do vendedor, ver a foto e fechar a compra:_\n` +
     `${adUrl}`
   );
 }

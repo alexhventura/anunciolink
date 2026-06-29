@@ -3,8 +3,11 @@ import { motion } from "motion/react";
 import { MessageCircle, Zap } from "lucide-react";
 import type { AdData } from "../types/ad";
 import { isAdExpired } from "../lib/adExpiry";
+import { trackAdPageView } from "../lib/adAnalytics";
 import { AdSenseSlot } from "./AdSenseSlot";
 import { AdProductThumb } from "./AdProductThumb";
+import { AdAudioPlayer } from "./AdAudioPlayer";
+import { CouponRedeem } from "./CouponRedeem";
 import { AdBrandedSurface } from "./AdBrandedSurface";
 import { AdExpiredBanner } from "./AdExpiredBanner";
 import { copyToClipboard } from "../lib/formatters";
@@ -24,10 +27,15 @@ const TYPE_LABEL: Record<AdData["t"], string> = {
 export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
   const [pixCopied, setPixCopied] = useState(false);
   const [isExpired, setIsExpired] = useState(false);
+  const [discountedPrice, setDiscountedPrice] = useState<string | null>(null);
 
   useEffect(() => {
     setIsExpired(isAdExpired(ad));
   }, [ad]);
+
+  useEffect(() => {
+    if (!isExpired) trackAdPageView(ad);
+  }, [ad, isExpired]);
 
   const handleCopyPix = async () => {
     if (!ad.pix || isExpired) return;
@@ -39,7 +47,10 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
   };
 
   const hasPayment = Boolean(ad.pix || ad.cardLink);
-  const priceLabel = ad.price + (ad.billingType === "recorrente" ? " /mês" : "");
+  const basePriceLabel = ad.price + (ad.billingType === "recorrente" ? " /mês" : "");
+  const displayPrice = discountedPrice
+    ? discountedPrice + (ad.billingType === "recorrente" ? " /mês" : "")
+    : basePriceLabel;
   const pixBtnClass = pixCopied ? "btn-payment-pix-copied" : "btn-payment-pix";
 
   return (
@@ -59,7 +70,7 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
         {isExpired && <AdExpiredBanner />}
 
         <div className={`neo-card-white overflow-hidden ${isExpired ? "opacity-95" : ""}`}>
-          <div className="px-6 pt-8 pb-4 text-center border-b-[3px] border-black bg-white">
+          <div className="px-6 pt-8 pb-4 text-center border-b-[3px] border-black bg-white space-y-4">
             <AdProductThumb
               src={ad.img}
               alt={ad.title}
@@ -69,6 +80,12 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
               size="md"
               className="mx-auto"
             />
+            {ad.img && (
+              <p className="text-xs font-medium text-zinc-500">
+                Foto otimizada automaticamente para o link.
+              </p>
+            )}
+            {ad.audio && !isExpired && <AdAudioPlayer src={ad.audio} />}
           </div>
 
           <div className="p-6 md:p-8 space-y-4 bg-amber-500">
@@ -82,6 +99,9 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
               {ad.billingType === "recorrente" && (
                 <span className="chip !bg-white !text-black">Recorrente</span>
               )}
+              {discountedPrice && (
+                <span className="chip !bg-lime-300 !text-black">Cupom ativo</span>
+              )}
             </div>
 
             <h1
@@ -91,15 +111,23 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
               {ad.title}
             </h1>
 
-            <p
-              className="text-3xl sm:text-4xl font-black text-black bg-white border-[3px] border-black inline-block px-4 py-2 neo-shadow-sm tabular-nums"
-              itemProp="offers"
-              itemScope
-              itemType="https://schema.org/Offer"
-            >
-              <span itemProp="price">{priceLabel}</span>
-              <meta itemProp="priceCurrency" content="BRL" />
-            </p>
+            <div className="space-y-1">
+              {discountedPrice && (
+                <p className="text-sm font-semibold text-black/60 line-through">{basePriceLabel}</p>
+              )}
+              <p
+                className="text-3xl sm:text-4xl font-black text-black bg-white border-[3px] border-black inline-block px-4 py-2 neo-shadow-sm tabular-nums"
+                itemProp="offers"
+                itemScope
+                itemType="https://schema.org/Offer"
+              >
+                <span itemProp="price">{displayPrice}</span>
+                <meta itemProp="priceCurrency" content="BRL" />
+              </p>
+              {discountedPrice && (
+                <p className="text-xs font-bold text-black/80">Valor com cupom aplicado</p>
+              )}
+            </div>
           </div>
         </div>
 
@@ -136,6 +164,10 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
           </p>
         </section>
 
+        {!isExpired && (
+          <CouponRedeem ad={ad} onApplied={setDiscountedPrice} />
+        )}
+
         {(hasPayment || ad.phone) && (
           <section
             className={`neo-card-white p-6 md:p-8 space-y-4 ${isExpired ? "opacity-80" : ""}`}
@@ -153,6 +185,12 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
               </button>
             ) : (
               <>
+                {discountedPrice && hasPayment && (
+                  <p className="text-xs font-semibold text-amber-800 bg-amber-100 border-2 border-amber-300 rounded-lg px-3 py-2 text-center">
+                    Pague o valor de <strong>{displayPrice}</strong> conforme combinado com o vendedor.
+                  </p>
+                )}
+
                 {hasPayment && (
                   <div className="space-y-3">
                     {ad.pix && ad.cardLink ? (
@@ -203,7 +241,7 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
                 {ad.phone && (
                   <a
                     href={`https://wa.me/${ad.phone}?text=${encodeURIComponent(
-                      `Olá! Vi seu anúncio "${ad.title}" no AnúncioLink. Gostaria de combinar a compra.`
+                      `Olá! Vi seu anúncio "${ad.title}" no AnúncioLink${discountedPrice ? ` com cupom — valor ${displayPrice}` : ""}. Gostaria de combinar a compra.`
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"

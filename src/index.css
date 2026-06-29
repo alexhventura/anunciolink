@@ -317,6 +317,27 @@
   box-shadow: 3px 3px 0 0 #18181b;
 }
 
+.ad-audio-player {
+  @apply rounded-lg border-2 border-zinc-900 bg-amber-50 px-3 py-2.5;
+  box-shadow: 2px 2px 0 0 #18181b;
+}
+
+.ad-audio-player__btn {
+  @apply flex h-10 w-10 items-center justify-center rounded-md border-2 border-zinc-900 bg-lime-300 text-black;
+  box-shadow: 2px 2px 0 0 #18181b;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.ad-audio-player__btn:hover {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 0 #18181b;
+}
+
+.ad-audio-native {
+  @apply rounded-md border border-zinc-300;
+  height: 36px;
+}
+
 .bento-desc { min-height: 120px; }
 .bento-actions { min-height: 96px; }
 

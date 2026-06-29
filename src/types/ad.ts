@@ -20,16 +20,25 @@ export interface AdData {
   pix?: string;
   cardLink?: string;
   img?: string;
-  /** Enquadramento escolhido pelo vendedor — reaplicado via CSS na visualização */
+  /** Áudio do vendedor — data URL webm/opus embutido na URL */
+  audio?: string;
+  /** Código do cupom (ex: DEZ10) */
+  couponCode?: string;
+  /** Percentual de desconto (1–99) */
+  couponPercent?: number;
   crop?: CropTransform;
   timestamp: number;
-  /** Unix ms — pausa automática após 30 dias (gravado na URL) */
   expiresAt?: number;
   printMode?: boolean;
 }
 
 export interface ImageUploadError {
   code: "INVALID_TYPE" | "FILE_TOO_LARGE" | "READ_FAILED" | "COMPRESS_FAILED";
+  message: string;
+}
+
+export interface AudioRecorderError {
+  code: "PERMISSION_DENIED" | "NOT_SUPPORTED" | "TOO_LARGE" | "RECORD_FAILED";
   message: string;
 }
 

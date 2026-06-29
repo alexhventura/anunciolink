@@ -1,14 +1,18 @@
 import { useState } from "react";
 import { motion } from "motion/react";
-import { Check, Lightbulb, MessageCircle, Zap } from "lucide-react";
+import { Check, Lightbulb, MessageCircle, Share2, Zap } from "lucide-react";
 import type { AdFormState } from "../hooks/useAdForm";
 import type { AdData } from "../types/ad";
 import { AdSenseSlot } from "./AdSenseSlot";
 import { AdProductThumb } from "./AdProductThumb";
 import { AdShareTools } from "./AdShareTools";
+import { AdStatsPanel } from "./AdStatsPanel";
 import { AdBrandedSurface } from "./AdBrandedSurface";
+import { ActionButtonWithHint, FieldLabelWithHint } from "./HelpTooltip";
 import { copyToClipboard } from "../lib/formatters";
 import { buildWhatsAppShareMessage, buildWhatsAppShareUrl } from "../lib/whatsappShare";
+import { useNativeShare } from "../hooks/useNativeShare";
+import { TOOLTIP_COPY } from "../lib/tooltipCopy";
 
 interface SuccessViewProps {
   form: AdFormState;
@@ -16,6 +20,7 @@ interface SuccessViewProps {
   adsenseReady: boolean;
   imageStrippedWarning?: boolean;
   textOptimizedWarning?: boolean;
+  audioStrippedWarning?: boolean;
   onBackToEdit: () => void;
   onResetHome: () => void;
 }
@@ -32,10 +37,13 @@ export function SuccessView({
   adsenseReady,
   imageStrippedWarning,
   textOptimizedWarning,
+  audioStrippedWarning,
   onBackToEdit,
   onResetHome,
 }: SuccessViewProps) {
   const [linkCopied, setLinkCopied] = useState(false);
+  const [shareStatus, setShareStatus] = useState<string | null>(null);
+  const { canShare, share } = useNativeShare();
 
   const shareMessage = buildWhatsAppShareMessage(
     form.title,
@@ -58,6 +66,20 @@ export function SuccessView({
     }
   };
 
+  const handleNativeShare = async () => {
+    const result = await share({
+      title: `${form.title} — AnúncioLink`,
+      text: shareMessage,
+      url: generatedLink,
+    });
+    if (result === "shared") setShareStatus("Compartilhado!");
+    else if (result === "cancelled") setShareStatus(null);
+    else setShareStatus(null);
+    if (result === "shared") {
+      window.setTimeout(() => setShareStatus(null), 2500);
+    }
+  };
+
   const adSnapshot: AdData = {
     t: form.adType,
     title: form.title,
@@ -68,6 +90,9 @@ export function SuccessView({
     pix: form.pix || undefined,
     cardLink: form.cardLink || undefined,
     img: form.photoPreview || undefined,
+    audio: form.audioDataUrl || undefined,
+    couponCode: form.couponEnabled ? form.couponCode : undefined,
+    couponPercent: form.couponEnabled ? form.couponPercent : undefined,
     timestamp: Date.now(),
     printMode: form.printMode,
   };
@@ -94,7 +119,7 @@ export function SuccessView({
             </h2>
           </div>
           <p className="text-sm font-bold text-black max-w-sm mx-auto">
-            Compartilhe o card de texto pronto — título, preço e descrição. A foto aparece só na página do anúncio.
+            Divulgue com o card de texto pronto. Foto e áudio aparecem só na página do anúncio.
           </p>
         </div>
 
@@ -103,7 +128,16 @@ export function SuccessView({
             role="alert"
             className="rounded-lg border-[3px] border-black bg-amber-400 px-4 py-3 text-xs font-bold text-black text-left neo-shadow-sm"
           >
-            A foto foi omitida do link por limite de tamanho do WhatsApp. Encurte o Pix ou a descrição e gere novamente com foto.
+            A foto foi omitida do link por limite de tamanho. Encurte o texto, remova o áudio ou gere novamente.
+          </div>
+        )}
+
+        {audioStrippedWarning && (
+          <div
+            role="alert"
+            className="rounded-lg border-[3px] border-black bg-amber-400 px-4 py-3 text-xs font-bold text-black text-left neo-shadow-sm"
+          >
+            O áudio foi omitido do link por limite de tamanho. Encurte a descrição ou grave um áudio mais breve.
           </div>
         )}
 
@@ -118,16 +152,16 @@ export function SuccessView({
 
         <div className="space-y-6 text-left">
           <div>
-            <label htmlFor="generated-link-input" className="label-field">
-              Mensagem para compartilhar
-            </label>
+            <FieldLabelWithHint hint={TOOLTIP_COPY.nativeShare} className="mb-2">
+              <span className="label-field">Mensagem para compartilhar</span>
+            </FieldLabelWithHint>
             <div className="flex flex-col sm:flex-row items-stretch gap-3 rounded-lg border-[3px] border-black bg-amber-50 p-3 neo-shadow-sm">
               <textarea
                 id="generated-link-input"
                 readOnly
-                rows={4}
+                rows={5}
                 value={shareMessage}
-                className="input-field !shadow-none flex-1 !py-2.5 text-xs font-medium resize-none min-h-[96px]"
+                className="input-field !shadow-none flex-1 !py-2.5 text-xs font-medium resize-none min-h-[120px]"
               />
               <button
                 type="button"
@@ -161,10 +195,10 @@ export function SuccessView({
                   <span className="mr-0.5" aria-hidden="true">
                     💡
                   </span>
-                  <strong className="font-black text-black">Dica do AnúncioLink:</strong> Como nosso site
-                  protege todas as informações e fotos direto no link de forma 100% gratuita, a URL gerada fica
-                  grande. Se você for divulgar na bio do Instagram, TikTok ou no seu blog, sugerimos encurtar este
-                  link gratuitamente em sites como o{" "}
+                  <strong className="font-black text-black">Por que o link é grande?</strong> Para garantir que
+                  suas fotos, áudio e cupons funcionem de forma 100% gratuita e sem cadastros, salvamos tudo direto
+                  na URL. Se for divulgar no perfil do Instagram ou TikTok, sugerimos encurtar este link
+                  gratuitamente no{" "}
                   <a
                     href="https://bitly.com"
                     target="_blank"
@@ -182,22 +216,51 @@ export function SuccessView({
                   >
                     tinyurl.com
                   </a>{" "}
-                  para deixá-lo menor e mais elegante!
+                  para deixá-lo compacto e elegante!
                 </p>
               </div>
             </aside>
           </div>
 
-          <a
-            href={whatsAppShareUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            id="btn-whatsapp-share-success"
-            className="btn-whatsapp"
-          >
-            <MessageCircle className="h-6 w-6 shrink-0" strokeWidth={2.5} aria-hidden="true" />
-            Compartilhar no WhatsApp
-          </a>
+          {canShare ? (
+            <ActionButtonWithHint
+              hint={TOOLTIP_COPY.nativeShare}
+              hintVariant="on-dark"
+              onClick={() => void handleNativeShare()}
+              id="btn-native-share-success"
+              className="btn-primary gap-2"
+              aria-live="polite"
+            >
+              <Share2 className="h-5 w-5 shrink-0" strokeWidth={2.5} aria-hidden="true" />
+              {shareStatus ?? "Divulgar anúncio"}
+            </ActionButtonWithHint>
+          ) : (
+            <a
+              href={whatsAppShareUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              id="btn-whatsapp-share-success"
+              className="btn-whatsapp"
+            >
+              <MessageCircle className="h-6 w-6 shrink-0" strokeWidth={2.5} aria-hidden="true" />
+              Compartilhar no WhatsApp
+            </a>
+          )}
+
+          {canShare && (
+            <a
+              href={whatsAppShareUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              id="btn-whatsapp-share-fallback"
+              className="btn-whatsapp"
+            >
+              <MessageCircle className="h-6 w-6 shrink-0" strokeWidth={2.5} aria-hidden="true" />
+              Compartilhar no WhatsApp
+            </a>
+          )}
+
+          <AdStatsPanel ad={adSnapshot} />
 
           <AdShareTools ad={adSnapshot} variant="create" />
         </div>
@@ -237,6 +300,11 @@ export function SuccessView({
               size="md"
               className="mx-auto"
             />
+            {form.photoPreview && (
+              <p className="text-xs font-medium text-zinc-500 mt-3">
+                Foto otimizada automaticamente para o link.
+              </p>
+            )}
           </div>
           <div className="p-8 space-y-3 bg-amber-500 flex-1">
             <span className="chip !bg-black !text-amber-400">{typeLabel[form.adType]}</span>

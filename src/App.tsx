@@ -27,13 +27,24 @@ import { saveAdToHistory } from "./lib/adHistory";
 export default function App() {
   const { currentView, setCurrentView, decodedAd, openSavedAdUrl, resetToHome, backToEdit } =
     useAdRouting();
-  const { state: form, setField, setPhoto, setImageError, setSubmitError, reset: resetForm, toAdData } =
-    useAdForm();
+  const {
+    state: form,
+    setField,
+    setPhoto,
+    setAudio,
+    setImageError,
+    setAudioError,
+    setCouponError,
+    setSubmitError,
+    reset: resetForm,
+    toAdData,
+  } = useAdForm();
   const { refresh: refreshHistory } = useAdHistory();
   const [generatedLink, setGeneratedLink] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imageStrippedWarning, setImageStrippedWarning] = useState(false);
   const [textOptimizedWarning, setTextOptimizedWarning] = useState(false);
+  const [audioStrippedWarning, setAudioStrippedWarning] = useState(false);
 
   const isAdView = currentView === "anuncio";
   const showAdsense = isAdView || currentView === "success";
@@ -47,6 +58,7 @@ export default function App() {
     setGeneratedLink("");
     setImageStrippedWarning(false);
     setTextOptimizedWarning(false);
+    setAudioStrippedWarning(false);
     resetToHome();
   }, [resetForm, resetToHome]);
 
@@ -56,11 +68,17 @@ export default function App() {
       setSubmitError(null);
       setImageStrippedWarning(false);
       setTextOptimizedWarning(false);
+      setAudioStrippedWarning(false);
 
       try {
         const rawAd = toAdData(payload?.image);
-        const { ad: adObject, hash: hashResult, imageStripped, textOptimized } =
-          await fitAdToUrlLength(rawAd, encodeAdData);
+        const {
+          ad: adObject,
+          hash: hashResult,
+          imageStripped,
+          textOptimized,
+          audioStripped,
+        } = await fitAdToUrlLength(rawAd, encodeAdData);
 
         const finalLink = buildAdUrl(hashResult);
 
@@ -75,6 +93,7 @@ export default function App() {
         setGeneratedLink(finalLink);
         setImageStrippedWarning(imageStripped);
         setTextOptimizedWarning(textOptimized);
+        setAudioStrippedWarning(audioStripped);
         setCurrentView("success");
       } catch (err) {
         const message =
@@ -101,7 +120,10 @@ export default function App() {
               isSubmitting={isSubmitting}
               onFieldChange={setField}
               onPhotoChange={setPhoto}
+              onAudioChange={setAudio}
               onImageError={setImageError}
+              onAudioError={(err) => setAudioError(err?.message ?? null)}
+              onCouponError={setCouponError}
               onSubmitError={setSubmitError}
               onSubmit={handleGenerate}
               onOpenSavedAd={openSavedAdUrl}
@@ -115,6 +137,7 @@ export default function App() {
               adsenseReady={adsenseReady}
               imageStrippedWarning={imageStrippedWarning}
               textOptimizedWarning={textOptimizedWarning}
+              audioStrippedWarning={audioStrippedWarning}
               onBackToEdit={backToEdit}
               onResetHome={handleResetHome}
             />
