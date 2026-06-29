@@ -23,6 +23,7 @@ import {
   fitAdToUrlLength,
 } from "./lib/adCodec";
 import { saveAdToHistory } from "./lib/adHistory";
+import { markAdOwner } from "./lib/adOwnership";
 
 export default function App() {
   const { currentView, setCurrentView, decodedAd, openSavedAdUrl, resetToHome, backToEdit } =
@@ -34,7 +35,6 @@ export default function App() {
     setAudio,
     setImageError,
     setAudioError,
-    setCouponError,
     setSubmitError,
     reset: resetForm,
     toAdData,
@@ -82,6 +82,8 @@ export default function App() {
 
         const finalLink = buildAdUrl(hashResult);
 
+        markAdOwner(adObject);
+
         saveAdToHistory({
           title: adObject.title,
           price: adObject.price,
@@ -123,7 +125,6 @@ export default function App() {
               onAudioChange={setAudio}
               onImageError={setImageError}
               onAudioError={(err) => setAudioError(err?.message ?? null)}
-              onCouponError={setCouponError}
               onSubmitError={setSubmitError}
               onSubmit={handleGenerate}
               onOpenSavedAd={openSavedAdUrl}

@@ -175,14 +175,6 @@ export async function fitAdToUrlLength(
     }
   }
 
-  if (current.couponCode) {
-    current = { ...current, couponCode: undefined, couponPercent: undefined };
-    hash = encodeFn(current);
-    if (urlFits(hash)) {
-      return { ad: current, hash, imageStripped, textOptimized, audioStripped };
-    }
-  }
-
   let maxDesc = originalDesc.length;
   while (maxDesc > 60) {
     const trialDesc = truncateDescription(originalDesc, maxDesc);

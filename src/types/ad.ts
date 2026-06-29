@@ -22,10 +22,6 @@ export interface AdData {
   img?: string;
   /** Áudio do vendedor — data URL webm/opus embutido na URL */
   audio?: string;
-  /** Código do cupom (ex: DEZ10) */
-  couponCode?: string;
-  /** Percentual de desconto (1–99) */
-  couponPercent?: number;
   crop?: CropTransform;
   timestamp: number;
   expiresAt?: number;

@@ -17,19 +17,18 @@ export interface ImageCompressionStep {
   quality: number;
 }
 
-/** Upload automático — 300px max, JPEG agressivo */
-export const UPLOAD_COMPRESSION: ImageCompressionStep = { maxEdge: 300, quality: 0.4 };
+/** Upload automático — 200px max, JPEG agressivo para caber na URL */
+export const UPLOAD_COMPRESSION: ImageCompressionStep = { maxEdge: 200, quality: 0.38 };
 
 /** Passos progressivos até caber na URL (WhatsApp ≤ 2048) */
 export const URL_FIT_COMPRESSION_STEPS: ImageCompressionStep[] = [
-  { maxEdge: 300, quality: 0.4 },
-  { maxEdge: 280, quality: 0.43 },
-  { maxEdge: 260, quality: 0.42 },
-  { maxEdge: 240, quality: 0.4 },
   { maxEdge: 200, quality: 0.38 },
-  { maxEdge: 168, quality: 0.36 },
+  { maxEdge: 180, quality: 0.37 },
+  { maxEdge: 160, quality: 0.36 },
   { maxEdge: 140, quality: 0.35 },
-  { maxEdge: 120, quality: 0.34 },
+  { maxEdge: 120, quality: 0.35 },
+  { maxEdge: 100, quality: 0.34 },
+  { maxEdge: 80, quality: 0.34 },
 ];
 
 export function validateImageFile(file: File): ImageUploadError | null {
@@ -79,7 +78,7 @@ export async function compressImageAtStep(
 }
 
 /**
- * Compacta ao selecionar da galeria — 300px, JPEG ~0.45.
+ * Compacta ao selecionar da galeria — 200px, JPEG ~0.38.
  * Processo 100% automático, invisível ao usuário.
  */
 export async function compressImageOnUpload(file: File): Promise<string> {

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Pause, Play, Volume2 } from "lucide-react";
+import { resolveAudioPlaybackUrl } from "../lib/audioPlayback";
 
 interface AdAudioPlayerProps {
   src: string;
@@ -10,23 +11,56 @@ export function AdAudioPlayer({ src, title = "Áudio do vendedor" }: AdAudioPlay
   const audioRef = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [playbackUrl, setPlaybackUrl] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState(false);
+
+  useEffect(() => {
+    if (!src) {
+      setPlaybackUrl(null);
+      return;
+    }
+
+    const { url, revoke } = resolveAudioPlaybackUrl(src);
+    setPlaybackUrl(url);
+    setLoadError(false);
+
+    return () => {
+      revoke?.();
+    };
+  }, [src]);
 
   useEffect(() => {
     const audio = audioRef.current;
-    if (!audio) return;
+    if (!audio || !playbackUrl) return;
 
     const onTime = () => {
-      if (audio.duration) setProgress((audio.currentTime / audio.duration) * 100);
+      if (audio.duration && Number.isFinite(audio.duration)) {
+        setProgress((audio.currentTime / audio.duration) * 100);
+      }
     };
     const onEnd = () => setPlaying(false);
+    const onError = () => setLoadError(true);
 
     audio.addEventListener("timeupdate", onTime);
     audio.addEventListener("ended", onEnd);
+    audio.addEventListener("error", onError);
+
     return () => {
       audio.removeEventListener("timeupdate", onTime);
       audio.removeEventListener("ended", onEnd);
+      audio.removeEventListener("error", onError);
     };
-  }, []);
+  }, [playbackUrl]);
+
+  if (!src || !playbackUrl) return null;
+
+  if (loadError) {
+    return (
+      <p className="text-xs font-medium text-zinc-500 text-center max-w-xs mx-auto">
+        Não foi possível carregar o áudio neste aparelho.
+      </p>
+    );
+  }
 
   const toggle = async () => {
     const audio = audioRef.current;
@@ -41,12 +75,19 @@ export function AdAudioPlayer({ src, title = "Áudio do vendedor" }: AdAudioPlay
       setPlaying(true);
     } catch {
       setPlaying(false);
+      setLoadError(true);
     }
   };
 
   return (
-    <div className="ad-audio-player mx-auto max-w-xs">
-      <audio ref={audioRef} src={src} preload="metadata" className="sr-only" />
+    <div className="ad-audio-player mx-auto max-w-xs w-full">
+      <audio
+        ref={audioRef}
+        src={playbackUrl}
+        preload="metadata"
+        playsInline
+        className="sr-only"
+      />
       <div className="flex items-center gap-3">
         <button
           type="button"

@@ -4,10 +4,8 @@ import type { AdFormState } from "../hooks/useAdForm";
 import type { AdImagePayload, AudioRecorderError } from "../types/ad";
 import { AdProductThumb } from "./AdProductThumb";
 import { AudioRecorderField } from "./AudioRecorderField";
-import { CouponField } from "./CouponField";
 import { MyAdsPanel } from "./MyAdsPanel";
 import { formatBRL, formatPhoneNumber, isValidPaymentUrl } from "../lib/formatters";
-import { validateCouponConfig } from "../lib/coupon";
 import { validateImageFile, ImageCompressorError, compressImageOnUpload } from "../lib/imageCompressor";
 import { MAX_DESC_LENGTH, MAX_PIX_LENGTH, MAX_TITLE_LENGTH, SITE_NAME } from "../lib/constants";
 import { TOOLTIP_COPY } from "../lib/tooltipCopy";
@@ -21,7 +19,6 @@ interface HomeViewProps {
   onAudioChange: (dataUrl: string) => void;
   onImageError: (error: { code: string; message: string } | null) => void;
   onAudioError: (error: AudioRecorderError | null) => void;
-  onCouponError: (error: string | null) => void;
   onSubmitError: (error: string | null) => void;
   onSubmit: (payload?: AdImagePayload) => void;
   onOpenSavedAd: (url: string) => void;
@@ -41,7 +38,6 @@ export function HomeView({
   onAudioChange,
   onImageError,
   onAudioError,
-  onCouponError,
   onSubmitError,
   onSubmit,
   onOpenSavedAd,
@@ -106,15 +102,6 @@ export function HomeView({
       onSubmitError("Informe um link de pagamento válido (http ou https).");
       return;
     }
-    if (form.couponEnabled) {
-      const couponErr = validateCouponConfig(form.couponCode, form.couponPercent);
-      if (couponErr) {
-        onCouponError(couponErr);
-        onSubmitError(couponErr);
-        return;
-      }
-    }
-    onCouponError(null);
 
     let imagePayload: AdImagePayload | undefined;
     if (form.photoPreview) {
@@ -415,16 +402,6 @@ export function HomeView({
                 {form.audioError}
               </p>
             )}
-
-            <CouponField
-              enabled={form.couponEnabled}
-              code={form.couponCode}
-              percent={form.couponPercent}
-              onEnabledChange={(v) => onFieldChange("couponEnabled", v)}
-              onCodeChange={(v) => onFieldChange("couponCode", v)}
-              onPercentChange={(v) => onFieldChange("couponPercent", v)}
-              error={form.couponError}
-            />
 
             <div className="rounded-lg border-[3px] border-black bg-amber-100 p-5 flex items-center justify-between gap-4 neo-shadow-sm">
               <div>

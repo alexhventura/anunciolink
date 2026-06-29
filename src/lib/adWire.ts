@@ -16,9 +16,6 @@ export interface CompactAdWire {
   i?: string;
   /** o:opus/webm base64 sem prefixo data: */
   a?: string;
-  /** Cupom: código + desconto % */
-  cc?: string;
-  dv?: number;
   cz?: number;
   cx?: number;
   cy?: number;
@@ -60,10 +57,6 @@ export function toCompactWire(ad: AdData): CompactAdWire {
   if (ad.printMode) wire.pm = true;
   if (ad.img) wire.i = stripImageDataUrl(ad.img);
   if (ad.audio) wire.a = stripAudioDataUrl(ad.audio);
-  if (ad.couponCode && ad.couponPercent) {
-    wire.cc = ad.couponCode;
-    wire.dv = ad.couponPercent;
-  }
   const cropFields = ad.crop ? encodeCrop(ad.crop) : undefined;
   if (cropFields) Object.assign(wire, cropFields);
   if (ad.expiresAt) wire.ex = ad.expiresAt;
@@ -82,8 +75,6 @@ export function fromCompactWire(wire: CompactAdWire): AdData {
     cardLink: wire.c,
     img: wire.i ? expandImageDataUrl(wire.i) : undefined,
     audio: wire.a ? expandAudioDataUrl(wire.a) : undefined,
-    couponCode: wire.cc,
-    couponPercent: wire.dv,
     crop: decodeCrop(wire),
     timestamp: wire.ts,
     expiresAt: wire.ex ?? computeExpiresAt(wire.ts),
@@ -156,8 +147,6 @@ export function normalizeLegacyAd(parsed: Record<string, unknown>): AdData | nul
     cardLink: legacy.cardLink,
     img: legacy.img,
     audio: legacy.audio,
-    couponCode: legacy.couponCode,
-    couponPercent: legacy.couponPercent,
     crop: legacy.crop ?? DEFAULT_CROP,
     timestamp,
     expiresAt: expiresAt && Number.isFinite(expiresAt) ? expiresAt : computeExpiresAt(timestamp),

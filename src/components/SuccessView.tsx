@@ -6,7 +6,6 @@ import type { AdData } from "../types/ad";
 import { AdSenseSlot } from "./AdSenseSlot";
 import { AdProductThumb } from "./AdProductThumb";
 import { AdShareTools } from "./AdShareTools";
-import { AdStatsPanel } from "./AdStatsPanel";
 import { AdBrandedSurface } from "./AdBrandedSurface";
 import { ActionButtonWithHint, FieldLabelWithHint } from "./HelpTooltip";
 import { copyToClipboard } from "../lib/formatters";
@@ -91,8 +90,6 @@ export function SuccessView({
     cardLink: form.cardLink || undefined,
     img: form.photoPreview || undefined,
     audio: form.audioDataUrl || undefined,
-    couponCode: form.couponEnabled ? form.couponCode : undefined,
-    couponPercent: form.couponEnabled ? form.couponPercent : undefined,
     timestamp: Date.now(),
     printMode: form.printMode,
   };
@@ -196,9 +193,8 @@ export function SuccessView({
                     💡
                   </span>
                   <strong className="font-black text-black">Por que o link é grande?</strong> Para garantir que
-                  suas fotos, áudio e cupons funcionem de forma 100% gratuita e sem cadastros, salvamos tudo direto
-                  na URL. Se for divulgar no perfil do Instagram ou TikTok, sugerimos encurtar este link
-                  gratuitamente no{" "}
+                  suas fotos e áudio funcionem de forma 100% gratuita e sem cadastros, salvamos tudo direto na URL.
+                  Se for divulgar no perfil do Instagram ou TikTok, sugerimos encurtar este link gratuitamente no{" "}
                   <a
                     href="https://bitly.com"
                     target="_blank"
@@ -259,8 +255,6 @@ export function SuccessView({
               Compartilhar no WhatsApp
             </a>
           )}
-
-          <AdStatsPanel ad={adSnapshot} />
 
           <AdShareTools ad={adSnapshot} variant="create" />
         </div>
