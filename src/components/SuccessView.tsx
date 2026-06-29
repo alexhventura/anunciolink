@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "motion/react";
-import { Check, MessageCircle, Zap } from "lucide-react";
+import { Check, Lightbulb, MessageCircle, Zap } from "lucide-react";
 import type { AdFormState } from "../hooks/useAdForm";
 import type { AdData } from "../types/ad";
 import { AdSenseSlot } from "./AdSenseSlot";
@@ -37,8 +37,18 @@ export function SuccessView({
 }: SuccessViewProps) {
   const [linkCopied, setLinkCopied] = useState(false);
 
-  const shareMessage = buildWhatsAppShareMessage(form.title, form.price, generatedLink);
-  const whatsAppShareUrl = buildWhatsAppShareUrl(form.title, form.price, generatedLink);
+  const shareMessage = buildWhatsAppShareMessage(
+    form.title,
+    form.price,
+    form.description,
+    generatedLink
+  );
+  const whatsAppShareUrl = buildWhatsAppShareUrl(
+    form.title,
+    form.price,
+    form.description,
+    generatedLink
+  );
 
   const handleCopyLink = async () => {
     const ok = await copyToClipboard(shareMessage);
@@ -84,7 +94,7 @@ export function SuccessView({
             </h2>
           </div>
           <p className="text-sm font-bold text-black max-w-sm mx-auto">
-            Compartilhe com a mensagem pronta — quem receber já verá título, preço e link.
+            Compartilhe o card de texto pronto — título, preço e descrição. A foto aparece só na página do anúncio.
           </p>
         </div>
 
@@ -131,6 +141,51 @@ export function SuccessView({
                 {linkCopied ? "✓ Copiado" : "Copiar texto"}
               </button>
             </div>
+
+            <aside
+              role="note"
+              aria-labelledby="link-shortener-tip-heading"
+              className="mt-4 rounded-lg border-2 border-zinc-900 bg-amber-100 px-4 py-3.5 neo-shadow-sm"
+            >
+              <div className="flex gap-3">
+                <span
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border-2 border-zinc-900 bg-lime-200 shadow-[2px_2px_0_0_#18181b]"
+                  aria-hidden="true"
+                >
+                  <Lightbulb className="h-4 w-4 text-black" strokeWidth={2.5} />
+                </span>
+                <p
+                  id="link-shortener-tip-heading"
+                  className="text-xs font-medium text-zinc-800 leading-relaxed"
+                >
+                  <span className="mr-0.5" aria-hidden="true">
+                    💡
+                  </span>
+                  <strong className="font-black text-black">Dica do AnúncioLink:</strong> Como nosso site
+                  protege todas as informações e fotos direto no link de forma 100% gratuita, a URL gerada fica
+                  grande. Se você for divulgar na bio do Instagram, TikTok ou no seu blog, sugerimos encurtar este
+                  link gratuitamente em sites como o{" "}
+                  <a
+                    href="https://bitly.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-bold text-black underline decoration-amber-600 underline-offset-2 hover:text-amber-900"
+                  >
+                    bitly.com
+                  </a>{" "}
+                  ou{" "}
+                  <a
+                    href="https://tinyurl.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-bold text-black underline decoration-amber-600 underline-offset-2 hover:text-amber-900"
+                  >
+                    tinyurl.com
+                  </a>{" "}
+                  para deixá-lo menor e mais elegante!
+                </p>
+              </div>
+            </aside>
           </div>
 
           <a

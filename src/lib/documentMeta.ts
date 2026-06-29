@@ -2,6 +2,9 @@ import type { AdData } from "../types/ad";
 import { SITE_NAME, SITE_URL } from "./constants";
 import { getAdCanonicalUrl } from "./adRoutes";
 import { parsePriceToNumber } from "./formatters";
+import { DEFAULT_OG_IMAGE_PATH } from "./whatsappShare";
+
+const DEFAULT_OG_IMAGE = `${SITE_URL}${DEFAULT_OG_IMAGE_PATH}`;
 
 const DEFAULT_TITLE = `${SITE_NAME} — Crie seu anúncio em segundos`;
 const DEFAULT_DESCRIPTION =
@@ -40,7 +43,7 @@ export function injectProductJsonLd(ad: AdData, canonicalUrl: string) {
     "@type": "Product",
     name: ad.title,
     description: ad.desc,
-    image: ad.img || `${SITE_URL}/og-default.jpg`,
+    image: DEFAULT_OG_IMAGE,
     url: canonicalUrl,
     offers: {
       "@type": "Offer",
@@ -71,16 +74,11 @@ export function applyAdDocumentMeta(ad: AdData) {
   upsertMeta("og:type", "product", "property");
   upsertMeta("og:url", canonicalUrl, "property");
   upsertMeta("og:site_name", SITE_NAME, "property");
-  upsertMeta("twitter:card", "summary_large_image");
+  upsertMeta("twitter:card", "summary");
   upsertMeta("twitter:title", pageTitle);
   upsertMeta("twitter:description", pageDescription);
-
-  if (ad.img) {
-    upsertMeta("og:image", ad.img, "property");
-    upsertMeta("twitter:image", ad.img);
-  } else {
-    upsertMeta("og:image", `${SITE_URL}/og-default.jpg`, "property");
-  }
+  upsertMeta("og:image", DEFAULT_OG_IMAGE, "property");
+  upsertMeta("twitter:image", DEFAULT_OG_IMAGE);
 
   upsertLink("canonical", canonicalUrl);
   injectProductJsonLd(ad, canonicalUrl);

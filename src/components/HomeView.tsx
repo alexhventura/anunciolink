@@ -362,7 +362,7 @@ export function HomeView({
                     className="mx-auto"
                   />
                   <p className="text-xs font-medium text-zinc-500">
-                    Foto otimizada automaticamente para o link do WhatsApp.
+                    Foto embutida no link — visível na página do anúncio, não no preview do WhatsApp.
                   </p>
                   <div className="flex items-center justify-center gap-3 pt-1">
                     <span className="text-xs font-medium text-zinc-500 truncate max-w-[200px]">

@@ -18,11 +18,11 @@ export interface ImageCompressionStep {
 }
 
 /** Upload automático — 300px max, JPEG agressivo */
-export const UPLOAD_COMPRESSION: ImageCompressionStep = { maxEdge: 300, quality: 0.45 };
+export const UPLOAD_COMPRESSION: ImageCompressionStep = { maxEdge: 300, quality: 0.4 };
 
 /** Passos progressivos até caber na URL (WhatsApp ≤ 2048) */
 export const URL_FIT_COMPRESSION_STEPS: ImageCompressionStep[] = [
-  { maxEdge: 300, quality: 0.45 },
+  { maxEdge: 300, quality: 0.4 },
   { maxEdge: 280, quality: 0.43 },
   { maxEdge: 260, quality: 0.42 },
   { maxEdge: 240, quality: 0.4 },
