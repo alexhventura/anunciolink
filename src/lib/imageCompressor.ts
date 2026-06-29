@@ -17,6 +17,31 @@ export class ImageCompressorError extends Error {
   }
 }
 
+export interface ImageCompressionStep {
+  maxEdge: number;
+  quality: number;
+}
+
+/** Primeira passagem ao selecionar foto — preview rápido no editor */
+export const UPLOAD_COMPRESSION_STEPS: ImageCompressionStep[] = [
+  { maxEdge: 400, quality: 0.58 },
+  { maxEdge: 360, quality: 0.52 },
+  { maxEdge: 320, quality: 0.48 },
+];
+
+/** Passos progressivos até caber na URL (WhatsApp / mobile) */
+export const URL_FIT_COMPRESSION_STEPS: ImageCompressionStep[] = [
+  { maxEdge: 400, quality: 0.58 },
+  { maxEdge: 360, quality: 0.54 },
+  { maxEdge: 320, quality: 0.5 },
+  { maxEdge: 280, quality: 0.48 },
+  { maxEdge: 240, quality: 0.45 },
+  { maxEdge: 200, quality: 0.42 },
+  { maxEdge: 168, quality: 0.4 },
+  { maxEdge: 140, quality: 0.38 },
+  { maxEdge: 120, quality: 0.36 },
+];
+
 export function validateImageFile(file: File): ImageUploadError | null {
   if (!file.type.startsWith("image/")) {
     return { code: "INVALID_TYPE", message: "Selecione apenas arquivos de imagem (JPG, PNG, WebP)." };
@@ -27,19 +52,7 @@ export function validateImageFile(file: File): ImageUploadError | null {
   return null;
 }
 
-const QUALITY_STEPS: { maxEdge: number; quality: number }[] = [
-  { maxEdge: 480, quality: 0.72 },
-  { maxEdge: 420, quality: 0.66 },
-  { maxEdge: 360, quality: 0.58 },
-  { maxEdge: 320, quality: 0.52 },
-];
-
-const MAX_DATA_URL_LENGTH = 95_000;
-
-function drawScaledSource(
-  img: HTMLImageElement,
-  maxEdge: number
-): { canvas: HTMLCanvasElement; quality: number } {
+function drawScaledSource(img: HTMLImageElement, maxEdge: number): HTMLCanvasElement {
   const ratio = maxEdge / Math.max(img.width, img.height, 1);
   const w = Math.max(1, Math.round(img.width * ratio));
   const h = Math.max(1, Math.round(img.height * ratio));
@@ -55,44 +68,75 @@ function drawScaledSource(
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
   ctx.drawImage(img, 0, 0, w, h);
-
-  return { canvas, quality: 0.72 };
+  return canvas;
 }
 
-function encodeCanvas(canvas: HTMLCanvasElement, quality: number): string {
-  const webp = canvas.toDataURL("image/webp", quality);
-  if (webp.startsWith("data:image/webp")) return webp;
-
-  const jpeg = canvas.toDataURL("image/jpeg", Math.min(quality, 0.55));
-  if (!jpeg || jpeg.length < 100) {
+/** JPEG para payload na URL — menor e previsível que WebP em base64 */
+function encodeCanvasJpeg(canvas: HTMLCanvasElement, quality: number): string {
+  const jpeg = canvas.toDataURL("image/jpeg", quality);
+  if (!jpeg || !jpeg.startsWith("data:image/jpeg") || jpeg.length < 100) {
     throw new ImageCompressorError("COMPRESS_FAILED", "A imagem compactada ficou inválida.");
   }
   return jpeg;
 }
 
+export async function compressImageAtStep(
+  imageSrc: string,
+  step: ImageCompressionStep
+): Promise<string> {
+  const img = await loadImageElement(imageSrc);
+  const canvas = drawScaledSource(img, step.maxEdge);
+  return encodeCanvasJpeg(canvas, step.quality);
+}
+
 /**
- * Compacta a foto inteira em alta nitidez (sem bake do crop).
- * Vetores de enquadramento vão separados na URL (adWire).
+ * Compacta ao selecionar/tirar foto — Canvas max ~400px, JPEG 0.48–0.58.
+ * Roda na memória do aparelho antes de qualquer geração de link.
  */
+export async function compressImageOnUpload(file: File): Promise<string> {
+  const validation = validateImageFile(file);
+  if (validation) {
+    throw new ImageCompressorError(validation.code, validation.message);
+  }
+
+  const objectUrl = URL.createObjectURL(file);
+  try {
+    const img = await loadImageElement(objectUrl);
+    for (const step of UPLOAD_COMPRESSION_STEPS) {
+      try {
+        const canvas = drawScaledSource(img, step.maxEdge);
+        return encodeCanvasJpeg(canvas, step.quality);
+      } catch {
+        continue;
+      }
+    }
+    const canvas = drawScaledSource(img, 280);
+    return encodeCanvasJpeg(canvas, 0.45);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Falha ao processar a imagem.";
+    throw new ImageCompressorError("COMPRESS_FAILED", message);
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+  }
+}
+
+/** @deprecated Alias — use compressImageOnUpload */
 export async function compressSourceImage(imageSrc: string): Promise<string> {
   try {
     const img = await loadImageElement(imageSrc);
-
-    for (const step of QUALITY_STEPS) {
-      const { canvas } = drawScaledSource(img, step.maxEdge);
-      const encoded = encodeCanvas(canvas, step.quality);
-      if (encoded.length <= MAX_DATA_URL_LENGTH) return encoded;
+    for (const step of UPLOAD_COMPRESSION_STEPS) {
+      const canvas = drawScaledSource(img, step.maxEdge);
+      return encodeCanvasJpeg(canvas, step.quality);
     }
-
-    const { canvas } = drawScaledSource(img, 280);
-    return encodeCanvas(canvas, 0.48);
+    const canvas = drawScaledSource(img, 280);
+    return encodeCanvasJpeg(canvas, 0.45);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Falha ao processar a imagem.";
     throw new ImageCompressorError("COMPRESS_FAILED", message);
   }
 }
 
-/** Recorte baked — apenas export offline (card PNG legado) */
+/** Recorte baked — apenas export offline (card/impressão) */
 export async function compressCroppedImage(
   imageSrc: string,
   crop: CropTransform = DEFAULT_CROP,
@@ -111,23 +155,6 @@ export async function compressCroppedImage(
   }
 }
 
-export function compressImage(file: File, isPrintMode = false): Promise<string> {
-  const validation = validateImageFile(file);
-  if (validation) {
-    return Promise.reject(new ImageCompressorError(validation.code, validation.message));
-  }
-
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const result = e.target?.result;
-      if (typeof result !== "string") {
-        reject(new ImageCompressorError("READ_FAILED", "Não foi possível ler o arquivo de imagem."));
-        return;
-      }
-      compressSourceImage(result).then(resolve).catch(reject);
-    };
-    reader.onerror = () => reject(new ImageCompressorError("READ_FAILED", "Erro ao abrir o arquivo de imagem."));
-    reader.readAsDataURL(file);
-  });
+export function compressImage(file: File): Promise<string> {
+  return compressImageOnUpload(file);
 }

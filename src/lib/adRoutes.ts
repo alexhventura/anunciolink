@@ -74,5 +74,7 @@ export function getAdCanonicalUrl(): string {
 }
 
 export function estimateAdUrlLength(payload: string): number {
-  return buildAdUrl(payload).length;
+  /** Usa domínio de produção para garantir compatibilidade no WhatsApp mesmo em localhost */
+  const origin = new URL(SITE_URL).origin;
+  return `${origin}${buildAdPath(payload)}`.length;
 }

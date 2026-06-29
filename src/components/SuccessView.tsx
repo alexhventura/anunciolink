@@ -7,6 +7,7 @@ import { AdSenseSlot } from "./AdSenseSlot";
 import { AdImage } from "./AdImage";
 import { ImageFallback } from "./ImageFallback";
 import { AdShareTools } from "./AdShareTools";
+import { AdBrandedSurface } from "./AdBrandedSurface";
 import { copyToClipboard } from "../lib/formatters";
 
 interface SuccessViewProps {
@@ -14,6 +15,7 @@ interface SuccessViewProps {
   generatedLink: string;
   adsenseReady: boolean;
   imageStrippedWarning?: boolean;
+  textOptimizedWarning?: boolean;
   onBackToEdit: () => void;
   onResetHome: () => void;
 }
@@ -29,6 +31,7 @@ export function SuccessView({
   generatedLink,
   adsenseReady,
   imageStrippedWarning,
+  textOptimizedWarning,
   onBackToEdit,
   onResetHome,
 }: SuccessViewProps) {
@@ -88,7 +91,16 @@ export function SuccessView({
             role="alert"
             className="rounded-lg border-[3px] border-black bg-amber-400 px-4 py-3 text-xs font-bold text-black text-left neo-shadow-sm"
           >
-            A foto foi omitida do link por limite de tamanho. Encurte o Pix ou a descrição e gere novamente com foto.
+            A foto foi omitida do link por limite de tamanho do WhatsApp. Encurte o Pix ou a descrição e gere novamente com foto.
+          </div>
+        )}
+
+        {textOptimizedWarning && (
+          <div
+            role="status"
+            className="rounded-lg border-2 border-zinc-900 bg-zinc-100 px-4 py-3 text-xs font-semibold text-zinc-700 text-left neo-shadow-sm"
+          >
+            Texto otimizado para caber no link do WhatsApp.
           </div>
         )}
 
@@ -156,7 +168,11 @@ export function SuccessView({
 
       <div className="no-print max-w-lg mx-auto space-y-6">
         <AdSenseSlot slot="topo" ready={adsenseReady} />
-        <div className="neo-card-white overflow-hidden">
+        <AdBrandedSurface
+          variant="create"
+          className="neo-card-white overflow-hidden min-h-[380px]"
+          contentClassName="flex flex-col flex-1"
+        >
           <div className="bento-image !rounded-none !border-x-0 !border-t-0 !shadow-none !min-h-[280px]">
             {form.photoPreview ? (
               <AdImage
@@ -172,7 +188,7 @@ export function SuccessView({
               <ImageFallback title={form.title} type={form.adType} />
             )}
           </div>
-          <div className="p-8 space-y-3 border-t-[3px] border-black bg-amber-500">
+          <div className="p-8 space-y-3 border-t-[3px] border-black bg-amber-500 flex-1">
             <span className="chip !bg-black !text-amber-400">{typeLabel[form.adType]}</span>
             <h3 className="text-xl font-black text-black">{form.title}</h3>
             <p className="text-3xl font-black text-black bg-white border-[3px] border-black inline-block px-3 py-1 neo-shadow-sm">
@@ -180,7 +196,7 @@ export function SuccessView({
             </p>
             <p className="text-sm text-black/80 line-clamp-4 font-medium">{form.description}</p>
           </div>
-        </div>
+        </AdBrandedSurface>
         <AdSenseSlot slot="meio" ready={adsenseReady} />
       </div>
     </motion.div>

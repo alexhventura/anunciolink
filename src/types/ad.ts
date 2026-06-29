@@ -23,6 +23,8 @@ export interface AdData {
   /** Enquadramento escolhido pelo vendedor — reaplicado via CSS na visualização */
   crop?: CropTransform;
   timestamp: number;
+  /** Unix ms — pausa automática após 30 dias (gravado na URL) */
+  expiresAt?: number;
   printMode?: boolean;
 }
 

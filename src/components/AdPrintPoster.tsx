@@ -4,9 +4,9 @@ import type { AdData } from "../types/ad";
 import { isQrUrlSafe } from "../lib/qrShareUrl";
 import { TOOLTIP_COPY } from "../lib/tooltipCopy";
 import { BrandMark } from "./BrandMark";
+import { AdBrandedSurface } from "./AdBrandedSurface";
 import { CroppedAdImage } from "./CroppedAdImage";
 import { ActionButtonWithHint } from "./HelpTooltip";
-import { SITE_DOMAIN } from "../lib/constants";
 
 const TYPE_LABEL: Record<AdData["t"], string> = {
   venda: "Venda",
@@ -53,7 +53,11 @@ export function AdPrintPoster({
       {qrSafe && (
         <div className="a4-poster" aria-hidden="true">
           <div className="a4-poster__sheet">
-            <div className="a4-poster__frame">
+            <AdBrandedSurface
+              variant="print"
+              className="a4-poster__frame"
+              contentClassName="a4-poster__body"
+            >
               <header className="a4-poster__header">
                 <BrandMark size="md" variant="soft" />
                 <span className="a4-poster__chip">{TYPE_LABEL[ad.t]}</span>
@@ -80,7 +84,7 @@ export function AdPrintPoster({
                 )}
               </div>
 
-              <footer className="a4-poster__base">
+              <div className="a4-poster__base">
                 <div className="a4-poster__price-box">
                   <span className="a4-poster__price-label">Preço</span>
                   <p className="a4-poster__price">{priceLabel}</p>
@@ -101,11 +105,10 @@ export function AdPrintPoster({
                     <p className="a4-poster__cta-body">
                       para ver detalhes e pagar via PIX ou Cartão!
                     </p>
-                    <p className="a4-poster__domain">{SITE_DOMAIN}</p>
                   </div>
                 </div>
-              </footer>
-            </div>
+              </div>
+            </AdBrandedSurface>
           </div>
         </div>
       )}

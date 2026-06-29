@@ -33,6 +33,7 @@ export default function App() {
   const [generatedLink, setGeneratedLink] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imageStrippedWarning, setImageStrippedWarning] = useState(false);
+  const [textOptimizedWarning, setTextOptimizedWarning] = useState(false);
 
   const isAdView = currentView === "anuncio";
   const showAdsense = isAdView || currentView === "success";
@@ -45,21 +46,21 @@ export default function App() {
     resetForm();
     setGeneratedLink("");
     setImageStrippedWarning(false);
+    setTextOptimizedWarning(false);
     resetToHome();
   }, [resetForm, resetToHome]);
 
   const handleGenerate = useCallback(
-    (payload?: AdImagePayload) => {
+    async (payload?: AdImagePayload) => {
       setIsSubmitting(true);
       setSubmitError(null);
       setImageStrippedWarning(false);
+      setTextOptimizedWarning(false);
 
       try {
         const rawAd = toAdData(payload?.image, payload?.crop);
-        const { ad: adObject, hash: hashResult, imageStripped } = fitAdToUrlLength(
-          rawAd,
-          encodeAdData
-        );
+        const { ad: adObject, hash: hashResult, imageStripped, textOptimized } =
+          await fitAdToUrlLength(rawAd, encodeAdData);
 
         const finalLink = buildAdUrl(hashResult);
 
@@ -73,6 +74,7 @@ export default function App() {
 
         setGeneratedLink(finalLink);
         setImageStrippedWarning(imageStripped);
+        setTextOptimizedWarning(textOptimized);
         setCurrentView("success");
       } catch (err) {
         const message =
@@ -112,6 +114,7 @@ export default function App() {
               generatedLink={generatedLink}
               adsenseReady={adsenseReady}
               imageStrippedWarning={imageStrippedWarning}
+              textOptimizedWarning={textOptimizedWarning}
               onBackToEdit={backToEdit}
               onResetHome={handleResetHome}
             />

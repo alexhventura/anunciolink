@@ -1,6 +1,7 @@
 import { useCallback, useReducer } from "react";
 import type { AdData, AdType, BillingType, CropTransform, ImageUploadError } from "../types/ad";
 import { DEFAULT_CROP, isDefaultCrop } from "../lib/imageCrop";
+import { computeExpiresAt } from "../lib/adExpiry";
 import { sanitizePhone } from "../lib/formatters";
 
 export interface AdFormState {
@@ -91,20 +92,24 @@ export function useAdForm() {
   }, []);
 
   const toAdData = useCallback(
-    (compressedImage?: string, crop?: CropTransform): AdData => ({
-      t: state.adType,
-      title: state.title.trim(),
-      price: state.price.trim(),
-      billingType: state.billingType,
-      desc: state.description.trim(),
-      phone: state.phone.trim() ? sanitizePhone(state.phone) : "",
-      pix: state.pix.trim() || undefined,
-      cardLink: state.cardLink.trim() || undefined,
-      img: compressedImage,
-      crop: crop && !isDefaultCrop(crop) ? crop : undefined,
-      timestamp: Date.now(),
-      printMode: state.printMode || undefined,
-    }),
+    (compressedImage?: string, crop?: CropTransform): AdData => {
+      const now = Date.now();
+      return {
+        t: state.adType,
+        title: state.title.trim(),
+        price: state.price.trim(),
+        billingType: state.billingType,
+        desc: state.description.trim(),
+        phone: state.phone.trim() ? sanitizePhone(state.phone) : "",
+        pix: state.pix.trim() || undefined,
+        cardLink: state.cardLink.trim() || undefined,
+        img: compressedImage,
+        crop: crop && !isDefaultCrop(crop) ? crop : undefined,
+        timestamp: now,
+        expiresAt: computeExpiresAt(now),
+        printMode: state.printMode || undefined,
+      };
+    },
     [state]
   );
 

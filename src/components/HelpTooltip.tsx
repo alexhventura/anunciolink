@@ -48,21 +48,47 @@ export function HelpTooltip({ text, placement = "top", variant = "default" }: He
 }
 
 interface FieldLabelWithHintProps {
-  htmlFor: string;
+  htmlFor?: string;
   hint: string;
   className?: string;
+  labelClassName?: string;
   children: ReactNode;
 }
 
 /** Label de formulário com ícone de instrução ao lado */
-export function FieldLabelWithHint({ htmlFor, hint, className = "", children }: FieldLabelWithHintProps) {
+export function FieldLabelWithHint({
+  htmlFor,
+  hint,
+  className = "",
+  labelClassName = "label-field mb-0",
+  children,
+}: FieldLabelWithHintProps) {
   return (
     <span className={`inline-flex items-center gap-1.5 flex-wrap ${className}`}>
-      <label htmlFor={htmlFor} className="label-field mb-0">
-        {children}
-      </label>
+      {htmlFor ? (
+        <label htmlFor={htmlFor} className={labelClassName}>
+          {children}
+        </label>
+      ) : (
+        <span className={labelClassName}>{children}</span>
+      )}
       <HelpTooltip text={hint} placement="top" />
     </span>
+  );
+}
+
+interface FieldLegendWithHintProps {
+  hint: string;
+  children: ReactNode;
+}
+
+/** Legenda de fieldset com ícone de instrução ao lado */
+export function FieldLegendWithHint({ hint, children }: FieldLegendWithHintProps) {
+  return (
+    <legend className="label-field inline-flex items-center gap-1.5 flex-wrap w-full mb-0">
+      {children}
+      <HelpTooltip text={hint} placement="top" />
+    </legend>
   );
 }
 

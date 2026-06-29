@@ -1,4 +1,5 @@
 import type { AdData, AdType, BillingType, CropTransform } from "../types/ad";
+import { computeExpiresAt } from "./adExpiry";
 import { DEFAULT_CROP, isDefaultCrop } from "./imageCrop";
 
 /** Payload compacto na URL — chaves mínimas para reduzir bytes antes do deflate */
@@ -18,6 +19,8 @@ export interface CompactAdWire {
   cx?: number;
   cy?: number;
   ts: number;
+  /** expiresAt em Unix ms */
+  ex?: number;
   pm?: boolean;
 }
 
@@ -55,6 +58,7 @@ export function toCompactWire(ad: AdData): CompactAdWire {
   if (ad.img) wire.i = stripImageDataUrl(ad.img);
   const cropFields = ad.crop ? encodeCrop(ad.crop) : undefined;
   if (cropFields) Object.assign(wire, cropFields);
+  if (ad.expiresAt) wire.ex = ad.expiresAt;
   return wire;
 }
 
@@ -71,6 +75,7 @@ export function fromCompactWire(wire: CompactAdWire): AdData {
     img: wire.i ? expandImageDataUrl(wire.i) : undefined,
     crop: decodeCrop(wire),
     timestamp: wire.ts,
+    expiresAt: wire.ex ?? computeExpiresAt(wire.ts),
     printMode: wire.pm,
   };
 }
@@ -95,8 +100,18 @@ export function normalizeLegacyAd(parsed: Record<string, unknown>): AdData | nul
   if (typeof parsed.ti === "string" && typeof parsed.t === "string") {
     return fromCompactWire(parsed as unknown as CompactAdWire);
   }
-  const legacy = parsed as Partial<AdData & { title?: string; desc?: string }>;
+  const legacy = parsed as Partial<AdData & { title?: string; desc?: string; expiresAt?: number | string }>;
   if (!legacy.t || !legacy.title || !legacy.price || !legacy.desc) return null;
+
+  const expiresAt =
+    typeof legacy.expiresAt === "number"
+      ? legacy.expiresAt
+      : typeof legacy.expiresAt === "string"
+        ? Date.parse(legacy.expiresAt)
+        : undefined;
+
+  const timestamp = legacy.timestamp ?? Date.now();
+
   return {
     t: legacy.t,
     title: legacy.title,
@@ -108,7 +123,8 @@ export function normalizeLegacyAd(parsed: Record<string, unknown>): AdData | nul
     cardLink: legacy.cardLink,
     img: legacy.img,
     crop: legacy.crop ?? DEFAULT_CROP,
-    timestamp: legacy.timestamp ?? Date.now(),
+    timestamp,
+    expiresAt: expiresAt && Number.isFinite(expiresAt) ? expiresAt : computeExpiresAt(timestamp),
     printMode: legacy.printMode,
   };
 }

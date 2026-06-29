@@ -8,10 +8,10 @@ import { ImageCropEditor } from "./ImageCropEditor";
 import { MyAdsPanel } from "./MyAdsPanel";
 import { formatBRL, formatPhoneNumber, isValidPaymentUrl } from "../lib/formatters";
 import { DEFAULT_CROP } from "../lib/imageCrop";
-import { validateImageFile, ImageCompressorError, compressSourceImage } from "../lib/imageCompressor";
+import { validateImageFile, ImageCompressorError, compressImageOnUpload } from "../lib/imageCompressor";
 import { MAX_DESC_LENGTH, MAX_PIX_LENGTH, MAX_TITLE_LENGTH, SITE_NAME } from "../lib/constants";
 import { TOOLTIP_COPY } from "../lib/tooltipCopy";
-import { ActionButtonWithHint, FieldLabelWithHint } from "./HelpTooltip";
+import { ActionButtonWithHint, FieldLabelWithHint, FieldLegendWithHint } from "./HelpTooltip";
 
 interface HomeViewProps {
   form: AdFormState;
@@ -43,6 +43,7 @@ export function HomeView({
   const previewUrlRef = useRef<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isCompressingPhoto, setIsCompressingPhoto] = useState(false);
 
   const getPlaceholderTitle = () => {
     if (form.adType === "venda") return "iPhone 13 Pro Max 128GB";
@@ -57,20 +58,35 @@ export function HomeView({
   };
 
   const handleFile = useCallback(
-    (file: File) => {
+    async (file: File) => {
       const validation = validateImageFile(file);
       if (validation) {
         onImageError(validation);
         return;
       }
+
       onImageError(null);
-      if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
-      const localUrl = URL.createObjectURL(file);
-      previewUrlRef.current = localUrl;
-      onFieldChange("photoCrop", DEFAULT_CROP);
-      onPhotoChange(file, localUrl);
+      if (previewUrlRef.current) {
+        URL.revokeObjectURL(previewUrlRef.current);
+        previewUrlRef.current = null;
+      }
+
+      setIsCompressingPhoto(true);
+      try {
+        const compressed = await compressImageOnUpload(file);
+        onFieldChange("photoCrop", DEFAULT_CROP);
+        onPhotoChange(file, compressed);
+      } catch (err) {
+        const message =
+          err instanceof ImageCompressorError
+            ? err.message
+            : "Não foi possível processar a imagem. Tente outra foto.";
+        onImageError({ code: "COMPRESS_FAILED", message });
+      } finally {
+        setIsCompressingPhoto(false);
+      }
     },
-    [onImageError, onPhotoChange]
+    [onFieldChange, onImageError, onPhotoChange]
   );
 
   const handleSubmit = async (e: FormEvent) => {
@@ -88,18 +104,7 @@ export function HomeView({
 
     let imagePayload: AdImagePayload | undefined;
     if (form.photoPreview) {
-      try {
-        const image = await compressSourceImage(form.photoPreview);
-        imagePayload = { image, crop: form.photoCrop };
-      } catch (err) {
-        const message =
-          err instanceof ImageCompressorError
-            ? err.message
-            : "Não foi possível processar a imagem. Tente outra foto.";
-        onImageError({ code: "COMPRESS_FAILED", message });
-        onSubmitError(message);
-        return;
-      }
+      imagePayload = { image: form.photoPreview, crop: form.photoCrop };
     }
 
     onSubmit(imagePayload);
@@ -154,7 +159,7 @@ export function HomeView({
             )}
 
             <fieldset className="space-y-3">
-              <legend className="label-field">Tipo de anúncio</legend>
+              <FieldLegendWithHint hint={TOOLTIP_COPY.adType}>Tipo de anúncio</FieldLegendWithHint>
               <div className="grid grid-cols-3 gap-3">
                 {AD_TYPES.map(({ id, label }) => (
                   <button
@@ -172,7 +177,7 @@ export function HomeView({
             </fieldset>
 
             <fieldset className="space-y-3">
-              <legend className="label-field">Cobrança</legend>
+              <FieldLegendWithHint hint={TOOLTIP_COPY.billing}>Cobrança</FieldLegendWithHint>
               <div className="grid grid-cols-2 gap-3">
                 {(["unico", "recorrente"] as const).map((billing) => (
                   <button
@@ -251,7 +256,9 @@ export function HomeView({
             </div>
 
             <div>
-              <label htmlFor="phone-input" className="label-field">WhatsApp (opcional)</label>
+              <FieldLabelWithHint htmlFor="phone-input" hint={TOOLTIP_COPY.phone} className="mb-2">
+                WhatsApp (opcional)
+              </FieldLabelWithHint>
               <input
                 type="tel"
                 id="phone-input"
@@ -282,7 +289,9 @@ export function HomeView({
             </div>
 
             <div>
-              <label htmlFor="card-input" className="label-field">Link de pagamento — cartão (opcional)</label>
+              <FieldLabelWithHint htmlFor="card-input" hint={TOOLTIP_COPY.cardLink} className="mb-2">
+                Link de pagamento — cartão (opcional)
+              </FieldLabelWithHint>
               <input
                 type="url"
                 id="card-input"
@@ -303,16 +312,21 @@ export function HomeView({
 
               {!form.photoPreview ? (
               <div
-                onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                onDragOver={(e) => { e.preventDefault(); if (!isCompressingPhoto) setIsDragging(true); }}
                 onDragLeave={() => setIsDragging(false)}
                 onDrop={(e) => {
                   e.preventDefault();
                   setIsDragging(false);
+                  if (isCompressingPhoto) return;
                   const file = e.dataTransfer.files?.[0];
-                  if (file) handleFile(file);
+                  if (file) void handleFile(file);
                 }}
                 className={`relative flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-zinc-900 p-10 text-center shadow-[3px_3px_0_0_#18181b] min-h-[140px] transition-all duration-150 ${
-                  isDragging ? "bg-lime-200 border-lime-400" : "bg-amber-50 hover:bg-amber-100"
+                  isCompressingPhoto
+                    ? "bg-zinc-100 border-zinc-400 cursor-wait"
+                    : isDragging
+                      ? "bg-lime-200 border-lime-400"
+                      : "bg-amber-50 hover:bg-amber-100"
                 }`}
               >
                 <input
@@ -320,15 +334,25 @@ export function HomeView({
                   type="file"
                   id="photo-upload-input"
                   accept="image/jpeg,image/png,image/webp,image/gif"
-                  className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                  disabled={isCompressingPhoto}
+                  className="absolute inset-0 h-full w-full cursor-pointer opacity-0 disabled:cursor-wait"
                   onChange={(e) => {
                     const file = e.target.files?.[0];
-                    if (file) handleFile(file);
+                    if (file) void handleFile(file);
                   }}
                 />
                   <div className="pointer-events-none space-y-1">
-                    <p className="text-sm font-medium text-zinc-800">Arraste ou clique para enviar</p>
-                    <p className="text-xs text-zinc-400">JPG, PNG ou WebP — máx. 5 MB</p>
+                    {isCompressingPhoto ? (
+                      <>
+                        <p className="text-sm font-semibold text-zinc-700">Otimizando foto para o link…</p>
+                        <p className="text-xs text-zinc-500">Redimensionando no seu aparelho</p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-sm font-medium text-zinc-800">Arraste ou clique para enviar</p>
+                        <p className="text-xs text-zinc-400">JPG, PNG ou WebP — máx. 5 MB · otimizado para WhatsApp</p>
+                      </>
+                    )}
                   </div>
               </div>
               ) : (
@@ -363,7 +387,12 @@ export function HomeView({
 
             <div className="rounded-lg border-[3px] border-black bg-amber-100 p-5 flex items-center justify-between gap-4 neo-shadow-sm">
               <div>
-                <span id="print-mode-label" className="text-sm font-medium text-zinc-800">Modo panfleto / QR Code</span>
+                <FieldLabelWithHint
+                  hint={TOOLTIP_COPY.printMode}
+                  labelClassName="text-sm font-medium text-zinc-800 mb-0"
+                >
+                  <span id="print-mode-label">Modo panfleto / QR Code</span>
+                </FieldLabelWithHint>
                 <p className="text-xs text-zinc-500 mt-0.5 font-normal">Imagem inteira, ideal para impressão</p>
               </div>
               <button
@@ -418,7 +447,7 @@ export function HomeView({
               hintVariant="on-dark"
               type="submit"
               id="btn-submit-generate"
-              disabled={isSubmitting}
+              disabled={isSubmitting || isCompressingPhoto}
               className="btn-primary"
             >
               {isSubmitting ? "Gerando…" : "⚡ Gerar anúncio grátis"}

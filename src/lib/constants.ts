@@ -7,6 +7,11 @@ export const MAX_TITLE_LENGTH = 100;
 export const MAX_DESC_LENGTH = 1000;
 export const MAX_PIX_LENGTH = 500;
 
+/** Limite absoluto da URL compartilhável (WhatsApp / mobile) */
+export const MAX_SHARE_URL_LENGTH = 2048;
+/** Margem de segurança antes de truncar texto */
+export const MAX_SHARE_URL_SAFE = 2000;
+
 export const ADSENSE_CLIENT = import.meta.env.VITE_ADSENSE_CLIENT_ID ?? "";
 export const ADSENSE_SLOTS: Record<
   import("../types/ad").AdSenseSlot,

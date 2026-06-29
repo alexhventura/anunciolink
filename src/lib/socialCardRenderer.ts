@@ -1,9 +1,13 @@
 import type { CropTransform } from "../types/ad";
+import {
+  drawCanvasBrandFooter,
+  drawCanvasBrandMark,
+  drawCanvasBrandWatermark,
+} from "./brandCanvas";
 import { CROP_VIEWPORT, DEFAULT_CROP, getCropSourceRect, loadImageElement } from "./imageCrop";
 
 const SIZE = 1080;
 const MUSTARD = "#d97706";
-const MUSTARD_SOFT = "#f59e0b";
 const INK = "#18181b";
 const MUTED = "#71717a";
 const WHITE = "#ffffff";
@@ -49,29 +53,6 @@ function drawFrame(
   ctx.stroke();
 }
 
-function drawBrandMark(ctx: CanvasRenderingContext2D, x: number, y: number) {
-  const box = 52;
-  drawFrame(ctx, x, y, box, box, 10, WHITE);
-  ctx.fillStyle = INK;
-  ctx.font = '900 26px Inter, Arial, sans-serif';
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText("A", x + box / 2, y + box / 2 + 1);
-  ctx.beginPath();
-  ctx.fillStyle = MUSTARD_SOFT;
-  ctx.strokeStyle = MUTED;
-  ctx.lineWidth = 2;
-  const zx = x + box - 10;
-  const zy = y + 8;
-  ctx.moveTo(zx, zy + 12);
-  ctx.lineTo(zx - 3, zy);
-  ctx.lineTo(zx + 2, zy + 5);
-  ctx.lineTo(zx - 5, zy + 5);
-  ctx.lineTo(zx, zy + 12);
-  ctx.fill();
-  ctx.stroke();
-}
-
 function truncateText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string {
   if (ctx.measureText(text).width <= maxWidth) return text;
   let out = text;
@@ -106,9 +87,13 @@ export async function renderSocialCard(input: SocialCardInput): Promise<Blob> {
   ctx.fillRect(0, 0, SIZE, SIZE);
 
   const pad = 56;
+  const footerReserve = 36;
+  const innerBottom = SIZE - pad - footerReserve;
+
   drawFrame(ctx, pad - 8, pad - 8, SIZE - pad * 2 + 16, SIZE - pad * 2 + 16, 24, WHITE);
 
-  drawBrandMark(ctx, SIZE - pad - 52, pad);
+  drawCanvasBrandWatermark(ctx, SIZE, SIZE, 0.07);
+  drawCanvasBrandMark(ctx, SIZE - pad - 52, pad);
 
   if (input.typeLabel) {
     ctx.font = '700 22px Inter, Arial, sans-serif';
@@ -176,7 +161,7 @@ export async function renderSocialCard(input: SocialCardInput): Promise<Blob> {
 
   const qrSize = 148;
   const qrX = pad;
-  const qrY = SIZE - pad - qrSize - 8;
+  const qrY = innerBottom - qrSize;
   drawFrame(ctx, qrX, qrY, qrSize, qrSize, 10, WHITE);
   ctx.drawImage(input.qrCanvas, qrX + 10, qrY + 10, qrSize - 20, qrSize - 20);
 
@@ -186,9 +171,7 @@ export async function renderSocialCard(input: SocialCardInput): Promise<Blob> {
   ctx.textBaseline = "top";
   wrapText(ctx, "Escaneie e compre via PIX ou Cartão", qrX + qrSize + 28, qrY + 12, SIZE - qrX - qrSize - pad - 36, 30);
 
-  ctx.font = '600 20px Inter, Arial, sans-serif';
-  ctx.fillStyle = MUTED;
-  ctx.fillText("anunciolink.com.br", qrX + qrSize + 28, SIZE - pad - 28);
+  drawCanvasBrandFooter(ctx, SIZE, SIZE - pad + 10, 17);
 
   return new Promise((resolve, reject) => {
     canvas.toBlob(
