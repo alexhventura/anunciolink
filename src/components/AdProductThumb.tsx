@@ -7,13 +7,20 @@ interface AdProductThumbProps {
   type: AdType;
   title: string;
   priority?: boolean;
-  size?: "sm" | "md";
+  size?: "card" | "sm" | "md";
   className?: string;
 }
 
 const SIZE_CLASS = {
+  card: "w-[150px] h-[150px]",
   sm: "w-32 h-32",
   md: "w-40 h-40",
+} as const;
+
+const SIZE_PX = {
+  card: 150,
+  sm: 128,
+  md: 160,
 } as const;
 
 /** Foto do produto — quadrado fixo, centralizado, object-cover */
@@ -23,9 +30,10 @@ export function AdProductThumb({
   type,
   title,
   priority = false,
-  size = "md",
+  size = "card",
   className = "",
 }: AdProductThumbProps) {
+  const px = SIZE_PX[size];
   const boxClass = `ad-product-thumb ${SIZE_CLASS[size]} ${className}`;
 
   if (!src) {
@@ -41,12 +49,12 @@ export function AdProductThumb({
       <img
         src={src}
         alt={alt}
-        width={size === "sm" ? 128 : 160}
-        height={size === "sm" ? 128 : 160}
+        width={px}
+        height={px}
         decoding={priority ? "sync" : "async"}
         fetchPriority={priority ? "high" : "auto"}
         loading={priority ? "eager" : "lazy"}
-        className="h-full w-full object-cover"
+        className="h-full w-full object-cover rounded-lg"
       />
     </div>
   );

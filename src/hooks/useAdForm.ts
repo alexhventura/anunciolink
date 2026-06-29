@@ -14,19 +14,15 @@ export interface AdFormState {
   cardLink: string;
   photoFile: File | null;
   photoPreview: string;
-  audioDataUrl: string;
   printMode: boolean;
   imageError: ImageUploadError | null;
-  audioError: string | null;
   submitError: string | null;
 }
 
 type AdFormAction =
   | { type: "SET_FIELD"; field: keyof AdFormState; value: AdFormState[keyof AdFormState] }
   | { type: "SET_PHOTO"; file: File | null; preview: string }
-  | { type: "SET_AUDIO"; dataUrl: string }
   | { type: "SET_IMAGE_ERROR"; error: ImageUploadError | null }
-  | { type: "SET_AUDIO_ERROR"; error: string | null }
   | { type: "SET_SUBMIT_ERROR"; error: string | null }
   | { type: "RESET" };
 
@@ -41,10 +37,8 @@ const initialState: AdFormState = {
   cardLink: "",
   photoFile: null,
   photoPreview: "",
-  audioDataUrl: "",
   printMode: false,
   imageError: null,
-  audioError: null,
   submitError: null,
 };
 
@@ -59,12 +53,8 @@ function adFormReducer(state: AdFormState, action: AdFormAction): AdFormState {
         photoPreview: action.preview,
         imageError: null,
       };
-    case "SET_AUDIO":
-      return { ...state, audioDataUrl: action.dataUrl, audioError: null };
     case "SET_IMAGE_ERROR":
       return { ...state, imageError: action.error, photoFile: null, photoPreview: "" };
-    case "SET_AUDIO_ERROR":
-      return { ...state, audioError: action.error };
     case "SET_SUBMIT_ERROR":
       return { ...state, submitError: action.error };
     case "RESET":
@@ -85,16 +75,8 @@ export function useAdForm() {
     dispatch({ type: "SET_PHOTO", file, preview });
   }, []);
 
-  const setAudio = useCallback((dataUrl: string) => {
-    dispatch({ type: "SET_AUDIO", dataUrl });
-  }, []);
-
   const setImageError = useCallback((error: ImageUploadError | null) => {
     dispatch({ type: "SET_IMAGE_ERROR", error });
-  }, []);
-
-  const setAudioError = useCallback((error: string | null) => {
-    dispatch({ type: "SET_AUDIO_ERROR", error });
   }, []);
 
   const setSubmitError = useCallback((error: string | null) => {
@@ -118,7 +100,6 @@ export function useAdForm() {
         pix: state.pix.trim() || undefined,
         cardLink: state.cardLink.trim() || undefined,
         img: compressedImage,
-        audio: state.audioDataUrl || undefined,
         timestamp: now,
         expiresAt: computeExpiresAt(now),
         printMode: state.printMode || undefined,
@@ -127,15 +108,5 @@ export function useAdForm() {
     [state]
   );
 
-  return {
-    state,
-    setField,
-    setPhoto,
-    setAudio,
-    setImageError,
-    setAudioError,
-    setSubmitError,
-    reset,
-    toAdData,
-  };
+  return { state, setField, setPhoto, setImageError, setSubmitError, reset, toAdData };
 }

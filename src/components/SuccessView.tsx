@@ -4,9 +4,8 @@ import { Check, Lightbulb, MessageCircle, Share2, Zap } from "lucide-react";
 import type { AdFormState } from "../hooks/useAdForm";
 import type { AdData } from "../types/ad";
 import { AdSenseSlot } from "./AdSenseSlot";
-import { AdProductThumb } from "./AdProductThumb";
+import { AdPreviewCard } from "./AdPreviewCard";
 import { AdShareTools } from "./AdShareTools";
-import { AdBrandedSurface } from "./AdBrandedSurface";
 import { ActionButtonWithHint, FieldLabelWithHint } from "./HelpTooltip";
 import { copyToClipboard } from "../lib/formatters";
 import { buildWhatsAppShareMessage, buildWhatsAppShareUrl } from "../lib/whatsappShare";
@@ -19,16 +18,10 @@ interface SuccessViewProps {
   adsenseReady: boolean;
   imageStrippedWarning?: boolean;
   textOptimizedWarning?: boolean;
-  audioStrippedWarning?: boolean;
   onBackToEdit: () => void;
   onResetHome: () => void;
 }
 
-const typeLabel = {
-  venda: "Venda",
-  servico: "Serviço",
-  vaquinha: "Vaquinha",
-} as const;
 
 export function SuccessView({
   form,
@@ -36,7 +29,6 @@ export function SuccessView({
   adsenseReady,
   imageStrippedWarning,
   textOptimizedWarning,
-  audioStrippedWarning,
   onBackToEdit,
   onResetHome,
 }: SuccessViewProps) {
@@ -89,7 +81,6 @@ export function SuccessView({
     pix: form.pix || undefined,
     cardLink: form.cardLink || undefined,
     img: form.photoPreview || undefined,
-    audio: form.audioDataUrl || undefined,
     timestamp: Date.now(),
     printMode: form.printMode,
   };
@@ -116,7 +107,7 @@ export function SuccessView({
             </h2>
           </div>
           <p className="text-sm font-bold text-black max-w-sm mx-auto">
-            Divulgue com o card de texto pronto. Foto e áudio aparecem só na página do anúncio.
+            Divulgue com o card de texto pronto. A foto aparece só na página do anúncio.
           </p>
         </div>
 
@@ -125,16 +116,7 @@ export function SuccessView({
             role="alert"
             className="rounded-lg border-[3px] border-black bg-amber-400 px-4 py-3 text-xs font-bold text-black text-left neo-shadow-sm"
           >
-            A foto foi omitida do link por limite de tamanho. Encurte o texto, remova o áudio ou gere novamente.
-          </div>
-        )}
-
-        {audioStrippedWarning && (
-          <div
-            role="alert"
-            className="rounded-lg border-[3px] border-black bg-amber-400 px-4 py-3 text-xs font-bold text-black text-left neo-shadow-sm"
-          >
-            O áudio foi omitido do link por limite de tamanho. Encurte a descrição ou grave um áudio mais breve.
+            A foto foi omitida do link por limite de tamanho. Encurte o texto ou gere novamente.
           </div>
         )}
 
@@ -193,7 +175,7 @@ export function SuccessView({
                     💡
                   </span>
                   <strong className="font-black text-black">Por que o link é grande?</strong> Para garantir que
-                  suas fotos e áudio funcionem de forma 100% gratuita e sem cadastros, salvamos tudo direto na URL.
+                  suas fotos funcionem de forma 100% gratuita e sem cadastros, salvamos tudo direto na URL.
                   Se for divulgar no perfil do Instagram ou TikTok, sugerimos encurtar este link gratuitamente no{" "}
                   <a
                     href="https://bitly.com"
@@ -280,35 +262,14 @@ export function SuccessView({
 
       <div className="no-print max-w-lg mx-auto space-y-6">
         <AdSenseSlot slot="topo" ready={adsenseReady} />
-        <AdBrandedSurface
-          variant="create"
-          className="neo-card-white overflow-hidden min-h-[380px]"
-          contentClassName="flex flex-col flex-1"
-        >
-          <div className="px-6 pt-6 pb-4 text-center bg-white border-b-[3px] border-black">
-            <AdProductThumb
-              src={form.photoPreview}
-              alt={form.title}
-              type={form.adType}
-              title={form.title}
-              size="md"
-              className="mx-auto"
-            />
-            {form.photoPreview && (
-              <p className="text-xs font-medium text-zinc-500 mt-3">
-                Foto otimizada automaticamente para o link.
-              </p>
-            )}
-          </div>
-          <div className="p-8 space-y-3 bg-amber-500 flex-1">
-            <span className="chip !bg-black !text-amber-400">{typeLabel[form.adType]}</span>
-            <h3 className="text-xl font-black text-black">{form.title}</h3>
-            <p className="text-3xl font-black text-black bg-white border-[3px] border-black inline-block px-3 py-1 neo-shadow-sm">
-              {form.price}
-            </p>
-            <p className="text-sm text-black/80 line-clamp-4 font-medium">{form.description}</p>
-          </div>
-        </AdBrandedSurface>
+        <AdPreviewCard
+          adType={form.adType}
+          title={form.title}
+          price={form.price}
+          description={form.description}
+          image={form.photoPreview}
+          billingType={form.billingType}
+        />
         <AdSenseSlot slot="meio" ready={adsenseReady} />
       </div>
     </motion.div>

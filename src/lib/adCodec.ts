@@ -123,7 +123,6 @@ export interface FitAdResult {
   hash: string;
   imageStripped: boolean;
   textOptimized: boolean;
-  audioStripped: boolean;
 }
 
 /**
@@ -137,7 +136,6 @@ export async function fitAdToUrlLength(
   let current: AdData = { ...ad };
   let imageStripped = false;
   let textOptimized = false;
-  let audioStripped = false;
   const originalDesc = current.desc;
 
   if (current.img) {
@@ -147,23 +145,14 @@ export async function fitAdToUrlLength(
       current = { ...current, img: compressed };
       const hash = encodeFn(current);
       if (urlFits(hash)) {
-        return { ad: current, hash, imageStripped, textOptimized, audioStripped };
+        return { ad: current, hash, imageStripped, textOptimized };
       }
     }
   }
 
   let hash = encodeFn(current);
   if (urlFits(hash)) {
-    return { ad: current, hash, imageStripped, textOptimized, audioStripped };
-  }
-
-  if (current.audio) {
-    audioStripped = true;
-    current = { ...current, audio: undefined };
-    hash = encodeFn(current);
-    if (urlFits(hash)) {
-      return { ad: current, hash, imageStripped, textOptimized, audioStripped };
-    }
+    return { ad: current, hash, imageStripped, textOptimized };
   }
 
   if (current.img) {
@@ -171,7 +160,7 @@ export async function fitAdToUrlLength(
     current = { ...current, img: undefined, crop: undefined };
     hash = encodeFn(current);
     if (urlFits(hash)) {
-      return { ad: current, hash, imageStripped, textOptimized, audioStripped };
+      return { ad: current, hash, imageStripped, textOptimized };
     }
   }
 
@@ -207,5 +196,5 @@ export async function fitAdToUrlLength(
     );
   }
 
-  return { ad: current, hash, imageStripped, textOptimized, audioStripped };
+  return { ad: current, hash, imageStripped, textOptimized };
 }

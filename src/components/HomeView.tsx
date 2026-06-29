@@ -1,9 +1,9 @@
 import { useCallback, useRef, useState, type FormEvent } from "react";
 import { motion } from "motion/react";
 import type { AdFormState } from "../hooks/useAdForm";
-import type { AdImagePayload, AudioRecorderError } from "../types/ad";
+import type { AdImagePayload } from "../types/ad";
+import { AdPreviewCard } from "./AdPreviewCard";
 import { AdProductThumb } from "./AdProductThumb";
-import { AudioRecorderField } from "./AudioRecorderField";
 import { MyAdsPanel } from "./MyAdsPanel";
 import { formatBRL, formatPhoneNumber, isValidPaymentUrl } from "../lib/formatters";
 import { validateImageFile, ImageCompressorError, compressImageOnUpload } from "../lib/imageCompressor";
@@ -16,9 +16,7 @@ interface HomeViewProps {
   isSubmitting: boolean;
   onFieldChange: <K extends keyof AdFormState>(field: K, value: AdFormState[K]) => void;
   onPhotoChange: (file: File | null, preview: string) => void;
-  onAudioChange: (dataUrl: string) => void;
   onImageError: (error: { code: string; message: string } | null) => void;
-  onAudioError: (error: AudioRecorderError | null) => void;
   onSubmitError: (error: string | null) => void;
   onSubmit: (payload?: AdImagePayload) => void;
   onOpenSavedAd: (url: string) => void;
@@ -35,9 +33,7 @@ export function HomeView({
   isSubmitting,
   onFieldChange,
   onPhotoChange,
-  onAudioChange,
   onImageError,
-  onAudioError,
   onSubmitError,
   onSubmit,
   onOpenSavedAd,
@@ -363,7 +359,7 @@ export function HomeView({
                     alt={form.title || "Foto do produto"}
                     type={form.adType}
                     title={form.title}
-                    size="md"
+                    size="card"
                     className="mx-auto"
                   />
                   <p className="text-xs font-medium text-zinc-500">
@@ -391,17 +387,6 @@ export function HomeView({
                 </div>
               )}
             </div>
-
-            <AudioRecorderField
-              audioDataUrl={form.audioDataUrl}
-              onAudioChange={onAudioChange}
-              onError={(err) => onAudioError(err)}
-            />
-            {form.audioError && (
-              <p role="alert" className="text-xs font-medium text-red-600 -mt-1">
-                {form.audioError}
-              </p>
-            )}
 
             <div className="rounded-lg border-[3px] border-black bg-amber-100 p-5 flex items-center justify-between gap-4 neo-shadow-sm">
               <div>
@@ -434,36 +419,14 @@ export function HomeView({
             {/* Prévia */}
             <div className="neo-card-muted p-6 space-y-5">
               <h3 className="label-field mb-0">Prévia ao vivo</h3>
-              <div className="neo-card-white p-5 space-y-5 !shadow-[4px_4px_0_0_#000]">
-                <div className="text-center">
-                  {form.photoPreview ? (
-                    <AdProductThumb
-                      src={form.photoPreview}
-                      alt={form.title || "Prévia"}
-                      type={form.adType}
-                      title={form.title}
-                      size="md"
-                      className="mx-auto"
-                    />
-                  ) : (
-                    <AdProductThumb
-                      alt={form.title || "Prévia"}
-                      type={form.adType}
-                      title={form.title}
-                      size="md"
-                      className="mx-auto"
-                    />
-                  )}
-                </div>
-                <div className="space-y-2 text-center sm:text-left">
-                  <p className="text-price text-xl font-bold min-h-[28px]">
-                    {form.price || "—"}
-                    {form.price && form.billingType === "recorrente" ? " /mês" : ""}
-                  </p>
-                  <h4 className="text-display text-base font-bold line-clamp-2">{form.title || "Título do anúncio"}</h4>
-                  <p className="text-sm text-zinc-500 line-clamp-3 font-normal">{form.description || "Descrição aparecerá aqui."}</p>
-                </div>
-              </div>
+              <AdPreviewCard
+                adType={form.adType}
+                title={form.title}
+                price={form.price}
+                description={form.description}
+                image={form.photoPreview}
+                billingType={form.billingType}
+              />
             </div>
 
             <ActionButtonWithHint
