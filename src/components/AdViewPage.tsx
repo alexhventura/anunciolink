@@ -54,10 +54,12 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
           title={ad.title}
           price={ad.price}
           description={ad.desc}
+          icon={ad.icon}
           image={ad.img}
           billingType={ad.billingType}
           priority
           showSecurityBadge
+          premium
           className={isExpired ? "opacity-95" : ""}
         />
 

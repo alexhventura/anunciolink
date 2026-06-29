@@ -10,6 +10,7 @@ import { ActionButtonWithHint, FieldLabelWithHint } from "./HelpTooltip";
 import { copyToClipboard } from "../lib/formatters";
 import { buildWhatsAppShareMessage, buildWhatsAppShareUrl } from "../lib/whatsappShare";
 import { useNativeShare } from "../hooks/useNativeShare";
+import { normalizeExternalImageUrl } from "../lib/externalImageUrl";
 import { TOOLTIP_COPY } from "../lib/tooltipCopy";
 
 interface SuccessViewProps {
@@ -21,7 +22,6 @@ interface SuccessViewProps {
   onBackToEdit: () => void;
   onResetHome: () => void;
 }
-
 
 export function SuccessView({
   form,
@@ -80,9 +80,9 @@ export function SuccessView({
     phone: form.phone,
     pix: form.pix || undefined,
     cardLink: form.cardLink || undefined,
-    img: form.photoPreview || undefined,
+    icon: form.icon,
+    img: normalizeExternalImageUrl(form.imageUrl),
     timestamp: Date.now(),
-    printMode: form.printMode,
   };
 
   return (
@@ -102,7 +102,7 @@ export function SuccessView({
             </h2>
           </div>
           <p className="text-sm font-bold text-black max-w-sm mx-auto">
-            Divulgue com o card de texto pronto. A foto aparece só na página do anúncio.
+            Copie o texto abaixo e divulgue. Card offline e panfleto A4 ficam disponíveis aqui.
           </p>
         </div>
 
@@ -111,7 +111,7 @@ export function SuccessView({
             role="alert"
             className="rounded-lg border-[3px] border-black bg-amber-400 px-4 py-3 text-xs font-bold text-black text-left neo-shadow-sm"
           >
-            A foto foi omitida do link por limite de tamanho. Encurte o texto ou gere novamente.
+            O link da foto foi omitido por limite de tamanho do URL. Encurte a descrição ou use um link de imagem mais curto.
           </div>
         )}
 
@@ -170,9 +170,8 @@ export function SuccessView({
                   <span className="mr-0.5" aria-hidden="true">
                     💡
                   </span>
-                  <strong className="font-black text-black">Por que o link é grande?</strong> Para garantir que
-                  suas fotos funcionem de forma 100% gratuita e sem cadastros, salvamos tudo direto na URL.
-                  Se for divulgar no perfil do Instagram ou TikTok, sugerimos encurtar este link gratuitamente no{" "}
+                  <strong className="font-black text-black">Por que o link é grande?</strong> Salvamos tudo direto na
+                  URL, sem cadastro. Para bios e redes, encurte gratuitamente no{" "}
                   <a
                     href="https://bitly.com"
                     target="_blank"
@@ -189,8 +188,8 @@ export function SuccessView({
                     className="font-bold text-black underline decoration-amber-600 underline-offset-2 hover:text-amber-900"
                   >
                     tinyurl.com
-                  </a>{" "}
-                  para deixá-lo compacto e elegante!
+                  </a>
+                  .
                 </p>
               </div>
             </aside>
@@ -278,8 +277,10 @@ export function SuccessView({
           title={form.title}
           price={form.price}
           description={form.description}
-          image={form.photoPreview}
+          icon={form.icon}
+          image={form.imageUrl.trim() || undefined}
           billingType={form.billingType}
+          premium
         />
         <AdSenseSlot slot="meio" ready={adsenseReady} />
       </div>

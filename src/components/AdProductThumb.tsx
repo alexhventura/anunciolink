@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { AdType } from "../types/ad";
+import { resolveRenderableImageSrc } from "../lib/imageUtils";
 import { ImageFallback } from "./ImageFallback";
-import { isRenderableImageSrc } from "../lib/imageUtils";
 
 interface AdProductThumbProps {
   src?: string;
@@ -29,7 +29,7 @@ const SIZE_PX = {
   xl: 288,
 } as const;
 
-/** Foto do produto — quadrado fixo, centralizado, object-cover */
+/** Foto do produto — quadrado fixo, centralizado, object-cover (URL externa ou embutida) */
 export function AdProductThumb({
   src,
   alt,
@@ -42,11 +42,13 @@ export function AdProductThumb({
   const [failed, setFailed] = useState(false);
   const px = SIZE_PX[size];
   const boxClass = `ad-product-thumb ${SIZE_CLASS[size]} ${className}`;
-  const canRender = Boolean(src && isRenderableImageSrc(src) && !failed);
+
+  const resolvedSrc = useMemo(() => resolveRenderableImageSrc(src), [src]);
+  const canRender = Boolean(resolvedSrc && !failed);
 
   useEffect(() => {
     setFailed(false);
-  }, [src]);
+  }, [resolvedSrc]);
 
   if (!canRender) {
     return (
@@ -59,13 +61,14 @@ export function AdProductThumb({
   return (
     <div className={boxClass}>
       <img
-        src={src}
+        src={resolvedSrc}
         alt={alt}
         width={px}
         height={px}
         decoding={priority ? "sync" : "async"}
         fetchPriority={priority ? "high" : "auto"}
         loading={priority ? "eager" : "lazy"}
+        referrerPolicy="no-referrer"
         className="h-full w-full object-cover object-center rounded-lg"
         onError={() => setFailed(true)}
       />

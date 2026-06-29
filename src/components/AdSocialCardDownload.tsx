@@ -3,6 +3,7 @@ import { Download } from "lucide-react";
 import type { AdData } from "../types/ad";
 import { TOOLTIP_COPY } from "../lib/tooltipCopy";
 import { renderPreviewCardBlob } from "../lib/adPreviewCardCanvas";
+import { renderQrToCanvas } from "../lib/qrCanvas";
 import { downloadBlob, slugifyFilename } from "../lib/socialCardRenderer";
 import { ActionButtonWithHint } from "./HelpTooltip";
 
@@ -15,6 +16,7 @@ interface AdSocialCardDownloadProps {
 
 export function AdSocialCardDownload({
   ad,
+  qrUrl,
   triggerClassName = "btn-share-card",
   hintVariant = "default",
 }: AdSocialCardDownloadProps) {
@@ -28,14 +30,17 @@ export function AdSocialCardDownload({
     try {
       await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
 
+      const qrCanvas = await renderQrToCanvas(qrUrl, 120);
       const blob = await renderPreviewCardBlob({
         adType: ad.t,
         title: ad.title,
         price: ad.price,
         description: ad.desc,
+        icon: ad.icon,
         imageSrc: ad.img,
-        crop: ad.crop,
         billingRecorrente: ad.billingType === "recorrente",
+        phone: ad.phone,
+        qrCanvas,
         width: 1080,
       });
 
@@ -45,7 +50,7 @@ export function AdSocialCardDownload({
     } finally {
       setGenerating(false);
     }
-  }, [ad]);
+  }, [ad, qrUrl]);
 
   return (
     <>
@@ -57,7 +62,7 @@ export function AdSocialCardDownload({
         id="btn-download-social-card"
         className={triggerClassName}
         aria-busy={generating}
-        aria-label="Baixar card idêntico ao anúncio para postagem"
+        aria-label="Baixar card idêntico ao anúncio com QR Code para postagem"
       >
         <Download className="h-5 w-5 shrink-0" strokeWidth={2} aria-hidden="true" />
         {generating ? "Gerando card…" : "Baixar Card para Postagem"}

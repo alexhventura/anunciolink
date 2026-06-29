@@ -3,6 +3,7 @@ import type { AdData } from "../types/ad";
 import { MAX_SHARE_URL_LENGTH, MAX_SHARE_URL_SAFE } from "./constants";
 import { fromCompactWire, normalizeLegacyAd, toCompactWire } from "./adWire";
 import { URL_FIT_COMPRESSION_STEPS, compressImageAtStep } from "./imageCompressor";
+import { isEmbeddedImageData } from "./imageUtils";
 import { estimateAdUrlLength } from "./adRoutes";
 import { sanitizeAdData } from "./sanitizeAd";
 
@@ -139,7 +140,7 @@ export async function fitAdToUrlLength(
   let textOptimized = false;
   const originalDesc = current.desc;
 
-  if (current.img) {
+  if (current.img && isEmbeddedImageData(current.img)) {
     const source = current.img;
     for (const step of URL_FIT_COMPRESSION_STEPS) {
       const compressed = await compressImageAtStep(source, step);

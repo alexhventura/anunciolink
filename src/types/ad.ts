@@ -25,11 +25,13 @@ export interface AdData {
   phone: string;
   pix?: string;
   cardLink?: string;
+  /** Emoji escolhido pelo criador (substitui foto) */
+  icon?: string;
+  /** URL externa (https) ou data URL legada embutida */
   img?: string;
   crop?: CropTransform;
   timestamp: number;
   expiresAt?: number;
-  printMode?: boolean;
 }
 
 export interface ImageUploadError {
@@ -38,5 +40,5 @@ export interface ImageUploadError {
 }
 
 export interface AdImagePayload {
-  image?: string;
+  icon?: string;
 }

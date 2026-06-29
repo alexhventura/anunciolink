@@ -1,6 +1,8 @@
 import { useCallback, useReducer } from "react";
-import type { AdData, AdType, BillingType, ImageUploadError } from "../types/ad";
+import type { AdData, AdType, BillingType } from "../types/ad";
 import { computeExpiresAt } from "../lib/adExpiry";
+import { ALL_AD_ICONS, DEFAULT_AD_ICON, resolveAdIcon } from "../lib/adIcons";
+import { normalizeExternalImageUrl } from "../lib/externalImageUrl";
 import { sanitizePhone } from "../lib/formatters";
 import { sanitizeAdData } from "../lib/sanitizeAd";
 
@@ -13,17 +15,13 @@ export interface AdFormState {
   phone: string;
   pix: string;
   cardLink: string;
-  photoFile: File | null;
-  photoPreview: string;
-  printMode: boolean;
-  imageError: ImageUploadError | null;
+  imageUrl: string;
+  icon: string;
   submitError: string | null;
 }
 
 type AdFormAction =
   | { type: "SET_FIELD"; field: keyof AdFormState; value: AdFormState[keyof AdFormState] }
-  | { type: "SET_PHOTO"; file: File | null; preview: string }
-  | { type: "SET_IMAGE_ERROR"; error: ImageUploadError | null }
   | { type: "SET_SUBMIT_ERROR"; error: string | null }
   | { type: "RESET" };
 
@@ -36,26 +34,23 @@ const initialState: AdFormState = {
   phone: "",
   pix: "",
   cardLink: "",
-  photoFile: null,
-  photoPreview: "",
-  printMode: false,
-  imageError: null,
+  imageUrl: "",
+  icon: DEFAULT_AD_ICON.venda,
   submitError: null,
 };
 
 function adFormReducer(state: AdFormState, action: AdFormAction): AdFormState {
   switch (action.type) {
-    case "SET_FIELD":
-      return { ...state, [action.field]: action.value };
-    case "SET_PHOTO":
-      return {
-        ...state,
-        photoFile: action.file,
-        photoPreview: action.preview,
-        imageError: null,
-      };
-    case "SET_IMAGE_ERROR":
-      return { ...state, imageError: action.error, photoFile: null, photoPreview: "" };
+    case "SET_FIELD": {
+      const next = { ...state, [action.field]: action.value };
+      if (action.field === "adType" && typeof action.value === "string") {
+        const adType = action.value as AdType;
+        if (!ALL_AD_ICONS.includes(next.icon) || next.icon === DEFAULT_AD_ICON[state.adType]) {
+          next.icon = DEFAULT_AD_ICON[adType];
+        }
+      }
+      return next;
+    }
     case "SET_SUBMIT_ERROR":
       return { ...state, submitError: action.error };
     case "RESET":
@@ -72,14 +67,6 @@ export function useAdForm() {
     dispatch({ type: "SET_FIELD", field, value });
   }, []);
 
-  const setPhoto = useCallback((file: File | null, preview: string) => {
-    dispatch({ type: "SET_PHOTO", file, preview });
-  }, []);
-
-  const setImageError = useCallback((error: ImageUploadError | null) => {
-    dispatch({ type: "SET_IMAGE_ERROR", error });
-  }, []);
-
   const setSubmitError = useCallback((error: string | null) => {
     dispatch({ type: "SET_SUBMIT_ERROR", error });
   }, []);
@@ -88,26 +75,23 @@ export function useAdForm() {
     dispatch({ type: "RESET" });
   }, []);
 
-  const toAdData = useCallback(
-    (compressedImage?: string): AdData => {
-      const now = Date.now();
-      return sanitizeAdData({
-        t: state.adType,
-        title: state.title.trim(),
-        price: state.price.trim(),
-        billingType: state.billingType,
-        desc: state.description.trim(),
-        phone: state.phone.trim() ? sanitizePhone(state.phone) : "",
-        pix: state.pix.trim() || undefined,
-        cardLink: state.cardLink.trim() || undefined,
-        img: compressedImage,
-        timestamp: now,
-        expiresAt: computeExpiresAt(now),
-        printMode: state.printMode || undefined,
-      });
-    },
-    [state]
-  );
+  const toAdData = useCallback((): AdData => {
+    const now = Date.now();
+    return sanitizeAdData({
+      t: state.adType,
+      title: state.title.trim(),
+      price: state.price.trim(),
+      billingType: state.billingType,
+      desc: state.description.trim(),
+      phone: state.phone.trim() ? sanitizePhone(state.phone) : "",
+      pix: state.pix.trim() || undefined,
+      cardLink: state.cardLink.trim() || undefined,
+      icon: resolveAdIcon(state.icon, state.adType),
+      img: normalizeExternalImageUrl(state.imageUrl),
+      timestamp: now,
+      expiresAt: computeExpiresAt(now),
+    });
+  }, [state]);
 
-  return { state, setField, setPhoto, setImageError, setSubmitError, reset, toAdData };
+  return { state, setField, setSubmitError, reset, toAdData };
 }

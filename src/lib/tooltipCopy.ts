@@ -1,13 +1,15 @@
 /** Micro-copy dos tooltips de instrução — Home e página do anúncio */
 export const TOOLTIP_COPY = {
   title:
-    "Escreva o nome do produto de forma direta. É o que vai aparecer gigante no topo do seu cartaz impresso.",
+    "Escreva o nome do produto de forma direta. É o que aparece em destaque no card do anúncio.",
   price:
     "Digite apenas os números. O sistema formata automaticamente em R$ BRL com letras em tamanho de destaque.",
   description:
-    "Detalhe o estado do produto e informações importantes. Menos texto ajuda a manter o design do panfleto limpo.",
-  photo:
-    "Selecione uma foto da galeria. Ela é compactada (150px) e embutida no link — o comprador vê na página do anúncio.",
+    "Detalhe o estado do produto e informações importantes. Texto claro ajuda na divulgação.",
+  icon:
+    "Escolha um ícone que represente seu produto ou serviço. Usado quando não houver link de foto.",
+  imageUrl:
+    "Cole o link direto (URL) da imagem hospedada por você — Postimages, OLX, etc. A foto aparece nativa no card, sem upload nem cadastro.",
   nativeShare:
     "Abre a gaveta nativa de compartilhamento do seu celular (Android/iOS) com o card de texto pronto — ideal para WhatsApp, Instagram e mais.",
   pix:
@@ -20,14 +22,12 @@ export const TOOLTIP_COPY = {
     "Seu WhatsApp aparece na página do comprador para tirar dúvidas. Só quem abrir o link verá o número.",
   cardLink:
     "Cole o link do Mercado Pago, Stripe ou similar. O comprador abre direto para pagar com cartão.",
-  printMode:
-    "Ative para cartazes impressos: a foto aparece inteira, sem recorte quadrado, ideal para panfletos e QR Code grande.",
   generateAd:
-    "Processa e compacta todos os seus dados e foto direto em um link único. Sem criar contas ou senhas.",
+    "Processa e compacta todos os seus dados — incluindo o link da foto — direto na URL. Sem criar contas ou senhas.",
   printPoster:
-    "Abre a tela de impressão configurada milimetricamente para uma folha A4 comum, com um QR Code gigante para colar na rua ou condomínio.",
+    "Imprime um panfleto A4 com a identidade do card, ícone, dados completos, telefone e QR Code.",
   socialCard:
-    "Gera e baixa um card quadrado perfeito no estilo Instagram para você disparar nos status do WhatsApp ou redes sociais.",
+    "Baixa um card idêntico ao anúncio com ícone, dados, telefone e QR Code — ideal para status e redes.",
   linkShortener:
-    "Nosso link carrega a foto de graça — por isso fica longo. Encurte gratuitamente no Bitly ou TinyURL para bios e redes.",
+    "Nosso link carrega todos os dados de graça — por isso fica longo. Encurte gratuitamente no Bitly ou TinyURL para bios e redes.",
 } as const;

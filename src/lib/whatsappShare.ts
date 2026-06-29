@@ -20,7 +20,7 @@ export function shortenDescriptionForShare(description: string, maxLen = 280): s
 
 /**
  * Card de texto para compartilhar no WhatsApp.
- * A foto fica apenas na URL — não entra no preview Open Graph.
+ * O visual completo fica na página do link.
  */
 export function buildWhatsAppShareMessage(
   title: string,
@@ -34,10 +34,10 @@ export function buildWhatsAppShareMessage(
 
   return (
     `🛍️ *NOVO ANÚNCIO NO ANÚNCIOLINK*\n\n` +
-    `📦 *Produto:* ${safeTitle}\n` +
+    `📦 *${safeTitle}*\n` +
     `💰 *Preço:* ${safePrice}\n` +
     `📝 *Descrição:* ${safeDesc}\n\n` +
-    `🔗 _Acesse o link seguro para ver o anúncio e fechar a compra:_\n` +
+    `🔗 _Acesse o link para ver o card completo e pagar:_\n` +
     `${adUrl}`
   );
 }

@@ -1,6 +1,7 @@
 import type { AdData, AdType, BillingType, CropTransform } from "../types/ad";
 import { computeExpiresAt } from "./adExpiry";
 import { DEFAULT_CROP, isDefaultCrop } from "./imageCrop";
+import { expandImageFromWire, stripImageForWire } from "./imageUtils";
 
 /** Payload compacto na URL — chaves mínimas para reduzir bytes antes do deflate */
 export interface CompactAdWire {
@@ -12,14 +13,15 @@ export interface CompactAdWire {
   ph?: string;
   x?: string;
   c?: string;
-  /** w:webp ou j:jpeg + base64 sem prefixo data: */
+  /** w:webp ou j:jpeg + base64 sem prefixo data: (legado) */
   i?: string;
+  /** emoji do produto */
+  e?: string;
   cz?: number;
   cx?: number;
   cy?: number;
   ts: number;
   ex?: number;
-  pm?: boolean;
 }
 
 function encodeCrop(crop: CropTransform): Pick<CompactAdWire, "cz" | "cx" | "cy"> | undefined {
@@ -52,8 +54,8 @@ export function toCompactWire(ad: AdData): CompactAdWire {
   if (ad.phone) wire.ph = ad.phone;
   if (ad.pix) wire.x = ad.pix;
   if (ad.cardLink) wire.c = ad.cardLink;
-  if (ad.printMode) wire.pm = true;
-  if (ad.img) wire.i = stripImageDataUrl(ad.img);
+  if (ad.icon) wire.e = ad.icon;
+  if (ad.img) wire.i = stripImageForWire(ad.img);
   const cropFields = ad.crop ? encodeCrop(ad.crop) : undefined;
   if (cropFields) Object.assign(wire, cropFields);
   if (ad.expiresAt) wire.ex = ad.expiresAt;
@@ -70,28 +72,12 @@ export function fromCompactWire(wire: CompactAdWire): AdData {
     phone: wire.ph ?? "",
     pix: wire.x,
     cardLink: wire.c,
-    img: wire.i ? expandImageDataUrl(wire.i) : undefined,
+    icon: wire.e,
+    img: wire.i ? expandImageFromWire(wire.i) : undefined,
     crop: decodeCrop(wire),
     timestamp: wire.ts,
     expiresAt: wire.ex ?? computeExpiresAt(wire.ts),
-    printMode: wire.pm,
   };
-}
-
-function stripImageDataUrl(dataUrl: string): string {
-  const webpMatch = dataUrl.match(/^data:image\/webp;base64,(.+)$/);
-  if (webpMatch) return `w:${webpMatch[1]}`;
-  const jpegMatch = dataUrl.match(/^data:image\/(?:jpeg|jpg);base64,(.+)$/);
-  if (jpegMatch) return `j:${jpegMatch[1]}`;
-  if (dataUrl.startsWith("w:") || dataUrl.startsWith("j:")) return dataUrl;
-  return `j:${dataUrl}`;
-}
-
-function expandImageDataUrl(compact: string): string {
-  if (compact.startsWith("w:")) return `data:image/webp;base64,${compact.slice(2)}`;
-  if (compact.startsWith("j:")) return `data:image/jpeg;base64,${compact.slice(2)}`;
-  if (compact.startsWith("data:image/")) return compact;
-  return `data:image/jpeg;base64,${compact}`;
 }
 
 /** Converte AdData legado (JSON completo) para wire compacto */
@@ -123,9 +109,9 @@ export function normalizeLegacyAd(parsed: Record<string, unknown>): AdData | nul
     pix: legacy.pix,
     cardLink: legacy.cardLink,
     img: legacy.img,
+    icon: typeof legacy.icon === "string" ? legacy.icon : undefined,
     crop: legacy.crop ?? DEFAULT_CROP,
     timestamp,
     expiresAt: expiresAt && Number.isFinite(expiresAt) ? expiresAt : computeExpiresAt(timestamp),
-    printMode: legacy.printMode,
   };
 }

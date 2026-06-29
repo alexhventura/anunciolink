@@ -1,8 +1,3 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import { Suspense, lazy, useCallback, useState } from "react";
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
@@ -14,7 +9,6 @@ import { useAdForm } from "./hooks/useAdForm";
 import { useDocumentMeta } from "./hooks/useDocumentMeta";
 import { useAdSenseLoader } from "./hooks/useAdSenseLoader";
 import { useAdHistory } from "./hooks/useAdHistory";
-import type { AdImagePayload } from "./types/ad";
 import {
   AdCodecError,
   buildAdUrl,
@@ -55,13 +49,12 @@ export default function App() {
     navigateToPage,
     isInstitutionalView,
   } = useAdRouting();
-  const { state: form, setField, setPhoto, setImageError, setSubmitError, reset: resetForm, toAdData } =
-    useAdForm();
+  const { state: form, setField, setSubmitError, reset: resetForm, toAdData } = useAdForm();
   const { refresh: refreshHistory } = useAdHistory();
   const [generatedLink, setGeneratedLink] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [imageStrippedWarning, setImageStrippedWarning] = useState(false);
   const [textOptimizedWarning, setTextOptimizedWarning] = useState(false);
+  const [imageStrippedWarning, setImageStrippedWarning] = useState(false);
 
   const isAdView = currentView === "anuncio";
   const showAdsense =
@@ -74,49 +67,46 @@ export default function App() {
   const handleResetHome = useCallback(() => {
     resetForm();
     setGeneratedLink("");
-    setImageStrippedWarning(false);
     setTextOptimizedWarning(false);
+    setImageStrippedWarning(false);
     resetToHome();
   }, [resetForm, resetToHome]);
 
-  const handleGenerate = useCallback(
-    async (payload?: AdImagePayload) => {
-      setIsSubmitting(true);
-      setSubmitError(null);
-      setImageStrippedWarning(false);
-      setTextOptimizedWarning(false);
+  const handleGenerate = useCallback(async () => {
+    setIsSubmitting(true);
+    setSubmitError(null);
+    setTextOptimizedWarning(false);
+    setImageStrippedWarning(false);
 
-      try {
-        const rawAd = toAdData(payload?.image);
-        const { ad: adObject, hash: hashResult, imageStripped, textOptimized } =
-          await fitAdToUrlLength(rawAd, encodeAdData);
+    try {
+      const rawAd = toAdData();
+      const { ad: adObject, hash: hashResult, imageStripped, textOptimized } =
+        await fitAdToUrlLength(rawAd, encodeAdData);
 
-        const finalLink = buildAdUrl(hashResult);
+      const finalLink = buildAdUrl(hashResult);
 
-        saveAdToHistory({
-          title: adObject.title,
-          price: adObject.price,
-          url: finalLink,
-          type: adObject.t,
-        });
-        refreshHistory();
+      saveAdToHistory({
+        title: adObject.title,
+        price: adObject.price,
+        url: finalLink,
+        type: adObject.t,
+      });
+      refreshHistory();
 
-        setGeneratedLink(finalLink);
-        setImageStrippedWarning(imageStripped);
-        setTextOptimizedWarning(textOptimized);
-        setCurrentView("success");
-      } catch (err) {
-        const message =
-          err instanceof AdCodecError
-            ? err.message
-            : "Não foi possível gerar o anúncio. Tente reduzir o texto ou remover a foto.";
-        setSubmitError(message);
-      } finally {
-        setIsSubmitting(false);
-      }
-    },
-    [toAdData, setSubmitError, setCurrentView, refreshHistory]
-  );
+      setGeneratedLink(finalLink);
+      setTextOptimizedWarning(textOptimized);
+      setImageStrippedWarning(imageStripped);
+      setCurrentView("success");
+    } catch (err) {
+      const message =
+        err instanceof AdCodecError
+          ? err.message
+          : "Não foi possível gerar o anúncio. Tente reduzir o texto.";
+      setSubmitError(message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [toAdData, setSubmitError, setCurrentView, refreshHistory]);
 
   return (
     <div className={`min-h-screen font-sans antialiased ${themeClass}`}>
@@ -137,8 +127,6 @@ export default function App() {
               isSubmitting={isSubmitting}
               adsenseReady={adsenseReady}
               onFieldChange={setField}
-              onPhotoChange={setPhoto}
-              onImageError={setImageError}
               onSubmitError={setSubmitError}
               onSubmit={handleGenerate}
               onOpenSavedAd={openSavedAdUrl}

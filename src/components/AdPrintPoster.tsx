@@ -27,6 +27,21 @@ export function AdPrintPoster({
     window.setTimeout(() => document.documentElement.classList.remove("printing-a4"), 500);
   };
 
+  const qrSlot = (
+    <div className="ad-preview-card__qr">
+      <QRCodeSVG
+        value={qrUrl}
+        size={140}
+        level="M"
+        includeMargin={false}
+        bgColor="#ffffff"
+        fgColor="#18181b"
+        aria-label="QR Code do anúncio"
+      />
+      <p className="ad-preview-card__qr-label">Escaneie para ver o anúncio completo</p>
+    </div>
+  );
+
   return (
     <>
       <ActionButtonWithHint
@@ -36,48 +51,43 @@ export function AdPrintPoster({
         id="btn-print-a4-poster"
         className={triggerClassName}
         disabled={!qrSafe}
-        aria-label="Gerar cartaz A4 para imprimir com o mesmo visual do anúncio"
+        aria-label="Gerar panfleto A4 para imprimir com identidade do card"
       >
         <Printer className="h-5 w-5 shrink-0" strokeWidth={2} aria-hidden="true" />
-        Gerar Cartaz para Imprimir (A4)
+        Gerar Panfleto A4 para Imprimir
       </ActionButtonWithHint>
 
       {qrSafe && (
         <div className="a4-poster" aria-hidden="true">
           <div className="a4-poster__sheet">
+            <header className="a4-poster__header">
+              <span className="a4-poster__site">AnúncioLink</span>
+              <span className="a4-poster__chip">
+                {ad.t === "venda" ? "Venda" : ad.t === "servico" ? "Serviço" : "Vaquinha"}
+              </span>
+            </header>
+
             <div className="a4-poster__card-wrap">
               <AdPreviewCard
                 adType={ad.t}
                 title={ad.title}
                 price={ad.price}
                 description={ad.desc}
+                icon={ad.icon}
                 image={ad.img}
                 billingType={ad.billingType}
-                showPhotoCaption={false}
+                phone={ad.phone}
                 showSecurityBadge
+                exportMode
+                qrSlot={qrSlot}
+                premium
               />
             </div>
 
-            <div className="a4-poster__scan-row">
-              <div className="a4-poster__qr-wrap">
-                <QRCodeSVG
-                  value={qrUrl}
-                  size={160}
-                  level="M"
-                  includeMargin={false}
-                  bgColor="#ffffff"
-                  fgColor="#18181b"
-                />
-              </div>
-              <div className="a4-poster__scan-copy">
-                <p className="a4-poster__scan-title">Aponte a câmera do celular</p>
-                <p className="a4-poster__scan-body">
-                  para ver o anúncio completo e pagar via Pix ou cartão — igual ao link do WhatsApp.
-                </p>
-              </div>
-            </div>
-
-            <p className="a4-poster__brand">Anunciado em: www.anunciolink.com.br</p>
+            <footer className="a4-poster__footer">
+              <p className="a4-poster__brand">www.anunciolink.com.br</p>
+              <p className="a4-poster__hint">Aponte a câmera do celular no QR Code para pagar via Pix ou cartão.</p>
+            </footer>
           </div>
         </div>
       )}

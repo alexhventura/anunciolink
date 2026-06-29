@@ -23,7 +23,7 @@ export function AdShareTools({ ad }: AdShareToolsProps) {
             Divulgue offline e online
           </h2>
           <p className="mt-1 text-xs font-medium text-zinc-500 leading-snug">
-            Cartaz A4 premium para imprimir ou card quadrado para redes sociais.
+            Card quadrado com QR Code ou panfleto A4 — disponível após gerar o link.
           </p>
         </div>
       </div>

@@ -1,5 +1,8 @@
+import type { ReactNode } from "react";
+import { Phone } from "lucide-react";
 import type { AdType, BillingType } from "../types/ad";
-import { AdProductThumb } from "./AdProductThumb";
+import { formatPhoneNumber } from "../lib/formatters";
+import { AdProductIcon } from "./AdProductIcon";
 import { SecurityBadge } from "./SecurityBadge";
 
 const TYPE_LABEL: Record<AdType, string> = {
@@ -13,53 +16,68 @@ interface AdPreviewCardProps {
   title: string;
   price: string;
   description: string;
+  icon?: string;
+  /** Legado */
   image?: string;
   billingType?: BillingType;
+  phone?: string;
   priority?: boolean;
-  showPhotoCaption?: boolean;
   showSecurityBadge?: boolean;
+  /** Card offline / impressão: telefone + QR no rodapé */
+  exportMode?: boolean;
+  qrSlot?: ReactNode;
+  /** Visual mais destacado para compartilhamento */
+  premium?: boolean;
   className?: string;
 }
 
-/** Card compacto de produto — idêntico na criação e na visualização */
+/** Card de anúncio — idêntico na criação, visualização e exportação offline */
 export function AdPreviewCard({
   adType,
   title,
   price,
   description,
+  icon,
   image,
   billingType = "unico",
+  phone,
   priority = false,
-  showPhotoCaption = true,
   showSecurityBadge = false,
+  exportMode = false,
+  qrSlot,
+  premium = false,
   className = "",
 }: AdPreviewCardProps) {
   const priceLabel = price + (billingType === "recorrente" ? " /mês" : "");
+  const phoneDisplay = phone ? formatPhoneNumber(phone) : "";
 
   return (
-    <div className={`neo-card-white overflow-hidden min-w-0 ${className}`}>
+    <div
+      className={`ad-preview-card neo-card-white overflow-hidden min-w-0 ${
+        premium ? "ad-preview-card--premium" : ""
+      } ${exportMode ? "ad-preview-card--export" : ""} ${className}`}
+    >
       {showSecurityBadge && (
         <div className="flex justify-center px-4 pt-4 pb-0 bg-white">
           <SecurityBadge />
         </div>
       )}
-      <div className="px-6 pt-6 pb-4 text-center bg-white border-b-[3px] border-black">
-        <AdProductThumb
-          src={image}
-          alt={title || "Produto"}
-          type={adType}
-          title={title}
-          priority={priority}
-          size="card"
-          className="mx-auto"
-        />
-        {image && showPhotoCaption && (
-          <p className="text-xs font-medium text-zinc-500 mt-3">
-            Foto otimizada automaticamente para o link.
-          </p>
-        )}
+
+      <div className="ad-preview-card__hero">
+        <div className="ad-preview-card__hero-inner">
+          <AdProductIcon
+            icon={icon}
+            image={image}
+            adType={adType}
+            title={title}
+            priority={priority}
+            size="card"
+            className="mx-auto"
+          />
+        </div>
       </div>
-      <div className="p-6 sm:p-8 space-y-3 bg-amber-500 min-w-0">
+
+      <div className="ad-preview-card__body p-6 sm:p-8 space-y-3 min-w-0">
         <span className="chip !bg-black !text-amber-400">{TYPE_LABEL[adType]}</span>
         <h3
           className="text-xl font-black text-black leading-snug break-words [overflow-wrap:anywhere]"
@@ -83,6 +101,18 @@ export function AdPreviewCard({
           {description || "Descrição aparecerá aqui."}
         </p>
       </div>
+
+      {exportMode && (phoneDisplay || qrSlot) && (
+        <div className="ad-preview-card__export-footer">
+          {phoneDisplay && (
+            <p className="ad-preview-card__phone">
+              <Phone className="h-4 w-4 shrink-0" strokeWidth={2.5} aria-hidden="true" />
+              <span>{phoneDisplay}</span>
+            </p>
+          )}
+          {qrSlot}
+        </div>
+      )}
     </div>
   );
 }
