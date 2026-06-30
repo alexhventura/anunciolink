@@ -51,7 +51,7 @@ export async function renderQrToCanvas(
     copy.height = size;
     const ctx = copy.getContext("2d");
     if (!ctx) throw new Error("Canvas indisponível");
-    ctx.drawImage(source, 0, 0);
+    ctx.drawImage(source, 0, 0, source.width, source.height, 0, 0, size, size);
     return copy;
   } finally {
     root.unmount();

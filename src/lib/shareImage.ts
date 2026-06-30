@@ -8,7 +8,7 @@ import { slugifyFilename } from "./socialCardRenderer";
 export async function generateShareCardBlob(ad: AdData, qrUrl: string): Promise<Blob> {
   await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
 
-  const qrCanvas = await renderQrToCanvas(qrUrl, 280, AD_QR_FOREGROUND);
+  const qrCanvas = await renderQrToCanvas(qrUrl, 256, AD_QR_FOREGROUND);
   return renderPreviewCardBlob({
     adType: ad.t,
     title: ad.title,
