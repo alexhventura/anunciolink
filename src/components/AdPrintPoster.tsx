@@ -1,11 +1,12 @@
 import { Printer } from "lucide-react";
+import { createPortal } from "react-dom";
 import { QRCodeSVG } from "qrcode.react";
 import type { AdData } from "../types/ad";
 import { resolveAdTheme } from "../lib/adThemes";
-import { formatPhoneNumber } from "../lib/formatters";
 import { isQrUrlSafe } from "../lib/qrShareUrl";
 import { TOOLTIP_COPY } from "../lib/tooltipCopy";
 import { ActionButtonWithHint } from "./HelpTooltip";
+import { AdProductIcon } from "./AdProductIcon";
 
 interface AdPrintPosterProps {
   ad: AdData;
@@ -14,13 +15,18 @@ interface AdPrintPosterProps {
   hintVariant?: "default" | "on-dark";
 }
 
-const TYPE_LABEL = {
-  venda: "Venda",
-  servico: "Serviço",
-  vaquinha: "Vaquinha",
-} as const;
+const POSTER_DESC_MAX = 140;
 
-/** Cartaz A4 — QR Code como elemento central; sem card completo na impressão */
+function summarizeDescription(text: string, maxLen = POSTER_DESC_MAX): string {
+  const clean = text.replace(/\s+/g, " ").trim();
+  if (clean.length <= maxLen) return clean;
+  const slice = clean.slice(0, maxLen);
+  const lastSpace = slice.lastIndexOf(" ");
+  const base = lastSpace > maxLen * 0.6 ? slice.slice(0, lastSpace) : slice;
+  return `${base.trim()}…`;
+}
+
+/** Cartaz A4 dedicado — renderizado no body para impressão correta */
 export function AdPrintPoster({
   ad,
   qrUrl,
@@ -29,9 +35,8 @@ export function AdPrintPoster({
 }: AdPrintPosterProps) {
   const qrSafe = isQrUrlSafe(qrUrl);
   const themeDef = resolveAdTheme(ad.theme);
-  const phoneDisplay = ad.phone ? formatPhoneNumber(ad.phone) : "";
-  const priceLabel = ad.price + (ad.billingType === "recorrente" ? " /mês" : "");
-  const qrSize = 268;
+  const summary = summarizeDescription(ad.desc);
+  const qrSize = 248;
   const logoSize = Math.round(qrSize * 0.22);
 
   const handlePrint = () => {
@@ -39,6 +44,52 @@ export function AdPrintPoster({
     window.print();
     window.setTimeout(() => document.documentElement.classList.remove("printing-a4"), 500);
   };
+
+  const poster =
+    qrSafe &&
+    createPortal(
+      <div className="a4-poster" aria-hidden="true">
+        <div className="a4-poster__sheet">
+          <div className="a4-poster__brand-mark" aria-hidden="true">
+            AnúncioLink
+          </div>
+
+          <main className="a4-poster__main">
+            <div className="a4-poster__icon-frame">
+              <AdProductIcon iconId={ad.icon} adType={ad.t} size={88} strokeWidth={2.5} color="#18181b" />
+            </div>
+
+            <h1 className="a4-poster__title">{ad.title}</h1>
+
+            {summary && <p className="a4-poster__desc">{summary}</p>}
+
+            <div className="a4-poster__qr-frame">
+              <QRCodeSVG
+                value={qrUrl}
+                size={qrSize}
+                level="H"
+                includeMargin={false}
+                bgColor="#ffffff"
+                fgColor={themeDef.qrFg}
+                imageSettings={{
+                  src: "/qr-logo.svg",
+                  height: logoSize,
+                  width: logoSize,
+                  excavate: true,
+                }}
+              />
+            </div>
+
+            <p className="a4-poster__scan-instruction">Escaneie para abrir este anúncio.</p>
+          </main>
+
+          <footer className="a4-poster__footer">
+            <p className="a4-poster__attribution">Gerado gratuitamente por AnúncioLink</p>
+          </footer>
+        </div>
+      </div>,
+      document.body
+    );
 
   return (
     <>
@@ -55,52 +106,7 @@ export function AdPrintPoster({
         Gerar Cartaz A4 para Imprimir
       </ActionButtonWithHint>
 
-      {qrSafe && (
-        <div className="a4-poster" aria-hidden="true">
-          <div className="a4-poster__sheet">
-            <header className="a4-poster__header">
-              <span className="a4-poster__site">AnúncioLink</span>
-              <span className="a4-poster__chip">{TYPE_LABEL[ad.t]}</span>
-            </header>
-
-            <main className="a4-poster__main">
-              <p className="a4-poster__scan-label">Escaneie com a câmera do celular</p>
-
-              <div className="a4-poster__qr-frame">
-                <QRCodeSVG
-                  value={qrUrl}
-                  size={qrSize}
-                  level="H"
-                  includeMargin={false}
-                  bgColor="#ffffff"
-                  fgColor={themeDef.qrFg}
-                  imageSettings={{
-                    src: "/qr-logo.svg",
-                    height: logoSize,
-                    width: logoSize,
-                    excavate: true,
-                  }}
-                />
-              </div>
-
-              <div className="a4-poster__info">
-                <h1 className="a4-poster__title">{ad.title}</h1>
-                <p className="a4-poster__price">{priceLabel}</p>
-                {phoneDisplay && (
-                  <p className="a4-poster__phone">{phoneDisplay}</p>
-                )}
-              </div>
-            </main>
-
-            <footer className="a4-poster__footer">
-              <p className="a4-poster__hint">
-                Abra o link, veja detalhes completos e pague via Pix ou cartão.
-              </p>
-              <p className="a4-poster__brand">www.anunciolink.com.br</p>
-            </footer>
-          </div>
-        </div>
-      )}
+      {poster}
     </>
   );
 }

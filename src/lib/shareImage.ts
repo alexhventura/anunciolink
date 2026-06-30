@@ -9,7 +9,7 @@ export async function generateShareCardBlob(ad: AdData, qrUrl: string): Promise<
   const themeDef = resolveAdTheme(ad.theme);
   await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
 
-  const qrCanvas = await renderQrToCanvas(qrUrl, 120, themeDef.qrFg);
+  const qrCanvas = await renderQrToCanvas(qrUrl, 280, themeDef.qrFg);
   return renderPreviewCardBlob({
     adType: ad.t,
     title: ad.title,

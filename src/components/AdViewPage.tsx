@@ -6,7 +6,7 @@ import { AdSenseSlot } from "./AdSenseSlot";
 import { AdPreviewCard } from "./AdPreviewCard";
 import { AdBrandedSurface } from "./AdBrandedSurface";
 import { AdExpiredBanner } from "./AdExpiredBanner";
-import { AdQrCodeSection } from "./AdQrCodeSection";
+import { AdLandingOfflineShare } from "./AdLandingOfflineShare";
 import { SecurityBadge } from "./SecurityBadge";
 import { ViewEnter } from "./ViewEnter";
 import { PixPaymentSection } from "./PixPaymentSection";
@@ -183,13 +183,7 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
             )}
 
             {pageUrl && (
-              <AdQrCodeSection
-                url={pageUrl}
-                theme={ad.theme}
-                deferMs={180}
-                landing
-                headingId={qrHeadingId}
-              />
+              <AdLandingOfflineShare url={pageUrl} theme={ad.theme} headingId={qrHeadingId} />
             )}
           </>
         )}

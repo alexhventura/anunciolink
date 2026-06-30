@@ -74,14 +74,16 @@ export function AdPreviewCard({
         headingLevel={landing ? "h1" : "h3"}
       />
 
-      <div className={`ad-preview-card__body p-6 sm:p-8 min-w-0 bg-amber-500 ${landing ? "ad-preview-card__body--landing" : "space-y-3"}`}>
+      <div className={`ad-preview-card__body p-5 sm:p-6 md:p-8 min-w-0 bg-amber-500 ${landing ? "ad-preview-card__body--landing" : "space-y-3"}`}>
         <p className="ad-preview-card__eyebrow">
           <span className={`chip ${themeDef.chipClass}`}>{TYPE_LABEL[adType]}</span>
         </p>
         <div className={`ad-preview-card__desc ${landing ? "ad-preview-card__desc--landing" : ""}`}>
           <h2 className="sr-only">Descrição do anúncio</h2>
           <p
-            className="ad-preview-card__desc-text whitespace-pre-wrap break-words [overflow-wrap:anywhere]"
+            className={`ad-preview-card__desc-text whitespace-pre-wrap break-words [overflow-wrap:anywhere] ${
+              landing ? "" : "ad-preview-card__desc-text--clamped"
+            }`}
             itemProp="description"
           >
             {description || "Descrição aparecerá aqui."}
@@ -91,13 +93,16 @@ export function AdPreviewCard({
 
       {exportMode && (phoneDisplay || qrSlot) && (
         <div className="ad-preview-card__export-footer">
+          {qrSlot && <div className="ad-preview-card__qr-slot">{qrSlot}</div>}
           {phoneDisplay && (
             <p className="ad-preview-card__phone">
               <Phone className="h-4 w-4 shrink-0" strokeWidth={2.5} aria-hidden="true" />
               <span>{phoneDisplay}</span>
             </p>
           )}
-          {qrSlot}
+          <p className="ad-preview-card__brand-mark" aria-hidden="true">
+            AnúncioLink
+          </p>
         </div>
       )}
     </div>

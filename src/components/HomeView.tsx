@@ -23,7 +23,7 @@ import {
   validateAdForm,
   validateAdFormField,
 } from "../lib/formValidation";
-import { MAX_DESC_LENGTH, MAX_PIX_LENGTH, MAX_TITLE_LENGTH, SITE_NAME } from "../lib/constants";
+import { MAX_DESC_LENGTH, MAX_PIX_LENGTH, MAX_TITLE_LENGTH } from "../lib/constants";
 import { TOOLTIP_COPY } from "../lib/tooltipCopy";
 import { AdFormField } from "./AdFormField";
 import { AdPreviewCard } from "./AdPreviewCard";
@@ -142,8 +142,8 @@ export function HomeView({
   const segmentIdle = "neo-segment-idle";
 
   return (
-    <ViewEnter className="space-y-16 sm:space-y-20">
-      <div className="text-center max-w-lg mx-auto space-y-6 px-2">
+    <ViewEnter className="space-y-12 sm:space-y-16 md:space-y-20">
+      <section className="home-landing__hero text-center max-w-2xl mx-auto space-y-5 sm:space-y-6 px-2">
         <span className="chip-accent">Sem cadastro · 100% grátis</span>
 
         <div className="neo-hero-banner mx-auto max-w-lg w-full">
@@ -154,11 +154,17 @@ export function HomeView({
           </h1>
         </div>
 
-        <p className="text-base font-semibold text-black max-w-md mx-auto leading-snug">
-          Ícone + tema + Pix + QR Code personalizado.
-          <span className="block text-sm font-medium text-zinc-700 mt-1">Rápido como raio — {SITE_NAME}.</span>
+        <p className="home-landing__tagline text-base sm:text-lg font-semibold text-black max-w-md mx-auto leading-snug tracking-tight">
+          Landing page profissional com ícone, tema, Pix e QR Code — pronta para compartilhar.
         </p>
-      </div>
+
+        <ul className="home-landing__features" aria-label="Recursos incluídos">
+          <li className="home-landing__feature">Ícone</li>
+          <li className="home-landing__feature">Tema</li>
+          <li className="home-landing__feature">Pix</li>
+          <li className="home-landing__feature">QR Code</li>
+        </ul>
+      </section>
 
       <MyAdsPanel onOpenAd={onOpenSavedAd} />
 

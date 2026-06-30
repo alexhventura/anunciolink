@@ -2,12 +2,13 @@ import type { AdType, AdThemeId } from "../types/ad";
 import type { AdIconId } from "./adIcons";
 import { resolveAdIconId } from "./adIcons";
 import { drawAdIconOnCanvas } from "./adIconCanvas";
-import { resolveAdTheme, type AdThemeDefinition } from "./adThemes";
 import { formatPhoneNumber } from "./formatters";
 
 const INK = "#18181b";
 const AMBER_500 = "#f59e0b";
+const AMBER_100 = "#fef3c7";
 const WHITE = "#ffffff";
+const MUTED = "#52525b";
 
 const TYPE_LABEL: Record<AdType, string> = {
   venda: "Venda",
@@ -15,21 +16,7 @@ const TYPE_LABEL: Record<AdType, string> = {
   vaquinha: "Vaquinha",
 };
 
-const THEME_GRADIENT: Record<AdThemeId, [string, string]> = {
-  amber: ["#fbbf24", "#fffbeb"],
-  midnight: ["#0f172a", "#334155"],
-  sunset: ["#ea580c", "#fb923c"],
-  purple: ["#7c3aed", "#c084fc"],
-  minimal: ["#d4d4d8", "#fafafa"],
-};
-
-const THEME_HERO_TEXT: Record<AdThemeId, string> = {
-  amber: INK,
-  midnight: "#ffffff",
-  sunset: "#ffffff",
-  purple: "#ffffff",
-  minimal: INK,
-};
+const BRAND_NAME = "AnúncioLink";
 
 export interface PreviewCardCanvasInput {
   adType: AdType;
@@ -44,14 +31,53 @@ export interface PreviewCardCanvasInput {
   qrCanvas?: HTMLCanvasElement;
 }
 
-function drawRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) {
-  ctx.fillRect(x, y, w, h);
+function drawStrokeRect(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  lineWidth = 4
+) {
   ctx.strokeStyle = INK;
-  ctx.lineWidth = 3;
-  ctx.strokeRect(x + 1.5, y + 1.5, w - 3, h - 3);
+  ctx.lineWidth = lineWidth;
+  ctx.strokeRect(x + lineWidth / 2, y + lineWidth / 2, w - lineWidth, h - lineWidth);
 }
 
-function wrapParagraph(
+function wrapLines(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  maxWidth: number,
+  maxLines: number
+): string[] {
+  const paragraphs = text.split("\n");
+  const lines: string[] = [];
+
+  for (const paragraph of paragraphs) {
+    const words = paragraph.split(/\s+/).filter(Boolean);
+    let line = "";
+
+    for (const word of words) {
+      const test = line ? `${line} ${word}` : word;
+      if (ctx.measureText(test).width > maxWidth && line) {
+        lines.push(line);
+        line = word;
+        if (lines.length >= maxLines) return lines;
+      } else {
+        line = test;
+      }
+    }
+
+    if (line) {
+      lines.push(line);
+      if (lines.length >= maxLines) return lines;
+    }
+  }
+
+  return lines;
+}
+
+function drawWrappedText(
   ctx: CanvasRenderingContext2D,
   text: string,
   x: number,
@@ -60,184 +86,141 @@ function wrapParagraph(
   lineHeight: number,
   maxLines: number
 ): number {
-  const paragraphs = text.split("\n");
+  const lines = wrapLines(ctx, text, maxWidth, maxLines);
+  const clipped = lines.length >= maxLines && text.length > lines.join(" ").length;
+  const displayLines = clipped
+    ? [...lines.slice(0, maxLines - 1), `${lines[maxLines - 1]?.replace(/\s+$/, "")}…`]
+    : lines;
+
   let cy = y;
-  let linesUsed = 0;
-
-  for (const paragraph of paragraphs) {
-    const words = paragraph.split(/(\s+)/).filter((w) => w.length > 0);
-    let line = "";
-
-    for (const word of words) {
-      const test = line + word;
-      if (ctx.measureText(test).width > maxWidth && line.trim()) {
-        ctx.fillText(line.trimEnd(), x, cy);
-        cy += lineHeight;
-        linesUsed++;
-        line = word.trimStart();
-        if (linesUsed >= maxLines) return cy;
-      } else {
-        line = test;
-      }
-    }
-
-    if (line.trim()) {
-      ctx.fillText(line.trimEnd(), x, cy);
-      cy += lineHeight;
-      linesUsed++;
-      if (linesUsed >= maxLines) return cy;
-    }
+  for (const line of displayLines) {
+    ctx.fillText(line, x, cy);
+    cy += lineHeight;
   }
-
   return cy;
 }
 
-async function drawBentoHero(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-  theme: AdThemeDefinition,
-  themeId: AdThemeId,
-  iconId: AdIconId,
-  title: string,
-  priceLabel: string
-) {
-  const [c1, c2] = THEME_GRADIENT[themeId];
-  const gradient = ctx.createLinearGradient(x, y, x + w, y + h);
-  gradient.addColorStop(0, c1);
-  gradient.addColorStop(1, c2);
-  ctx.fillStyle = gradient;
-  ctx.fillRect(x, y, w, h);
-  ctx.strokeStyle = INK;
-  ctx.lineWidth = 3;
-  ctx.strokeRect(x + 1.5, y + 1.5, w - 3, h - 3);
-
-  const iconSize = Math.round(w * 0.22);
-  const iconColor = THEME_HERO_TEXT[themeId];
-  await drawAdIconOnCanvas(ctx, iconId, x + w / 2, y + h * 0.38, iconSize, iconColor);
-
-  ctx.fillStyle = iconColor;
-  ctx.font = "900 28px system-ui, sans-serif";
-  ctx.textBaseline = "top";
-  wrapParagraph(ctx, title || "Título", x + 24, y + h * 0.58, w - 48, 34, 2);
-
-  ctx.font = "900 26px system-ui, sans-serif";
-  ctx.fillText(priceLabel || "—", x + 24, y + h - 56);
-}
-
-/** Renderiza card Bento idêntico ao AdPreviewCard em canvas */
+/** Card social 1080×1080 — QR protagonista, identidade Mostarda/Preto/Branco */
 export async function renderPreviewCardCanvas(input: PreviewCardCanvasInput): Promise<HTMLCanvasElement> {
-  const canvasW = input.width ?? 1080;
-  const pad = 48;
-  const cardW = canvasW - pad * 2;
-  const innerPad = 36;
-  const contentW = cardW - innerPad * 2;
+  const size = input.width ?? 1080;
+  const pad = 56;
+  const innerW = size - pad * 2;
+  const safeX = pad + 32;
+  const safeW = innerW - 64;
 
-  const themeId = input.theme ?? "amber";
-  const themeDef = resolveAdTheme(themeId);
   const iconId = resolveAdIconId(input.icon, input.adType);
   const priceLabel = input.price + (input.billingRecorrente ? " /mês" : "");
   const typeLabel = TYPE_LABEL[input.adType].toUpperCase();
   const phoneDisplay = input.phone ? formatPhoneNumber(input.phone) : "";
-
-  const measureCanvas = document.createElement("canvas");
-  const mctx = measureCanvas.getContext("2d")!;
-  mctx.font = "500 17px system-ui, sans-serif";
-  const descLineCount = Math.min(
-    14,
-    Math.max(2, Math.ceil((input.description || "").length / Math.max(1, Math.floor(contentW / 9))))
-  );
-
-  const heroH = 320;
-  const chipH = 34;
-  const descH = descLineCount * 24 + 16;
-  const bodyH = innerPad + chipH + 14 + descH + innerPad;
-  const footerH = input.qrCanvas ? (phoneDisplay ? 220 : 190) : phoneDisplay ? 56 : 0;
-  const canvasH = pad + heroH + bodyH + footerH + pad;
+  const title = input.title.trim() || "Título do anúncio";
+  const description = input.description.trim() || "Descrição do anúncio.";
 
   const canvas = document.createElement("canvas");
-  canvas.width = canvasW;
-  canvas.height = canvasH;
+  canvas.width = size;
+  canvas.height = size;
   const ctx = canvas.getContext("2d")!;
 
-  ctx.fillStyle = "#fffbeb";
-  ctx.fillRect(0, 0, canvasW, canvasH);
+  ctx.fillStyle = AMBER_100;
+  ctx.fillRect(0, 0, size, size);
 
-  let y = pad;
   const cardX = pad;
-  const cardH = heroH + bodyH + footerH;
+  const cardY = pad;
+  const cardW = innerW;
+  const cardH = innerW;
 
   ctx.fillStyle = WHITE;
-  ctx.shadowColor = INK;
-  ctx.shadowOffsetX = 6;
-  ctx.shadowOffsetY = 6;
-  ctx.fillRect(cardX, y, cardW, cardH);
-  ctx.shadowColor = "transparent";
-  ctx.strokeStyle = INK;
-  ctx.lineWidth = 3;
-  ctx.strokeRect(cardX, y, cardW, cardH);
+  ctx.fillRect(cardX, cardY, cardW, cardH);
+  drawStrokeRect(ctx, cardX, cardY, cardW, cardH, 4);
 
-  await drawBentoHero(ctx, cardX, y, cardW, heroH, themeDef, themeId, iconId, input.title, priceLabel);
-
-  y += heroH;
+  const headerH = 300;
   ctx.fillStyle = AMBER_500;
-  ctx.fillRect(cardX + 3, y, cardW - 6, bodyH - 3);
+  ctx.fillRect(cardX + 4, cardY + 4, cardW - 8, headerH - 4);
+  ctx.beginPath();
+  ctx.moveTo(cardX + 4, cardY + headerH);
+  ctx.lineTo(cardX + cardW - 4, cardY + headerH);
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = INK;
+  ctx.stroke();
 
-  let cy = y + innerPad;
-  const cx = cardX + innerPad;
+  const iconSize = 112;
+  await drawAdIconOnCanvas(ctx, iconId, cardX + cardW / 2, cardY + 78, iconSize, INK);
 
   ctx.fillStyle = INK;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
+  ctx.font = "900 42px system-ui, sans-serif";
+  drawWrappedText(ctx, title, cardX + cardW / 2, cardY + 150, safeW, 48, 2);
+
+  ctx.font = "900 36px system-ui, sans-serif";
+  ctx.fillText(priceLabel || "—", cardX + cardW / 2, cardY + headerH - 58);
+
+  let bodyY = cardY + headerH + 28;
+  const bodyX = safeX;
+
+  ctx.textAlign = "left";
   ctx.font = "800 13px system-ui, sans-serif";
-  const chipW = ctx.measureText(typeLabel).width + 28;
-  ctx.fillRect(cx, cy, chipW, chipH);
-  ctx.fillStyle = "#fbbf24";
+  const chipText = typeLabel;
+  const chipW = ctx.measureText(chipText).width + 24;
+  ctx.fillStyle = INK;
+  ctx.fillRect(bodyX, bodyY, chipW, 30);
+  ctx.fillStyle = AMBER_500;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillText(typeLabel, cx + chipW / 2, cy + chipH / 2);
+  ctx.fillText(chipText, bodyX + chipW / 2, bodyY + 15);
 
-  cy += chipH + 14;
-  ctx.font = "500 17px system-ui, sans-serif";
-  ctx.fillStyle = "rgba(24,24,27,0.85)";
+  bodyY += 46;
   ctx.textAlign = "left";
   ctx.textBaseline = "top";
-  wrapParagraph(ctx, input.description || "Descrição aparecerá aqui.", cx, cy, contentW, 24, descLineCount);
+  ctx.font = "600 22px system-ui, sans-serif";
+  ctx.fillStyle = INK;
 
-  if (footerH > 0) {
-    const footerY = y + bodyH;
+  const footerReserve = input.qrCanvas ? 380 : 72;
+  const descLineHeight = 30;
+  const maxDescLines = Math.max(
+    2,
+    Math.min(4, Math.floor((cardY + cardH - footerReserve - bodyY) / descLineHeight))
+  );
+  drawWrappedText(ctx, description, bodyX, bodyY, safeW, descLineHeight, maxDescLines);
+
+  const qrSize = input.qrCanvas ? 280 : 0;
+  const qrBlockH = qrSize ? qrSize + 72 : 0;
+  const qrY = cardY + cardH - qrBlockH - 52;
+
+  if (input.qrCanvas && qrSize > 0) {
+    const qrX = cardX + (cardW - qrSize) / 2;
     ctx.fillStyle = WHITE;
-    ctx.fillRect(cardX + 3, footerY, cardW - 6, footerH - 3);
-    ctx.strokeStyle = INK;
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(cardX + innerPad, footerY);
-    ctx.lineTo(cardX + cardW - innerPad, footerY);
-    ctx.stroke();
+    ctx.fillRect(qrX - 16, qrY - 16, qrSize + 32, qrSize + 32);
+    drawStrokeRect(ctx, qrX - 16, qrY - 16, qrSize + 32, qrSize + 32, 4);
 
-    let fy = footerY + 20;
+    ctx.shadowColor = INK;
+    ctx.shadowOffsetX = 4;
+    ctx.shadowOffsetY = 4;
+    ctx.fillStyle = WHITE;
+    ctx.fillRect(qrX - 8, qrY - 8, qrSize + 16, qrSize + 16);
+    ctx.shadowColor = "transparent";
 
-    if (phoneDisplay) {
-      ctx.fillStyle = INK;
-      ctx.font = "700 22px system-ui, sans-serif";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "top";
-      ctx.fillText(`📞 ${phoneDisplay}`, cardX + cardW / 2, fy);
-      fy += 40;
-    }
+    ctx.drawImage(input.qrCanvas, qrX, qrY, qrSize, qrSize);
 
-    if (input.qrCanvas) {
-      const qrSize = 140;
-      const qrX = cardX + (cardW - qrSize) / 2;
-      drawRect(ctx, qrX, fy, qrSize, qrSize);
-      ctx.drawImage(input.qrCanvas, qrX + 10, fy + 10, qrSize - 20, qrSize - 20);
-
-      ctx.fillStyle = INK;
-      ctx.font = "700 17px system-ui, sans-serif";
-      ctx.textAlign = "center";
-      ctx.fillText("Escaneie para ver o anúncio completo", cardX + cardW / 2, fy + qrSize + 22);
-    }
+    ctx.fillStyle = INK;
+    ctx.font = "800 20px system-ui, sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "top";
+    ctx.fillText("Escaneie para ver o anúncio", cardX + cardW / 2, qrY + qrSize + 20);
   }
+
+  if (phoneDisplay) {
+    ctx.fillStyle = MUTED;
+    ctx.font = "700 18px system-ui, sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText(phoneDisplay, cardX + cardW / 2, cardY + cardH - 36);
+  }
+
+  ctx.fillStyle = MUTED;
+  ctx.font = "800 14px system-ui, sans-serif";
+  ctx.textAlign = "center";
+  ctx.letterSpacing = "0.12em";
+  ctx.fillText(BRAND_NAME.toUpperCase(), cardX + cardW / 2, cardY + cardH - 18);
+  ctx.letterSpacing = "0";
 
   return canvas;
 }

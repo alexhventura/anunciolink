@@ -25,7 +25,7 @@ export const TOOLTIP_COPY = {
   generateAd:
     "Gera landing + link + QR Code. Tudo codificado na URL — sem upload e sem banco.",
   printPoster:
-    "Cartaz A4 com QR em destaque, título, preço e telefone — pronto para imprimir.",
+    "Cartaz A4 com ícone, título, resumo e QR em destaque — pronto para imprimir.",
   socialCard:
     "Card PNG idêntico à landing — ideal para status e redes sociais.",
   linkShortener:
