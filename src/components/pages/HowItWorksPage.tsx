@@ -1,12 +1,14 @@
 import {
   Clock3,
   FilePenLine,
-  ImageIcon,
   Link2,
-  MessageCircle,
+  QrCode,
+  Share2,
+  Shapes,
+  Smartphone,
 } from "lucide-react";
-import { InstitutionalPageLayout, StepCard } from "../InstitutionalPageLayout";
-import { SITE_NAME } from "../../lib/constants";
+import { InstitutionalPageLayout, InstitutionalSection, StepCard } from "../InstitutionalPageLayout";
+import { SITE_DOMAIN, SITE_NAME } from "../../lib/constants";
 
 interface HowItWorksPageProps {
   adsenseReady: boolean;
@@ -16,57 +18,103 @@ export function HowItWorksPage({ adsenseReady }: HowItWorksPageProps) {
   return (
     <InstitutionalPageLayout
       title="Como Funciona"
-      subtitle={`O ${SITE_NAME} é uma ferramenta de custo zero: sem cadastro, sem banco de dados e sem taxas. Veja o passo a passo completo.`}
+      subtitle={`O ${SITE_NAME} cria páginas de anúncio profissionais em segundos — sem cadastro, sem banco de dados e sem taxas. Veja o passo a passo completo.`}
       adsenseReady={adsenseReady}
     >
       <StepCard
         step={1}
         icon={<FilePenLine className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />}
-        title="Preenchimento Rápido"
+        title="Monte seu anúncio"
       >
-        O vendedor acessa a plataforma e digita o <strong>Título</strong>, o <strong>Preço</strong> e uma{" "}
-        <strong>Descrição curta</strong> do produto ou serviço. Em poucos segundos o anúncio já está estruturado
-        para compartilhar — sem formulários longos nem etapas desnecessárias.
+        Informe <strong>título</strong>, <strong>preço</strong> e <strong>descrição</strong>. Escolha o tipo
+        (venda, serviço ou vaquinha) e se o valor é único ou mensal. Tudo em um formulário curto — sem
+        cadastro e sem etapas desnecessárias.
       </StepCard>
 
       <StepCard
         step={2}
-        icon={<ImageIcon className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />}
-        title="Foto da Galeria Otimizada"
+        icon={<Shapes className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />}
+        title="Personalize com ícone e pagamento"
       >
-        O usuário escolhe uma foto direto da galeria do celular. Nossa tecnologia avançada reduz o tamanho da imagem
-        em tempo real (HTML Canvas) para caber perfeitamente dentro de um link seguro, sem consumir dados extras nem
-        enviar arquivos para servidores externos.
+        Opcionalmente, escolha um <strong>ícone</strong> que representa seu produto ou serviço, adicione{" "}
+        <strong>WhatsApp</strong>, <strong>Pix copia e cola</strong> e <strong>link de cartão</strong> (Mercado
+        Pago, Stripe, etc.). A prévia ao lado mostra exatamente como o card do anúncio ficará.
       </StepCard>
 
       <StepCard
         step={3}
         icon={<Link2 className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />}
-        title="Geração do Link Inteligente"
+        title="Gere o link do anúncio"
       >
-        Ao clicar em gerar, um link exclusivo é criado instantaneamente no próprio navegador. Esse link carrega
-        todas as informações e a foto criptografada de graça, dispensando bancos de dados, hospedagem de imagens e
-        mensalidades.
+        Ao clicar em <strong>Gerar anúncio grátis</strong>, tudo é compactado e codificado dentro de um link
+        exclusivo — direto no seu navegador. Não usamos servidor para guardar seus dados: o anúncio viaja na
+        própria URL.
       </StepCard>
 
       <StepCard
         step={4}
-        icon={<MessageCircle className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />}
-        title="Compartilhamento Visual no WhatsApp"
+        icon={<Share2 className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />}
+        title="Divulgue em qualquer canal"
       >
-        O vendedor copia o link e, ao colar no WhatsApp, um card de texto super atraente com emojis é gerado
-        automaticamente, chamando a atenção dos clientes e direcionando para a página de compra com Pix, cartão e
-        contato.
+        Na tela de sucesso você encontra atalhos para <strong>WhatsApp</strong>, Telegram, Facebook, LinkedIn e
+        X/Twitter, além de <strong>copiar o link</strong> e <strong>compartilhar pelo celular</strong> (menu
+        nativo). O texto para WhatsApp já vem formatado com título, preço e descrição.
       </StepCard>
 
       <StepCard
         step={5}
-        icon={<Clock3 className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />}
-        title="Expiração Automática de 30 Dias"
+        icon={<QrCode className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />}
+        title="QR Code, card PNG e cartaz A4"
       >
-        Para a segurança de todos, após 30 dias o link congela os botões de compra e exibe uma mensagem amigável de
-        anúncio encerrado, incentivando a renovação e mantendo a navegação limpa para quem acessa links antigos.
+        Baixe o <strong>QR Code em PNG</strong> para vitrines e panfletos. Gere o{" "}
+        <strong>card para postagem</strong> (imagem quadrada pronta para Instagram e stories) e o{" "}
+        <strong>cartaz A4</strong> para impressão — ambos no layout visual do seu anúncio, com QR centralizado.
       </StepCard>
+
+      <StepCard
+        step={6}
+        icon={<Smartphone className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />}
+        title="O comprador abre a página do anúncio"
+      >
+        Quem recebe o link vê o card completo com ícone, preço e descrição. Se você informou pagamento, aparecem
+        botões de <strong>Pix</strong> e <strong>cartão</strong>; com telefone, há atalho direto para{" "}
+        <strong>WhatsApp</strong>. Quem já está na página pode copiar o link ou baixar um QR discreto para uso
+        offline.
+      </StepCard>
+
+      <StepCard
+        step={7}
+        icon={<Clock3 className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />}
+        title="Validade e histórico local"
+      >
+        Cada anúncio expira automaticamente em <strong>30 dias</strong> — os botões de compra são desativados e
+        uma mensagem orienta a renovar. Na home, <strong>Meus anúncios</strong> guarda seus links recentes só
+        no seu navegador (sem conta).
+      </StepCard>
+
+      <InstitutionalSection title="O que está incluso — sempre grátis">
+        <ul className="list-disc pl-5 space-y-2">
+          <li>Página de anúncio com visual Bento (mostarda e preto)</li>
+          <li>Ícone personalizado por categoria</li>
+          <li>Pix, cartão e WhatsApp na página do comprador</li>
+          <li>QR Code com logo {SITE_NAME}</li>
+          <li>Card PNG 1080×1080 para redes sociais</li>
+          <li>Cartaz A4 para impressão</li>
+          <li>Compartilhamento em múltiplos canais</li>
+          <li>Indicador de peso do link (payload) na prévia</li>
+        </ul>
+        <p className="mt-3 text-sm text-zinc-600">
+          Não há upload de fotos, temas extras nem servidor de dados. Tudo em{" "}
+          <strong>{SITE_DOMAIN}</strong> — custo zero para você.
+        </p>
+      </InstitutionalSection>
+
+      <InstitutionalSection title="O que o Anuncio Link não faz">
+        <p>
+          Não intermediamos pagamentos, não guardamos dinheiro e não validamos produtos. Pix e cartão vão
+          direto para o vendedor. Não exigimos cadastro, e-mail ou aplicativo instalado — basta o navegador.
+        </p>
+      </InstitutionalSection>
     </InstitutionalPageLayout>
   );
 }
