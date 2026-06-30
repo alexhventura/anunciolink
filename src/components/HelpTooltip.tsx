@@ -208,6 +208,8 @@ export function FieldLegendWithHint({ hint, fieldLabel, children }: FieldLegendW
 interface ActionButtonWithHintProps {
   hint: string;
   hintVariant?: "default" | "on-dark";
+  /** overlay = ícone no canto do botão; below = hint separado, sem sobrepor texto */
+  hintLayout?: "overlay" | "below";
   children: ReactNode;
   className?: string;
   id?: string;
@@ -222,6 +224,7 @@ interface ActionButtonWithHintProps {
 export function ActionButtonWithHint({
   hint,
   hintVariant = "on-dark",
+  hintLayout = "overlay",
   children,
   className = "",
   id,
@@ -232,8 +235,13 @@ export function ActionButtonWithHint({
   "aria-live": ariaLive,
   "aria-label": ariaLabel,
 }: ActionButtonWithHintProps) {
+  const wrapClass =
+    hintLayout === "below"
+      ? "action-btn-hint action-btn-hint--below block w-full min-w-0"
+      : "action-btn-hint relative block w-full min-w-0";
+
   return (
-    <span className="action-btn-hint relative block w-full">
+    <span className={wrapClass}>
       <button
         type={type}
         id={id}
@@ -246,7 +254,7 @@ export function ActionButtonWithHint({
       >
         {children}
       </button>
-      <span className="action-btn-hint__icon">
+      <span className={hintLayout === "below" ? "action-btn-hint__below" : "action-btn-hint__icon"}>
         <HelpTooltip text={hint} placement="top" variant={hintVariant} triggerLabel="Ajuda sobre esta ação" />
       </span>
     </span>

@@ -1,5 +1,5 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react";
-import { Link2, Share2 } from "lucide-react";
+import { Link2, Share2, Trash2 } from "lucide-react";
 import type { SavedAdEntry } from "../../lib/adHistory";
 import { copyToClipboard } from "../../lib/formatters";
 import { buildNativeShareText } from "../../lib/shareLinks";
@@ -10,7 +10,7 @@ import { useNativeShare } from "../../hooks/useNativeShare";
 import { TOOLTIP_COPY } from "../../lib/tooltipCopy";
 import { DeleteAdConfirmDialog } from "../DeleteAdConfirmDialog";
 import { InstitutionalPageLayout } from "../InstitutionalPageLayout";
-import { ActionButtonWithHint } from "../HelpTooltip";
+import { IconActionButton } from "../IconActionButton";
 
 const AdExportButtons = lazy(() =>
   import("../AdExportButtons").then((m) => ({ default: m.AdExportButtons }))
@@ -30,7 +30,6 @@ export function MyAdsPage({ adsenseReady, onOpenAd, onCreateAd }: MyAdsPageProps
   const { items, remove, refresh } = useAdHistory();
   const { canShare, canShareFile, share, shareWithFile } = useNativeShare();
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [shareStatusId, setShareStatusId] = useState<string | null>(null);
   const [shareLoadingId, setShareLoadingId] = useState<string | null>(null);
   const [pendingDelete, setPendingDelete] = useState<SavedAdEntry | null>(null);
 
@@ -79,20 +78,12 @@ export function MyAdsPage({ adsenseReady, onOpenAd, onCreateAd }: MyAdsPageProps
         const filePayload = { file, title, text: nativeText, url: entry.url };
 
         if (canShareFile(file, filePayload)) {
-          const result = await shareWithFile(filePayload);
-          if (result === "shared") {
-            setShareStatusId(entry.id);
-            window.setTimeout(() => setShareStatusId(null), 2000);
-          }
+          await shareWithFile(filePayload);
           return;
         }
 
         if (canShare) {
-          const result = await share({ title, text: nativeText, url: entry.url });
-          if (result === "shared") {
-            setShareStatusId(entry.id);
-            window.setTimeout(() => setShareStatusId(null), 2000);
-          }
+          await share({ title, text: nativeText, url: entry.url });
           return;
         }
 
@@ -146,60 +137,51 @@ export function MyAdsPage({ adsenseReady, onOpenAd, onCreateAd }: MyAdsPageProps
                   {formatAdHeadline(entry)}
                 </button>
 
-                <div className="my-ads-item__actions">
-                  <ActionButtonWithHint
+                <div
+                  className="my-ads-item__toolbar"
+                  role="toolbar"
+                  aria-label={`Ações para ${entry.title}`}
+                >
+                  <IconActionButton
+                    icon={Share2}
+                    label={`Compartilhar anúncio ${entry.title}`}
                     hint={TOOLTIP_COPY.nativeShare}
-                    hintVariant="default"
                     onClick={() => void handleShare(entry)}
-                    className="btn-ghost text-xs !py-2.5 min-h-[44px] inline-flex items-center gap-1.5"
-                    disabled={shareLoadingId === entry.id}
-                    aria-label={`Compartilhar anúncio ${entry.title}`}
-                  >
-                    <Share2 className="h-4 w-4 shrink-0" strokeWidth={2.5} aria-hidden="true" />
-                    {shareStatusId === entry.id
-                      ? "Enviado!"
-                      : shareLoadingId === entry.id
-                        ? "Preparando…"
-                        : "Compartilhar"}
-                  </ActionButtonWithHint>
+                    busy={shareLoadingId === entry.id}
+                  />
 
-                  <button
-                    type="button"
-                    onClick={() => void handleCopy(entry)}
-                    className="btn-accent text-xs !py-2.5 min-h-[44px] inline-flex items-center gap-1.5"
-                    aria-live="polite"
-                    aria-label={
+                  <IconActionButton
+                    icon={Link2}
+                    label={
                       copiedId === entry.id
                         ? `Link de ${entry.title} copiado`
                         : `Copiar link de ${entry.title}`
                     }
-                  >
-                    <Link2 className="h-4 w-4 shrink-0" strokeWidth={2.25} aria-hidden="true" />
-                    {copiedId === entry.id ? "Copiado!" : "Copiar link"}
-                  </button>
+                    hint="Copia somente o endereço do anúncio."
+                    variant="accent"
+                    onClick={() => void handleCopy(entry)}
+                  />
 
                   {exportable && ad ? (
                     <Suspense fallback={null}>
-                      <AdExportButtons ad={ad} qrUrl={entry.url} compact />
+                      <AdExportButtons ad={ad} qrUrl={entry.url} iconsOnly />
                     </Suspense>
-                  ) : (
-                    <span
-                      className="my-ads-item__export-hint text-[10px] font-semibold text-zinc-500 self-center px-1"
-                      title="Anúncio com senha — abra e desbloqueie para exportar PDF ou JPG"
-                    >
-                      PDF/JPG ao abrir
-                    </span>
-                  )}
+                  ) : null}
 
-                  <button
-                    type="button"
+                  <IconActionButton
+                    icon={Trash2}
+                    label={`Excluir ${entry.title} da lista local`}
+                    hint="Remove este anúncio apenas do histórico deste navegador."
+                    variant="danger"
                     onClick={() => setPendingDelete(entry)}
-                    className="my-ads-item__delete"
-                    aria-label={`Excluir ${entry.title} da lista local`}
-                  >
-                    Excluir
-                  </button>
+                  />
                 </div>
+
+                {!exportable ? (
+                  <p className="my-ads-item__export-hint" role="note">
+                    PDF e JPG disponíveis após abrir anúncios protegidos por senha.
+                  </p>
+                ) : null}
               </li>
             );
           })}

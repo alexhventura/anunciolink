@@ -3,6 +3,8 @@ import { drawAdIconOnCanvas } from "./adIconCanvas";
 import { isValidAdIconId, usesBrandMarkIcon } from "./adIcons";
 import { drawCanvasBrandMarkCentered } from "./brandCanvas";
 import { SITE_DOMAIN } from "./constants";
+import type { ExportQrMode } from "./exportQr";
+import { resolveExportQr } from "./exportQr";
 import { formatPhoneNumber } from "./formatters";
 import { renderQrToCanvas } from "./qrCanvas";
 import { AD_QR_FOREGROUND } from "./adThemes";
@@ -16,6 +18,7 @@ export const A4_EXPORT_HEIGHT = 1754;
 
 const INK = "#18181b";
 const AMBER_500 = "#f59e0b";
+const MUSTARD = "#fbbf24";
 const WHITE = "#ffffff";
 const MUTED = "#71717a";
 
@@ -181,7 +184,7 @@ async function drawProductCell(
   border: number,
   s: number
 ) {
-  drawCell(ctx, rect, WHITE, border);
+  drawCell(ctx, rect, MUSTARD, border);
 
   const pad = Math.round(s * 0.04);
   const cx = rect.x + rect.w / 2;
@@ -292,6 +295,7 @@ function drawFooterCell(
   rect: Rect,
   qrCanvas: HTMLCanvasElement,
   phoneDisplay: string,
+  qrMode: ExportQrMode,
   border: number,
   s: number
 ) {
@@ -338,21 +342,51 @@ function drawFooterCell(
     innerSize
   );
 
-  const lines: Array<{ text: string; size: number; weight: string; color: string }> = [
-    { text: "Escaneie o QR Code", size: Math.round(s * 0.042), weight: "900", color: INK },
-    {
-      text: "Aponte a câmera do celular para abrir o anúncio completo.",
-      size: Math.round(s * 0.026),
-      weight: "600",
-      color: MUTED,
-    },
-  ];
+  const lines: Array<{ text: string; size: number; weight: string; color: string; maxLines?: number }> =
+    qrMode === "pix"
+      ? [
+          { text: "QR Pix — pagamento", size: Math.round(s * 0.042), weight: "900", color: INK },
+          {
+            text: "Escaneie no app do banco para pagar direto ao vendedor.",
+            size: Math.round(s * 0.026),
+            weight: "600",
+            color: MUTED,
+            maxLines: 4,
+          },
+          {
+            text: "Confirme valor e dados no app antes de concluir.",
+            size: Math.round(s * 0.022),
+            weight: "600",
+            color: MUTED,
+            maxLines: 3,
+          },
+        ]
+      : [
+          { text: "Escaneie o QR Code", size: Math.round(s * 0.042), weight: "900", color: INK },
+          {
+            text: "Aponte a câmera do celular para abrir o anúncio completo.",
+            size: Math.round(s * 0.026),
+            weight: "600",
+            color: MUTED,
+            maxLines: 4,
+          },
+        ];
 
   if (phoneDisplay) {
     lines.push({ text: phoneDisplay, size: Math.round(s * 0.044), weight: "900", color: INK });
   }
 
-  lines.push({ text: SITE_DOMAIN, size: Math.round(s * 0.024), weight: "700", color: MUTED });
+  if (qrMode === "pix") {
+    lines.push({
+      text: `Anúncio completo em ${SITE_DOMAIN}`,
+      size: Math.round(s * 0.022),
+      weight: "700",
+      color: MUTED,
+      maxLines: 2,
+    });
+  } else {
+    lines.push({ text: SITE_DOMAIN, size: Math.round(s * 0.024), weight: "700", color: MUTED });
+  }
 
   const wrappedBlocks: Array<{ lines: string[]; lineH: number; size: number; weight: string; color: string }> =
     [];
@@ -360,7 +394,7 @@ function drawFooterCell(
   for (const block of lines) {
     ctx.font = `${block.weight} ${block.size}px system-ui, sans-serif`;
     const lineH = Math.round(block.size * 1.35);
-    const wrapped = wrapLines(ctx, block.text, textArea.w, block.text === lines[1]?.text ? 4 : 2);
+    const wrapped = wrapLines(ctx, block.text, textArea.w, block.maxLines ?? 2);
     wrappedBlocks.push({ lines: wrapped, lineH, size: block.size, weight: block.weight, color: block.color });
   }
 
@@ -390,7 +424,8 @@ export async function renderAdExportCanvas(
   ad: AdData,
   qrCanvas: HTMLCanvasElement,
   width: number,
-  height: number
+  height: number,
+  qrMode: ExportQrMode = "ad"
 ): Promise<HTMLCanvasElement> {
   const canvas = document.createElement("canvas");
   canvas.width = width;
@@ -411,17 +446,25 @@ export async function renderAdExportCanvas(
 
   await drawProductCell(ctx, layout.tl, ad, title, priceLabel, border, s);
   drawDescriptionCell(ctx, layout.tr, typeLabel, description, border, s);
-  drawFooterCell(ctx, layout.bottom, qrCanvas, phoneDisplay, border, s);
+  drawFooterCell(ctx, layout.bottom, qrCanvas, phoneDisplay, qrMode, border, s);
 
   return canvas;
 }
 
-export async function renderCardExportCanvas(ad: AdData, qrCanvas: HTMLCanvasElement) {
-  return renderAdExportCanvas(ad, qrCanvas, CARD_EXPORT_SIZE, CARD_EXPORT_SIZE);
+export async function renderCardExportCanvas(
+  ad: AdData,
+  qrCanvas: HTMLCanvasElement,
+  qrMode: ExportQrMode = "ad"
+) {
+  return renderAdExportCanvas(ad, qrCanvas, CARD_EXPORT_SIZE, CARD_EXPORT_SIZE, qrMode);
 }
 
-export async function renderA4ExportCanvas(ad: AdData, qrCanvas: HTMLCanvasElement) {
-  return renderAdExportCanvas(ad, qrCanvas, A4_EXPORT_WIDTH, A4_EXPORT_HEIGHT);
+export async function renderA4ExportCanvas(
+  ad: AdData,
+  qrCanvas: HTMLCanvasElement,
+  qrMode: ExportQrMode = "ad"
+) {
+  return renderAdExportCanvas(ad, qrCanvas, A4_EXPORT_WIDTH, A4_EXPORT_HEIGHT, qrMode);
 }
 
 async function canvasToJpegBlob(canvas: HTMLCanvasElement): Promise<Blob> {
@@ -434,14 +477,16 @@ async function canvasToJpegBlob(canvas: HTMLCanvasElement): Promise<Blob> {
   });
 }
 
-export async function renderCardExportBlob(ad: AdData, qrUrl: string): Promise<Blob> {
-  const qrCanvas = await renderQrToCanvas(qrUrl, 512, AD_QR_FOREGROUND);
-  const canvas = await renderCardExportCanvas(ad, qrCanvas);
+export async function renderCardExportBlob(ad: AdData, adUrl: string): Promise<Blob> {
+  const { value, mode } = resolveExportQr(ad, adUrl);
+  const qrCanvas = await renderQrToCanvas(value, 512, AD_QR_FOREGROUND);
+  const canvas = await renderCardExportCanvas(ad, qrCanvas, mode);
   return canvasToJpegBlob(canvas);
 }
 
-export async function renderA4PosterBlob(ad: AdData, qrUrl: string): Promise<Blob> {
-  const qrCanvas = await renderQrToCanvas(qrUrl, 640, AD_QR_FOREGROUND);
-  const canvas = await renderA4ExportCanvas(ad, qrCanvas);
+export async function renderA4PosterBlob(ad: AdData, adUrl: string): Promise<Blob> {
+  const { value, mode } = resolveExportQr(ad, adUrl);
+  const qrCanvas = await renderQrToCanvas(value, 640, AD_QR_FOREGROUND);
+  const canvas = await renderA4ExportCanvas(ad, qrCanvas, mode);
   return canvasToJpegBlob(canvas);
 }

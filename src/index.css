@@ -867,6 +867,27 @@
   pointer-events: auto;
 }
 
+.action-btn-hint--below {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.action-btn-hint--below > button {
+  width: 100%;
+  min-width: 0;
+}
+
+.action-btn-hint__below {
+  display: flex;
+  justify-content: flex-end;
+  align-self: flex-end;
+  line-height: 0;
+  flex-shrink: 0;
+}
+
 .action-btn-hint__icon .help-tooltip__bubble--top {
   right: 0;
   left: auto;
@@ -1381,6 +1402,86 @@
   gap: 0.5rem;
 }
 
+.my-ads-item__toolbar {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 0.125rem;
+  scrollbar-width: thin;
+}
+
+.icon-action-btn-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.125rem;
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+.icon-action-btn-wrap__hint {
+  line-height: 0;
+  flex-shrink: 0;
+}
+
+.icon-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  padding: 0;
+  border: 2px solid #18181b;
+  border-radius: 0.375rem;
+  background: #ffffff;
+  color: #18181b;
+  box-shadow: 2px 2px 0 0 #18181b;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.icon-action-btn__icon {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex-shrink: 0;
+}
+
+.icon-action-btn:hover:not(:disabled) {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 0 #18181b;
+}
+
+.icon-action-btn:focus-visible {
+  outline: 3px solid #a3e635;
+  outline-offset: 2px;
+}
+
+.icon-action-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.icon-action-btn--accent {
+  background: #fde68a;
+}
+
+.icon-action-btn--ghost {
+  background: #fafafa;
+}
+
+.icon-action-btn--danger {
+  background: #fecaca;
+  color: #991b1b;
+}
+
 .my-ads-item__delete {
   display: inline-flex;
   align-items: center;
@@ -1406,13 +1507,18 @@
 }
 
 .my-ads-item__export-hint {
+  margin: 0;
   flex: 1 1 100%;
-  text-align: center;
+  text-align: left;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #71717a;
 }
 
 @media (min-width: 480px) {
   .my-ads-item__export-hint {
-    flex: 0 1 auto;
+    flex: 1 1 auto;
   }
 }
 
@@ -1567,6 +1673,29 @@
 
 .share-channels__grid--actions {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.625rem;
+  align-items: stretch;
+}
+
+.share-channels__grid--actions .share-channel {
+  min-height: 3.25rem;
+  padding: 0.625rem 0.5rem;
+  font-size: clamp(0.625rem, 2.8vw, 0.6875rem);
+  white-space: normal;
+  text-align: center;
+  line-height: 1.25;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+.share-channels__grid--actions .action-btn-hint {
+  min-width: 0;
+  height: 100%;
+}
+
+.share-channels__grid--actions .action-btn-hint--below > button {
+  height: 100%;
+  min-height: 3.25rem;
 }
 
 @media (min-width: 480px) {
@@ -1631,17 +1760,6 @@
 
 .share-channel--primary {
   background: #a3e635;
-  grid-column: span 2;
-}
-
-@media (min-width: 480px) {
-  .share-channel--primary {
-    grid-column: span 1;
-  }
-}
-
-.share-channels__grid--actions .action-btn-hint {
-  min-width: 0;
 }
 
 .share-channel--image {
@@ -2048,6 +2166,15 @@ textarea.input-field {
 .neo-card-white,
 .neo-card-muted {
   max-width: 100%;
+  min-width: 0;
+}
+
+.share-channels,
+.share-channels__grid,
+.my-ads-item,
+.my-ads-item__toolbar {
+  min-width: 0;
+  max-width: 100%;
 }
 
 @supports (padding: max(0px)) {
@@ -2061,7 +2188,7 @@ textarea.input-field {
 }
 
 @media (max-width: 359px) {
-  .share-channels__grid {
+  .share-channels__grid:not(.share-channels__grid--actions) {
     grid-template-columns: 1fr;
   }
 

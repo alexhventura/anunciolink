@@ -118,6 +118,7 @@ export function ShareChannels({ ad, shareUrl }: ShareChannelsProps) {
         <ActionButtonWithHint
           hint={TOOLTIP_COPY.nativeShare}
           hintVariant="on-dark"
+          hintLayout="below"
           onClick={() => void handleNativeShare()}
           disabled={sharing}
           id="btn-native-share"
@@ -143,6 +144,7 @@ export function ShareChannels({ ad, shareUrl }: ShareChannelsProps) {
         <ActionButtonWithHint
           hint={TOOLTIP_COPY.printPoster}
           hintVariant="default"
+          hintLayout="below"
           onClick={() => void handlePdf()}
           disabled={!qrUrl.trim() || pdfLoading}
           id="btn-export-pdf"
@@ -157,6 +159,7 @@ export function ShareChannels({ ad, shareUrl }: ShareChannelsProps) {
         <ActionButtonWithHint
           hint={TOOLTIP_COPY.socialCard}
           hintVariant="default"
+          hintLayout="below"
           onClick={() => void handleJpg()}
           disabled={jpgLoading}
           id="btn-export-jpg"
