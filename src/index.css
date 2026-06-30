@@ -1037,286 +1037,6 @@
   border-top: 2px solid #18181b;
 }
 
-/* ——— Cartaz A4 (impressão) ——— */
-.a4-poster {
-  position: fixed;
-  inset: 0;
-  width: 210mm;
-  height: 297mm;
-  opacity: 0;
-  pointer-events: none;
-  z-index: -1;
-  overflow: hidden;
-}
-
-.a4-poster__sheet {
-  box-sizing: border-box;
-  width: 210mm;
-  height: 297mm;
-  margin: 0;
-  padding: 10mm 12mm 8mm;
-  background: #fffbeb;
-  display: grid;
-  grid-template-rows: 9mm minmax(0, 1fr) 1.5mm minmax(0, 1fr) 7mm;
-  gap: 3mm;
-  overflow: hidden;
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
-  color: #18181b;
-  -webkit-print-color-adjust: exact;
-  print-color-adjust: exact;
-}
-
-.a4-poster__brand {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 9mm;
-  border: 0.7mm solid #18181b;
-  border-radius: 1.5mm;
-  background: #18181b;
-}
-
-.a4-poster__brand-name {
-  font-size: 9pt;
-  font-weight: 900;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #fbbf24 !important;
-}
-
-.a4-poster__top {
-  display: grid;
-  grid-template-rows: 24mm 9mm 16mm 14mm minmax(28mm, 1fr) 14mm;
-  gap: 2mm;
-  min-height: 0;
-  padding: 3mm 4mm;
-  border: 1mm solid #18181b;
-  border-radius: 2mm;
-  background: #ffffff;
-  overflow: hidden;
-}
-
-.a4-poster__bottom {
-  display: grid;
-  grid-template-rows: 10mm minmax(0, 1fr) 10mm;
-  gap: 2mm;
-  min-height: 0;
-  padding: 3mm 4mm 2mm;
-  border: 1mm solid #18181b;
-  border-radius: 2mm;
-  background: #ffffff;
-  text-align: center;
-  overflow: hidden;
-}
-
-.a4-poster__rule {
-  height: 1.5mm;
-  background: #18181b;
-  border-radius: 1mm;
-}
-
-.a4-poster__slot {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.a4-poster__slot--icon {
-  align-items: flex-end;
-}
-
-.a4-poster__slot--type {
-  align-items: flex-start;
-  justify-content: flex-start;
-}
-
-.a4-poster__slot--title,
-.a4-poster__slot--price,
-.a4-poster__slot--desc {
-  align-items: flex-start;
-  justify-content: flex-start;
-  width: 100%;
-}
-
-.a4-poster__slot--desc {
-  align-items: stretch;
-}
-
-.a4-poster__slot--qr {
-  align-items: center;
-}
-
-.a4-poster__slot-empty {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-.a4-poster__icon-well {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 20mm;
-  height: 20mm;
-  border: 0.8mm solid #18181b;
-  border-radius: 2mm;
-  background: #ffffff;
-}
-
-.a4-poster__icon-well svg {
-  width: 12mm !important;
-  height: 12mm !important;
-}
-
-.a4-poster__chip {
-  display: inline-block;
-  padding: 0.8mm 3mm;
-  border: 0.45mm solid #18181b;
-  background: #18181b;
-  color: #fbbf24 !important;
-  font-size: 8pt;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.a4-poster__title {
-  margin: 0;
-  width: 100%;
-  font-size: 18pt;
-  font-weight: 900;
-  line-height: 1.12;
-  letter-spacing: -0.02em;
-  color: #18181b !important;
-  text-align: left;
-  word-wrap: break-word;
-  overflow-wrap: anywhere;
-}
-
-.a4-poster__price {
-  margin: 0;
-  width: 100%;
-  font-size: 24pt;
-  font-weight: 900;
-  line-height: 1.05;
-  color: #18181b !important;
-  text-align: left;
-  font-variant-numeric: tabular-nums;
-}
-
-.a4-poster__desc {
-  margin: 0;
-  width: 100%;
-  font-size: 10.5pt;
-  font-weight: 600;
-  line-height: 1.4;
-  color: #18181b !important;
-  text-align: left;
-  overflow: hidden;
-}
-
-.a4-poster__seller-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 3mm;
-  min-height: 14mm;
-}
-
-.a4-poster__slot--phone,
-.a4-poster__slot--pix {
-  align-items: flex-start;
-  justify-content: flex-start;
-  border: 0.4mm dashed #d4d4d8;
-  border-radius: 1mm;
-  padding: 1.5mm 2mm;
-}
-
-.a4-poster__meta {
-  margin: 0;
-  width: 100%;
-  text-align: left;
-}
-
-.a4-poster__meta-label {
-  display: block;
-  font-size: 7pt;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #71717a !important;
-}
-
-.a4-poster__meta-value {
-  display: block;
-  margin-top: 0.5mm;
-  font-size: 9.5pt;
-  font-weight: 700;
-  color: #18181b !important;
-  line-height: 1.25;
-}
-
-.a4-poster__qr-heading {
-  margin: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12pt;
-  font-weight: 900;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: #18181b !important;
-}
-
-.a4-poster__qr-frame {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 62mm;
-  height: 62mm;
-  max-width: 100%;
-  max-height: 100%;
-  margin: 0 auto;
-  padding: 2mm;
-  border: 0.9mm solid #18181b;
-  border-radius: 1.5mm;
-  background: #ffffff;
-  line-height: 0;
-}
-
-.a4-poster__qr-img {
-  display: block;
-  width: 54mm;
-  height: 54mm;
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-}
-
-.a4-poster__scan-instruction {
-  margin: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 10pt;
-  font-weight: 700;
-  color: #18181b !important;
-}
-
-.a4-poster__site-footer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0;
-  font-size: 8.5pt;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: #18181b !important;
-  text-align: center;
-}
-
 @media print {
   @page {
     size: A4 portrait;
@@ -1325,12 +1045,10 @@
 
   /* Nunca imprimir menus, patrocínios nem UI da aplicação */
   .no-print,
-  header,
-  footer,
-  nav,
   .site-header,
   .site-footer,
   .site-footer__nav,
+  nav,
   .adsense-slot,
   .adsense-slot__placeholder,
   ins.adsbygoogle,
@@ -1342,73 +1060,6 @@
   button {
     display: none !important;
     visibility: hidden !important;
-  }
-
-  /* Modo cartaz A4: imprime somente o poster */
-  html.printing-a4,
-  html.printing-a4 body {
-    width: 210mm !important;
-    height: 297mm !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: hidden !important;
-    background: #ffffff !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-
-  html.printing-a4 #root,
-  html.printing-a4 body > :not(.a4-poster) {
-    display: none !important;
-  }
-
-  html.printing-a4 .a4-poster,
-  html.printing-a4 .a4-poster * {
-    visibility: visible !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-
-  html.printing-a4 .a4-poster {
-    display: block !important;
-    position: fixed !important;
-    inset: 0 !important;
-    width: 210mm !important;
-    height: 297mm !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    opacity: 1 !important;
-    overflow: hidden !important;
-    z-index: 99999 !important;
-    pointer-events: none !important;
-    page-break-after: avoid !important;
-    page-break-inside: avoid !important;
-  }
-
-  html.printing-a4 .a4-poster__sheet {
-    width: 210mm !important;
-    height: 297mm !important;
-    max-height: 297mm !important;
-    margin: 0 !important;
-    padding: 10mm 12mm 8mm !important;
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-  }
-
-  html.printing-a4 .a4-poster__top,
-  html.printing-a4 .a4-poster__bottom,
-  html.printing-a4 .a4-poster__brand {
-    box-shadow: none !important;
-  }
-
-  html.printing-a4 .a4-poster__brand {
-    background: #18181b !important;
-  }
-
-  html.printing-a4 .a4-poster__qr-img {
-    width: 54mm !important;
-    height: 54mm !important;
-    visibility: visible !important;
   }
 }
 
@@ -2144,37 +1795,12 @@ textarea.input-field {
 .home-landing__tagline {
   letter-spacing: -0.02em;
   line-height: 1.45;
-}
-
-.home-landing__features {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem 0.625rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.home-landing__feature {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.375rem 0.75rem;
-  border: 2px solid #18181b;
-  border-radius: 9999px;
-  background: #ffffff;
-  font-size: 0.6875rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #18181b;
-  box-shadow: 2px 2px 0 0 #18181b;
+  margin-top: 0;
 }
 
 .home-landing__pillars {
   display: inline-block;
-  margin: 0;
+  margin: 0 0 1.25rem;
   padding: 0.5rem 1rem;
   border: 3px solid #18181b;
   border-radius: 0.5rem;
@@ -2185,6 +1811,35 @@ textarea.input-field {
   text-transform: uppercase;
   letter-spacing: 0.2em;
   box-shadow: 3px 3px 0 0 #18181b;
+}
+
+.home-landing__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  border: 4px solid #18181b;
+  border-radius: 0.5rem;
+  background: #f59e0b;
+  color: #18181b;
+  font-size: 0.8125rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  box-shadow: 6px 6px 0 0 #18181b;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.home-landing__cta:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 4px 4px 0 0 #18181b;
+}
+
+.home-landing__cta:focus-visible {
+  outline: 3px solid #18181b;
+  outline-offset: 3px;
 }
 
 /* ——— Home SEO blocks ——— */

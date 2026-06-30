@@ -165,14 +165,19 @@ export function HomeView({
         </p>
 
         <p className="home-landing__tagline text-base sm:text-lg font-semibold text-black max-w-md mx-auto leading-snug tracking-tight">
-          Anúncio profissional com ícone, Pix e QR Code — pronto para compartilhar.
+          Anúncio profissional e pronto para compartilhar em poucos segundos.
         </p>
 
-        <ul className="home-landing__features" aria-label="Recursos incluídos">
-          <li className="home-landing__feature">Ícone</li>
-          <li className="home-landing__feature">Pix</li>
-          <li className="home-landing__feature">QR Code</li>
-        </ul>
+        <a
+          href="#criar-anuncio"
+          className="home-landing__cta"
+          onClick={(e) => {
+            e.preventDefault();
+            scrollToForm();
+          }}
+        >
+          Crie o Seu Anúncio Grátis
+        </a>
       </section>
 
       <HomeSeoSection />
