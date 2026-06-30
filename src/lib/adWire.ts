@@ -62,7 +62,7 @@ export function toCompactWire(ad: AdData): CompactAdWire {
   if (wireIcon !== undefined) wire.e = wireIcon;
   /** Tema removido da UI — não codifica mais (decode legado preservado) */
   /** Encode de imagem/crop removido — decode legado preservado em fromCompactWire */
-  if (ad.expiresAt) wire.ex = ad.expiresAt;
+  if (ad.t === "venda" && ad.expiresAt) wire.ex = ad.expiresAt;
   return wire;
 }
 
@@ -81,7 +81,8 @@ export function fromCompactWire(wire: CompactAdWire): AdData {
     img: wire.i ? expandImageFromWire(wire.i) : undefined,
     crop: decodeCrop(wire),
     timestamp: wire.ts,
-    expiresAt: wire.ex ?? computeExpiresAt(wire.ts),
+    expiresAt:
+      wire.t === "venda" ? (wire.ex ?? computeExpiresAt(wire.ts, "venda")) : undefined,
   };
 }
 
@@ -124,6 +125,11 @@ export function normalizeLegacyAd(parsed: Record<string, unknown>): AdData | nul
         : undefined,
     crop: legacy.crop ?? DEFAULT_CROP,
     timestamp,
-    expiresAt: expiresAt && Number.isFinite(expiresAt) ? expiresAt : computeExpiresAt(timestamp),
+    expiresAt:
+      legacy.t === "venda"
+        ? expiresAt && Number.isFinite(expiresAt)
+          ? expiresAt
+          : computeExpiresAt(timestamp, "venda")
+        : undefined,
   };
 }

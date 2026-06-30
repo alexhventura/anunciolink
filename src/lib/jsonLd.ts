@@ -65,7 +65,45 @@ function baseWebApplication(description: string) {
 export function buildSiteJsonLd(description: string) {
   return {
     "@context": "https://schema.org",
-    "@graph": [baseOrganization(), baseWebSite(description), baseWebApplication(description)],
+    "@graph": [
+      baseOrganization(),
+      baseWebSite(description),
+      baseWebApplication(description),
+      buildHomeFaqPage(),
+    ],
+  };
+}
+
+function buildHomeFaqPage() {
+  return {
+    "@type": "FAQPage",
+    "@id": `${SEO_SITE.url}/#faq`,
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "Como criar um anúncio grátis no Anuncio Link?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Preencha título, preço e descrição no formulário, adicione ícone e Pix se quiser, e clique em Gerar anúncio grátis. O link e o QR Code são criados na hora, sem cadastro.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "O Anuncio Link guarda meus dados?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Não. Os dados do anúncio são codificados na URL que você compartilha. Não há banco de dados nem servidor armazenando título, Pix ou descrição.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Posso imprimir QR Code para vitrine?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Sim. Após gerar o anúncio, baixe o QR Code em PNG ou imprima o cartaz A4 com layout profissional, pronto para vitrines e panfletos.",
+        },
+      },
+    ],
   };
 }
 
@@ -116,7 +154,6 @@ export function buildAdProductJsonLd(ad: AdData, canonicalUrl: string, priceAmou
   const safeTitle = sanitizePlainText(ad.title, 120);
   const safeDesc = sanitizePlainText(ad.desc, 300);
   const expiresAt = resolveAdExpiresAt(ad);
-  const priceValidUntil = new Date(expiresAt).toISOString().slice(0, 10);
 
   const offer: Record<string, unknown> = {
     "@type": "Offer",
@@ -124,9 +161,12 @@ export function buildAdProductJsonLd(ad: AdData, canonicalUrl: string, priceAmou
     priceCurrency: "BRL",
     price: priceAmount ?? sanitizePlainText(ad.price, 32),
     availability: "https://schema.org/InStock",
-    priceValidUntil,
     seller: { "@id": ORG_ID },
   };
+
+  if (expiresAt !== undefined) {
+    offer.priceValidUntil = new Date(expiresAt).toISOString().slice(0, 10);
+  }
 
   const condition = ITEM_CONDITION[ad.t];
   if (condition) offer.itemCondition = condition;

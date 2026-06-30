@@ -39,11 +39,16 @@ export function TermsPage({ adsenseReady }: TermsPageProps) {
         </p>
       </InstitutionalSection>
 
-      <InstitutionalSection title="Expiração automática em 30 dias">
+      <InstitutionalSection title="Expiração de anúncios de venda">
         <p>
-          Para garantir a segurança do ecossistema, os anúncios expiram automaticamente após{" "}
-          <strong>30 dias</strong>. Após esse prazo, os botões de compra são desativados e uma mensagem informa
-          que o anúncio foi encerrado, incentivando o vendedor a criar um novo link atualizado.
+          Para garantir a segurança do ecossistema, anúncios do tipo <strong>venda</strong> expiram
+          automaticamente após <strong>30 dias</strong>. Após esse prazo, os botões de compra são desativados e
+          uma mensagem informa que o anúncio foi encerrado, incentivando o vendedor a criar um novo link
+          atualizado.
+        </p>
+        <p>
+          Anúncios de <strong>serviço</strong> e <strong>vaquinha</strong> permanecem ativos sem prazo de
+          expiração, por serem voltados a pagamentos recorrentes ou arrecadações de longo prazo.
         </p>
       </InstitutionalSection>
 

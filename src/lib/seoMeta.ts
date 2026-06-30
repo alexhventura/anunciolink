@@ -1,5 +1,6 @@
 import type { AdData, AdType } from "../types/ad";
 import type { InstitutionalView } from "./siteRoutes";
+import { isAdExpired } from "./adExpiry";
 import { SITE_NAME, SITE_URL } from "./constants";
 import { parsePriceToNumber } from "./formatters";
 import { sanitizePlainText } from "./sanitize";
@@ -55,13 +56,13 @@ export interface PageSeoMeta {
 }
 
 export const HOME_SEO: Omit<PageSeoMeta, "canonicalUrl"> = {
-  title: buildSeoTitle("Anúncio online grátis com Pix e QR Code"),
+  title: buildSeoTitle("Anúncio grátis com Pix e QR Code"),
   description: buildSeoDescription(
-    "Crie anúncio com ícone, Pix e QR Code. Link compartilhável no WhatsApp. Sem cadastro, sem taxas, 100% no navegador."
+    "Crie anúncio grátis com ícone, Pix e QR Code. Gerador de link e cartaz A4. Sem cadastro, sem login, 100% no navegador."
   ),
   robots: "index, follow, max-image-preview:large",
   ogType: "website",
-  imageAlt: `${SITE_NAME} — anúncio online grátis com Pix e QR Code`,
+  imageAlt: `${SITE_NAME} — anúncio grátis com Pix e QR Code`,
 };
 
 export const INSTITUTIONAL_SEO: Record<
@@ -69,9 +70,9 @@ export const INSTITUTIONAL_SEO: Record<
   { title: string; description: string; breadcrumb: string }
 > = {
   "como-funciona": {
-    title: buildSeoTitle("Como funciona"),
+    title: buildSeoTitle("Como criar anúncio grátis"),
     description: buildSeoDescription(
-      "Passo a passo para criar anúncio com ícone, Pix e QR Code. Compartilhe o link no WhatsApp. Sem cadastro e custo zero."
+      "Passo a passo: anúncio com ícone, Pix, QR Code, card PNG e cartaz A4. Compartilhe no WhatsApp sem cadastro."
     ),
     breadcrumb: "Como funciona",
   },
@@ -92,7 +93,7 @@ export const INSTITUTIONAL_SEO: Record<
   termos: {
     title: buildSeoTitle("Termos de uso"),
     description: buildSeoDescription(
-      "Termos de uso do Anuncio Link. Ferramenta gratuita de anúncios. Responsabilidade do vendedor e expiração padrão em 30 dias."
+      "Termos de uso do Anuncio Link. Ferramenta gratuita de anúncios. Vendas expiram em 30 dias; serviços e vaquinhas permanecem ativos."
     ),
     breadcrumb: "Termos",
   },
@@ -105,20 +106,22 @@ export function buildAdPageSeo(ad: AdData, canonicalUrl: string): PageSeoMeta {
   const priceValue = parsePriceToNumber(ad.price);
   const category = AD_TYPE_LABEL[ad.t];
 
-  const titleSuffix = ` | ${SITE_NAME}`;
+  const titleSuffix = ` — QR Code | ${SITE_NAME}`;
   const pricePart = ` — ${safePrice}`;
   const maxTitleLen = SEO_TITLE_MAX - titleSuffix.length - pricePart.length;
   const shortTitle = truncateAtWord(safeTitle, Math.max(16, maxTitleLen));
 
   const description = buildSeoDescription(
-    `${category}: ${safeTitle} por ${safePrice}. ${safeDesc}`
+    `${category}: ${safeTitle} por ${safePrice}. ${safeDesc} Anúncio com QR Code e Pix. Crie o seu grátis no ${SITE_NAME}.`
   );
+
+  const expired = isAdExpired(ad);
 
   return {
     title: `${shortTitle}${pricePart}${titleSuffix}`,
     description,
     canonicalUrl,
-    robots: "index, follow, max-image-preview:large",
+    robots: expired ? "noindex, nofollow" : "index, follow, max-image-preview:large",
     ogType: "product",
     imageAlt: `${safeTitle} — ${safePrice} no ${SITE_NAME}`,
     priceAmount: priceValue !== undefined ? priceValue.toFixed(2) : undefined,

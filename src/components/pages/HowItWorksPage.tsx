@@ -87,9 +87,10 @@ export function HowItWorksPage({ adsenseReady }: HowItWorksPageProps) {
         icon={<Clock3 className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />}
         title="Validade e histórico local"
       >
-        Cada anúncio expira automaticamente em <strong>30 dias</strong> — os botões de compra são desativados e
-        uma mensagem orienta a renovar. Na home, <strong>Meus anúncios</strong> guarda seus links recentes só
-        no seu navegador (sem conta).
+        Anúncios de <strong>venda</strong> expiram automaticamente em <strong>30 dias</strong> — os botões de
+        compra são desativados e uma mensagem orienta a renovar. <strong>Serviços</strong> e{" "}
+        <strong>vaquinhas</strong> permanecem ativos sem prazo, ideais para pagamentos recorrentes. Na home,{" "}
+        <strong>Meus anúncios</strong> guarda seus links recentes só no seu navegador (sem conta).
       </StepCard>
 
       <InstitutionalSection title="O que está incluso — sempre grátis">

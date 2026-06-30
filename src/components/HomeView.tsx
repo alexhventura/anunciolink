@@ -32,6 +32,7 @@ import { AdSenseSlot } from "./AdSenseSlot";
 import { PayloadScoreIndicator } from "./PayloadScoreIndicator";
 import { ViewEnter } from "./ViewEnter";
 import { ActionButtonWithHint, FieldLegendWithHint, HelpTooltip } from "./HelpTooltip";
+import { HomeSeoCta, HomeSeoSection } from "./HomeSeoSection";
 
 const IconPicker = lazy(() =>
   import("./IconPicker").then((m) => ({ default: m.IconPicker }))
@@ -79,6 +80,7 @@ export function HomeView({
   const [touched, setTouched] = useState<Partial<Record<AdFormFieldKey, boolean>>>({});
   const [optionalOpen, setOptionalOpen] = useState(true);
   const submitErrorRef = useRef<HTMLDivElement>(null);
+  const formStartRef = useRef<HTMLDivElement>(null);
   const formValues = useMemo(() => toFormValues(form), [form]);
 
   useEffect(() => {
@@ -140,6 +142,11 @@ export function HomeView({
   const segmentActive = "neo-segment-active";
   const segmentIdle = "neo-segment-idle";
 
+  const scrollToForm = useCallback(() => {
+    formStartRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    queueMicrotask(() => focusFirstField("title"));
+  }, []);
+
   return (
     <ViewEnter className="space-y-12 sm:space-y-16 md:space-y-20">
       <section className="home-landing__hero text-center max-w-2xl mx-auto space-y-5 sm:space-y-6 px-2">
@@ -153,6 +160,10 @@ export function HomeView({
           </h1>
         </div>
 
+        <p className="home-landing__pillars" aria-label="Simples, rápido e grátis">
+          Simples · Rápido · Grátis
+        </p>
+
         <p className="home-landing__tagline text-base sm:text-lg font-semibold text-black max-w-md mx-auto leading-snug tracking-tight">
           Anúncio profissional com ícone, Pix e QR Code — pronto para compartilhar.
         </p>
@@ -164,11 +175,13 @@ export function HomeView({
         </ul>
       </section>
 
+      <HomeSeoSection />
+
       <MyAdsPanel onOpenAd={onOpenSavedAd} />
 
       <AdSenseSlot slot="topo" ready={adsenseReady} />
 
-      <div className="ad-form-bento max-w-6xl mx-auto w-full px-2 sm:px-3 min-w-0">
+      <div ref={formStartRef} id="criar-anuncio" className="ad-form-bento max-w-6xl mx-auto w-full px-2 sm:px-3 min-w-0 scroll-mt-24">
         <form onSubmit={handleSubmit} className="ad-form-bento__grid" noValidate>
           <div className="ad-form-bento__main space-y-6">
             {form.submitError && (
@@ -476,6 +489,8 @@ export function HomeView({
           </aside>
         </form>
       </div>
+
+      <HomeSeoCta onScrollToForm={scrollToForm} />
     </ViewEnter>
   );
 }

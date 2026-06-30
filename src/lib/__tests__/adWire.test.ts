@@ -1,6 +1,14 @@
 import { describe, expect, it } from "vitest";
+import { isAdExpired } from "../adExpiry";
 import { toCompactWire, fromCompactWire, normalizeLegacyAd } from "../adWire";
-import { COMPACT_WIRE, FULL_AD, LEGACY_EXPANDED, LEGACY_WITH_IMAGE, MINIMAL_AD } from "./fixtures";
+import {
+  COMPACT_WIRE,
+  FIXTURE_EXPIRES,
+  FULL_AD,
+  LEGACY_EXPANDED,
+  LEGACY_WITH_IMAGE,
+  MINIMAL_AD,
+} from "./fixtures";
 
 describe("adWire", () => {
   it("serializa campos mínimos com chaves compactas", () => {
@@ -56,5 +64,19 @@ describe("adWire", () => {
   it("reconhece wire já compacto inline", () => {
     const ad = normalizeLegacyAd(COMPACT_WIRE as unknown as Record<string, unknown>);
     expect(ad?.title).toBe(COMPACT_WIRE.ti);
+  });
+
+  it("não codifica expiração para serviço ou vaquinha", () => {
+    const servico = toCompactWire({ ...FULL_AD, t: "servico", expiresAt: FIXTURE_EXPIRES });
+    expect(servico.ex).toBeUndefined();
+
+    const vaquinha = toCompactWire({ ...FULL_AD, t: "vaquinha", expiresAt: FIXTURE_EXPIRES });
+    expect(vaquinha.ex).toBeUndefined();
+  });
+
+  it("decodifica serviço sem expiração mesmo com ex legado no wire", () => {
+    const ad = fromCompactWire({ ...COMPACT_WIRE, t: "servico", ex: FIXTURE_EXPIRES });
+    expect(ad.expiresAt).toBeUndefined();
+    expect(isAdExpired(ad, FIXTURE_EXPIRES + 1)).toBe(false);
   });
 });

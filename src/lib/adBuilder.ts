@@ -52,7 +52,7 @@ export const AdBuilder = {
       cardLink: state.cardLink.trim() || undefined,
       icon: resolveAdIconId(state.icon, state.adType),
       timestamp: now,
-      expiresAt: computeExpiresAt(now),
+      expiresAt: computeExpiresAt(now, state.adType),
     });
   },
 

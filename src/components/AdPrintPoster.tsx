@@ -1,9 +1,12 @@
 import { Printer } from "lucide-react";
 import { createPortal } from "react-dom";
-import { QRCodeSVG } from "qrcode.react";
+import { useEffect, useState, type ReactNode } from "react";
 import type { AdData } from "../types/ad";
-import { SITE_DOMAIN } from "../lib/constants";
-import { AD_QR_FOREGROUND } from "../lib/adThemes";
+import { SITE_DOMAIN, SITE_NAME } from "../lib/constants";
+import { getAdIconDefinition, resolveAdIconId } from "../lib/adIcons";
+import { loadAdIcon } from "../lib/adIconLoaders";
+import { formatPhoneNumber } from "../lib/formatters";
+import { renderQrToCanvas } from "../lib/qrCanvas";
 import { isQrUrlSafe } from "../lib/qrShareUrl";
 import { TOOLTIP_COPY } from "../lib/tooltipCopy";
 import { ActionButtonWithHint } from "./HelpTooltip";
@@ -22,8 +25,7 @@ const TYPE_LABEL = {
   vaquinha: "Vaquinha",
 } as const;
 
-const POSTER_DESC_MAX = 200;
-const QR_SIZE = 196;
+const POSTER_DESC_MAX = 320;
 
 function summarizeDescription(text: string, maxLen = POSTER_DESC_MAX): string {
   const clean = text.replace(/\s+/g, " ").trim();
@@ -34,7 +36,21 @@ function summarizeDescription(text: string, maxLen = POSTER_DESC_MAX): string {
   return `${base.trim()}…`;
 }
 
-/** Cartaz A4 — layout do card do anúncio + QR centralizado */
+function Slot({
+  className = "",
+  children,
+}: {
+  className?: string;
+  children?: ReactNode;
+}) {
+  return (
+    <div className={`a4-poster__slot ${className}`.trim()}>
+      {children ?? <span className="a4-poster__slot-empty" aria-hidden="true" />}
+    </div>
+  );
+}
+
+/** Cartaz A4 — metade superior: produto; metade inferior: QR (slots fixos) */
 export function AdPrintPoster({
   ad,
   qrUrl,
@@ -42,14 +58,41 @@ export function AdPrintPoster({
   hintVariant = "on-dark",
 }: AdPrintPosterProps) {
   const qrSafe = isQrUrlSafe(qrUrl);
+  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
+
   const summary = summarizeDescription(ad.desc);
   const priceLabel = ad.price + (ad.billingType === "recorrente" ? " /mês" : "");
-  const logoSize = Math.round(QR_SIZE * 0.22);
+  const phoneLabel = ad.phone ? formatPhoneNumber(ad.phone) : "";
+
+  useEffect(() => {
+    const definition = getAdIconDefinition(resolveAdIconId(ad.icon, ad.t));
+    const loader = definition ? loadAdIcon(definition.lucideKey) : undefined;
+    if (loader) void loader();
+  }, [ad.icon, ad.t]);
+
+  useEffect(() => {
+    if (!qrSafe) {
+      setQrDataUrl(null);
+      return;
+    }
+    let cancelled = false;
+    void renderQrToCanvas(qrUrl, 512).then((canvas) => {
+      if (!cancelled) setQrDataUrl(canvas.toDataURL("image/png"));
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [qrUrl, qrSafe]);
 
   const handlePrint = () => {
+    if (!qrDataUrl) return;
     document.documentElement.classList.add("printing-a4");
-    window.print();
-    window.setTimeout(() => document.documentElement.classList.remove("printing-a4"), 500);
+    window.requestAnimationFrame(() => {
+      window.setTimeout(() => {
+        window.print();
+        window.setTimeout(() => document.documentElement.classList.remove("printing-a4"), 500);
+      }, 80);
+    });
   };
 
   const poster =
@@ -57,45 +100,78 @@ export function AdPrintPoster({
     createPortal(
       <div className="a4-poster" aria-hidden="true">
         <div className="a4-poster__sheet">
-          <div className="a4-poster__stage">
-            <article className="a4-poster__card">
-              <header className="a4-poster__hero">
-                <div className="a4-poster__icon-well">
-                  <AdProductIcon iconId={ad.icon} adType={ad.t} size={72} strokeWidth={2.5} color="#18181b" />
-                </div>
-                <h1 className="a4-poster__title">{ad.title}</h1>
-                <p className="a4-poster__price">{priceLabel}</p>
-              </header>
+          <header className="a4-poster__brand">
+            <span className="a4-poster__brand-name">{SITE_NAME}</span>
+          </header>
 
-              <section className="a4-poster__body">
-                <span className="a4-poster__chip">{TYPE_LABEL[ad.t]}</span>
-                {summary && <p className="a4-poster__desc">{summary}</p>}
-              </section>
+          <section className="a4-poster__top" aria-label="Informações do anúncio">
+            <Slot className="a4-poster__slot--icon">
+              <div className="a4-poster__icon-well">
+                <AdProductIcon iconId={ad.icon} adType={ad.t} size={52} strokeWidth={2.5} color="#18181b" />
+              </div>
+            </Slot>
 
-              <footer className="a4-poster__qr-panel">
+            <Slot className="a4-poster__slot--type">
+              <span className="a4-poster__chip">{TYPE_LABEL[ad.t]}</span>
+            </Slot>
+
+            <Slot className="a4-poster__slot--title">
+              {ad.title ? <h1 className="a4-poster__title">{ad.title}</h1> : null}
+            </Slot>
+
+            <Slot className="a4-poster__slot--price">
+              {ad.price ? <p className="a4-poster__price">{priceLabel}</p> : null}
+            </Slot>
+
+            <Slot className="a4-poster__slot--desc">
+              {summary ? <p className="a4-poster__desc">{summary}</p> : null}
+            </Slot>
+
+            <div className="a4-poster__seller-row">
+              <Slot className="a4-poster__slot--phone">
+                {phoneLabel ? (
+                  <p className="a4-poster__meta">
+                    <span className="a4-poster__meta-label">WhatsApp</span>
+                    <span className="a4-poster__meta-value">{phoneLabel}</span>
+                  </p>
+                ) : null}
+              </Slot>
+              <Slot className="a4-poster__slot--pix">
+                {ad.pix ? (
+                  <p className="a4-poster__meta">
+                    <span className="a4-poster__meta-label">Pix</span>
+                    <span className="a4-poster__meta-value">Disponível no anúncio online</span>
+                  </p>
+                ) : null}
+              </Slot>
+            </div>
+          </section>
+
+          <div className="a4-poster__rule" aria-hidden="true" />
+
+          <section className="a4-poster__bottom" aria-label="QR Code">
+            <h2 className="a4-poster__qr-heading">Escaneie o QR Code</h2>
+
+            <Slot className="a4-poster__slot--qr">
+              {qrDataUrl ? (
                 <div className="a4-poster__qr-frame">
-                  <QRCodeSVG
-                    value={qrUrl}
-                    size={QR_SIZE}
-                    level="H"
-                    includeMargin
-                    marginSize={3}
-                    bgColor="#ffffff"
-                    fgColor={AD_QR_FOREGROUND}
-                    imageSettings={{
-                      src: "/qr-logo.svg",
-                      height: logoSize,
-                      width: logoSize,
-                      excavate: true,
-                    }}
+                  <img
+                    src={qrDataUrl}
+                    alt=""
+                    className="a4-poster__qr-img"
+                    width={512}
+                    height={512}
                   />
                 </div>
-                <p className="a4-poster__scan-instruction">Escaneie para abrir este anúncio.</p>
-              </footer>
-            </article>
+              ) : null}
+            </Slot>
 
-            <p className="a4-poster__site-footer">{SITE_DOMAIN}</p>
-          </div>
+            <Slot className="a4-poster__slot--scan">
+              <p className="a4-poster__scan-instruction">Abra o anúncio completo no celular.</p>
+            </Slot>
+          </section>
+
+          <footer className="a4-poster__site-footer">{SITE_DOMAIN}</footer>
         </div>
       </div>,
       document.body
@@ -109,7 +185,7 @@ export function AdPrintPoster({
         onClick={handlePrint}
         id="btn-print-a4-poster"
         className={`${triggerClassName} no-print`}
-        disabled={!qrSafe}
+        disabled={!qrSafe || !qrDataUrl}
         aria-label="Gerar cartaz A4 para imprimir com QR Code em destaque"
       >
         <Printer className="h-5 w-5 shrink-0" strokeWidth={2} aria-hidden="true" />
