@@ -75,7 +75,7 @@ export function SuccessView({
   };
 
   return (
-    <ViewEnter className="max-w-xl mx-auto space-y-10">
+    <ViewEnter className="max-w-xl mx-auto w-full min-w-0 px-1 sm:px-0 space-y-8 sm:space-y-10">
       <AdSenseSlot slot="topo" ready={adsenseReady} />
 
       <div className="neo-card-white p-8 md:p-10 text-center space-y-8 no-print">
@@ -85,7 +85,7 @@ export function SuccessView({
 
         <div className="space-y-3">
           <div className="neo-hero-banner mx-auto max-w-sm !rotate-0">
-            <h1 className="text-display text-2xl sm:text-3xl font-black uppercase flex items-center justify-center gap-2">
+            <h1 className="neo-hero-banner__title text-display font-black uppercase flex flex-wrap items-center justify-center gap-2">
               <Zap className="h-7 w-7 fill-amber-500 stroke-black" strokeWidth={2.5} aria-hidden="true" />
               Anúncio publicado
             </h1>

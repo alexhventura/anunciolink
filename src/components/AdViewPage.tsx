@@ -50,7 +50,7 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
   return (
     <ViewEnter
       as="article"
-      className="ad-landing-page mx-auto w-full max-w-2xl px-4 sm:px-6 pb-10 sm:pb-14"
+      className="ad-landing-page mx-auto w-full max-w-2xl min-w-0 px-3 sm:px-4 md:px-6 pb-8 sm:pb-10 md:pb-14"
       itemScope
       itemType="https://schema.org/Product"
     >

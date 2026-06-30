@@ -110,6 +110,13 @@ export default function App() {
     }
   }, [form, setSubmitError, setCurrentView, refreshHistory]);
 
+  const mainMaxWidth =
+    currentView === "home"
+      ? "max-w-6xl"
+      : currentView === "anuncio" || isInstitutionalView
+        ? "max-w-2xl"
+        : "max-w-xl";
+
   return (
     <div className={`min-h-screen font-sans antialiased ${themeClass}`}>
       <a href="#conteudo-principal" className="skip-link">
@@ -120,7 +127,7 @@ export default function App() {
       <main
         id="conteudo-principal"
         aria-label="Conteúdo principal do Anuncio Link"
-        className={`mx-auto px-5 py-12 md:py-16 ${isInstitutionalView ? "max-w-2xl" : "max-w-xl"}`}
+        className={`mx-auto w-full min-w-0 px-4 sm:px-5 py-8 sm:py-12 md:py-16 ${mainMaxWidth}`}
       >
         <div key={currentView}>
           {currentView === "home" && (

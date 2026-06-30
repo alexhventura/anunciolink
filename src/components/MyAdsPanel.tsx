@@ -28,7 +28,7 @@ export function MyAdsPanel({ onOpenAd }: MyAdsPanelProps) {
   };
 
   return (
-    <section className="max-w-xl mx-auto w-full neo-card-white p-8" aria-labelledby="my-ads-heading">
+    <section className="w-full max-w-3xl mx-auto neo-card-white p-5 sm:p-8" aria-labelledby="my-ads-heading">
       <div className="mb-6 border-b-[3px] border-black pb-4">
         <h2 id="my-ads-heading" className="text-display text-lg font-black uppercase">
           Meus anúncios

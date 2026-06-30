@@ -146,11 +146,11 @@ export function HomeView({
       <div className="text-center max-w-lg mx-auto space-y-6 px-2">
         <span className="chip-accent">Sem cadastro · 100% grátis</span>
 
-        <div className="neo-hero-banner mx-auto max-w-md">
-          <h1 className="text-display text-3xl sm:text-4xl font-black leading-[1.05] text-black uppercase">
-            Landing page
+        <div className="neo-hero-banner mx-auto max-w-lg w-full">
+          <h1 className="neo-hero-banner__title text-display font-black leading-[1.08] text-black uppercase">
+            Anúncios
             <br />
-            <span className="text-white bg-black px-2 py-0.5 inline-block mt-1 -rotate-1">em segundos</span>
+            <span className="text-white bg-black px-2 py-0.5 inline-block mt-1 -rotate-1">Em Segundos</span>
           </h1>
         </div>
 
@@ -164,7 +164,7 @@ export function HomeView({
 
       <AdSenseSlot slot="topo" ready={adsenseReady} />
 
-      <div className="ad-form-bento max-w-6xl mx-auto w-full px-1">
+      <div className="ad-form-bento max-w-6xl mx-auto w-full px-2 sm:px-3 min-w-0">
         <form onSubmit={handleSubmit} className="ad-form-bento__grid" noValidate>
           <div className="ad-form-bento__main space-y-6">
             {form.submitError && (
@@ -179,7 +179,7 @@ export function HomeView({
             )}
 
             {/* ——— Obrigatórios ——— */}
-            <section className="ad-form-section ad-form-section--required neo-card-white p-6 sm:p-8">
+            <section className="ad-form-section ad-form-section--required neo-card-white p-4 sm:p-6 md:p-8">
               <header className="ad-form-section__header">
                 <div className="ad-form-section__titles">
                   <span className="ad-form-section__badge ad-form-section__badge--required">
@@ -315,7 +315,7 @@ export function HomeView({
             </section>
 
             {/* ——— Opcionais ——— */}
-            <section className="ad-form-section ad-form-section--optional neo-card-muted p-6 sm:p-8">
+            <section className="ad-form-section ad-form-section--optional neo-card-muted p-4 sm:p-6 md:p-8">
               <header className="ad-form-section__header ad-form-section__header--collapsible">
                 <div className="ad-form-section__titles">
                   <span className="ad-form-section__badge ad-form-section__badge--optional">
@@ -456,7 +456,7 @@ export function HomeView({
           </div>
 
           <aside className="ad-form-bento__aside">
-            <div className="ad-form-preview neo-card-white p-5 sm:p-6 space-y-4">
+            <div className="ad-form-preview neo-card-white p-4 sm:p-5 md:p-6 space-y-4 min-w-0">
               <header>
                 <h3 className="ad-form-section__title text-base">{FORM_SECTION_COPY.preview.title}</h3>
                 <p className="ad-form-section__subtitle mt-1">{FORM_SECTION_COPY.preview.subtitle}</p>

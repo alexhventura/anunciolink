@@ -10,8 +10,8 @@ interface HeaderProps {
 
 export function Header({ onResetHome, onNavigate }: HeaderProps) {
   return (
-    <header className="site-header sticky top-0 z-40 px-5 py-4 no-print">
-      <div className="mx-auto flex max-w-xl items-center justify-between gap-3">
+    <header className="site-header sticky top-0 z-40 px-4 sm:px-5 py-3 sm:py-4 no-print">
+      <div className="mx-auto flex w-full max-w-6xl min-w-0 items-center justify-between gap-2 sm:gap-3">
         <button
           type="button"
           onClick={onResetHome}
@@ -35,7 +35,7 @@ export function Header({ onResetHome, onNavigate }: HeaderProps) {
           </span>
         </button>
 
-        <SiteNavLink view="como-funciona" onNavigate={onNavigate} highlight>
+        <SiteNavLink view="como-funciona" onNavigate={onNavigate} highlight className="text-[10px] sm:text-xs shrink-0 whitespace-nowrap">
           Como Funciona
         </SiteNavLink>
       </div>
