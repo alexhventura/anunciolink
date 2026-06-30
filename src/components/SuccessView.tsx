@@ -1,17 +1,22 @@
-import { useState } from "react";
-import { Check, Lightbulb, MessageCircle, Share2, Zap } from "lucide-react";
+import { lazy, Suspense, useId, useState } from "react";
+import { Check, Lightbulb, Share2, Zap } from "lucide-react";
 import type { AdFormState } from "../hooks/useAdForm";
 import type { AdData } from "../types/ad";
 import { AdSenseSlot } from "./AdSenseSlot";
 import { AdPreviewCard } from "./AdPreviewCard";
-import { AdShareTools } from "./AdShareTools";
 import { AdQrCodeSection } from "./AdQrCodeSection";
 import { ViewEnter } from "./ViewEnter";
-import { ActionButtonWithHint, FieldLabelWithHint } from "./HelpTooltip";
-import { copyToClipboard } from "../lib/formatters";
-import { buildWhatsAppShareMessage, buildWhatsAppShareUrl } from "../lib/whatsappShare";
+import { ActionButtonWithHint } from "./HelpTooltip";
+import { buildWhatsAppShareMessage } from "../lib/whatsappShare";
 import { useNativeShare } from "../hooks/useNativeShare";
 import { TOOLTIP_COPY } from "../lib/tooltipCopy";
+
+const ShareChannels = lazy(() =>
+  import("./ShareChannels").then((m) => ({ default: m.ShareChannels }))
+);
+const AdShareTools = lazy(() =>
+  import("./AdShareTools").then((m) => ({ default: m.AdShareTools }))
+);
 
 interface SuccessViewProps {
   form: AdFormState;
@@ -30,9 +35,9 @@ export function SuccessView({
   onBackToEdit,
   onResetHome,
 }: SuccessViewProps) {
-  const [linkCopied, setLinkCopied] = useState(false);
   const [shareStatus, setShareStatus] = useState<string | null>(null);
   const { canShare, share } = useNativeShare();
+  const qrHeadingId = useId();
 
   const shareMessage = buildWhatsAppShareMessage(
     form.title,
@@ -40,20 +45,6 @@ export function SuccessView({
     form.description,
     generatedLink
   );
-  const whatsAppShareUrl = buildWhatsAppShareUrl(
-    form.title,
-    form.price,
-    form.description,
-    generatedLink
-  );
-
-  const handleCopyLink = async () => {
-    const ok = await copyToClipboard(shareMessage);
-    if (ok) {
-      setLinkCopied(true);
-      window.setTimeout(() => setLinkCopied(false), 2500);
-    }
-  };
 
   const handleNativeShare = async () => {
     const result = await share({
@@ -94,10 +85,10 @@ export function SuccessView({
 
         <div className="space-y-3">
           <div className="neo-hero-banner mx-auto max-w-sm !rotate-0">
-            <h2 className="text-display text-2xl sm:text-3xl font-black uppercase flex items-center justify-center gap-2">
+            <h1 className="text-display text-2xl sm:text-3xl font-black uppercase flex items-center justify-center gap-2">
               <Zap className="h-7 w-7 fill-amber-500 stroke-black" strokeWidth={2.5} aria-hidden="true" />
               Anúncio publicado
-            </h2>
+            </h1>
           </div>
           <p className="text-sm font-bold text-black max-w-sm mx-auto">
             Copie o link, baixe o QR Code e divulgue. Panfleto A4 e card offline também estão aqui.
@@ -114,77 +105,11 @@ export function SuccessView({
         )}
 
         <div className="space-y-6 text-left">
-          <div>
-            <FieldLabelWithHint hint={TOOLTIP_COPY.nativeShare} className="mb-2">
-              <span className="label-field">Mensagem para compartilhar</span>
-            </FieldLabelWithHint>
-            <div className="flex flex-col sm:flex-row items-stretch gap-3 rounded-lg border-[3px] border-black bg-amber-50 p-3 neo-shadow-sm">
-              <textarea
-                id="generated-link-input"
-                readOnly
-                rows={5}
-                value={shareMessage}
-                className="input-field !shadow-none flex-1 !py-2.5 text-xs font-medium resize-none min-h-[120px]"
-              />
-              <button
-                type="button"
-                onClick={handleCopyLink}
-                id="btn-copy-link-sucesso"
-                aria-live="polite"
-                aria-label={linkCopied ? "Texto do anúncio copiado" : "Copiar texto do anúncio para compartilhar"}
-                className={`shrink-0 min-h-[52px] !w-auto !min-w-[120px] ${
-                  linkCopied ? "btn-payment-pix-copied !min-h-[52px]" : "btn-accent !min-h-[52px]"
-                }`}
-              >
-                {linkCopied ? "✓ Copiado" : "Copiar texto"}
-              </button>
-            </div>
+          <Suspense fallback={<div className="neo-inset p-6 text-center text-xs font-bold text-zinc-500">Carregando canais…</div>}>
+            <ShareChannels ad={adSnapshot} shareUrl={generatedLink} whatsAppMessage={shareMessage} />
+          </Suspense>
 
-            <aside
-              role="note"
-              aria-labelledby="link-shortener-tip-heading"
-              className="mt-4 rounded-lg border-2 border-zinc-900 bg-amber-100 px-4 py-3.5 neo-shadow-sm"
-            >
-              <div className="flex gap-3">
-                <span
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border-2 border-zinc-900 bg-lime-200 shadow-[2px_2px_0_0_#18181b]"
-                  aria-hidden="true"
-                >
-                  <Lightbulb className="h-4 w-4 text-black" strokeWidth={2.5} />
-                </span>
-                <p
-                  id="link-shortener-tip-heading"
-                  className="text-xs font-medium text-zinc-800 leading-relaxed"
-                >
-                  <span className="mr-0.5" aria-hidden="true">
-                    💡
-                  </span>
-                  <strong className="font-black text-black">Por que o link é grande?</strong> Salvamos tudo direto na
-                  URL, sem cadastro. Para bios e redes, encurte gratuitamente no{" "}
-                  <a
-                    href="https://bitly.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-bold text-black underline decoration-amber-600 underline-offset-2 hover:text-amber-900"
-                  >
-                    bitly.com
-                  </a>{" "}
-                  ou{" "}
-                  <a
-                    href="https://tinyurl.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-bold text-black underline decoration-amber-600 underline-offset-2 hover:text-amber-900"
-                  >
-                    tinyurl.com
-                  </a>
-                  .
-                </p>
-              </div>
-            </aside>
-          </div>
-
-          {canShare ? (
+          {canShare && (
             <ActionButtonWithHint
               hint={TOOLTIP_COPY.nativeShare}
               hintVariant="on-dark"
@@ -192,42 +117,57 @@ export function SuccessView({
               id="btn-native-share-success"
               className="btn-primary gap-2"
               aria-live="polite"
-              aria-label={shareStatus ?? "Divulgar anúncio pelo compartilhamento nativo do celular"}
+              aria-label={shareStatus ?? "Divulgar pelo menu nativo do celular"}
             >
               <Share2 className="h-5 w-5 shrink-0" strokeWidth={2.5} aria-hidden="true" />
-              {shareStatus ?? "Divulgar anúncio"}
+              {shareStatus ?? "Compartilhar pelo celular"}
             </ActionButtonWithHint>
-          ) : (
-            <a
-              href={whatsAppShareUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              id="btn-whatsapp-share-success"
-              className="btn-whatsapp"
-              aria-label="Compartilhar anúncio no WhatsApp em nova aba"
-            >
-              <MessageCircle className="h-6 w-6 shrink-0" strokeWidth={2.5} aria-hidden="true" />
-              Compartilhar no WhatsApp
-            </a>
           )}
 
-          {canShare && (
-            <a
-              href={whatsAppShareUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              id="btn-whatsapp-share-fallback"
-              className="btn-whatsapp"
-              aria-label="Compartilhar anúncio no WhatsApp em nova aba"
-            >
-              <MessageCircle className="h-6 w-6 shrink-0" strokeWidth={2.5} aria-hidden="true" />
-              Compartilhar no WhatsApp
-            </a>
-          )}
+          <AdQrCodeSection url={generatedLink} theme={form.theme} deferMs={200} headingId={qrHeadingId} />
 
-          <AdQrCodeSection url={generatedLink} theme={form.theme} deferMs={200} />
+          <Suspense fallback={<div className="neo-inset p-6 text-center text-xs font-bold text-zinc-500">Carregando ferramentas…</div>}>
+            <AdShareTools ad={adSnapshot} />
+          </Suspense>
 
-          <AdShareTools ad={adSnapshot} />
+          <aside
+            role="note"
+            aria-labelledby="link-shortener-tip-heading"
+            className="rounded-lg border-2 border-zinc-900 bg-amber-100 px-4 py-3.5 neo-shadow-sm"
+          >
+            <div className="flex gap-3">
+              <span
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border-2 border-zinc-900 bg-lime-200 shadow-[2px_2px_0_0_#18181b]"
+                aria-hidden="true"
+              >
+                <Lightbulb className="h-4 w-4 text-black" strokeWidth={2.5} />
+              </span>
+              <p
+                id="link-shortener-tip-heading"
+                className="text-xs font-medium text-zinc-800 leading-relaxed"
+              >
+                <strong className="font-black text-black">Link grande?</strong> Encurte no{" "}
+                <a
+                  href="https://bitly.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-bold text-black underline decoration-amber-600 underline-offset-2"
+                >
+                  bitly.com
+                </a>{" "}
+                ou{" "}
+                <a
+                  href="https://tinyurl.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-bold text-black underline decoration-amber-600 underline-offset-2"
+                >
+                  tinyurl.com
+                </a>{" "}
+                para bio e stories.
+              </p>
+            </div>
+          </aside>
         </div>
 
         <div className="flex flex-col sm:flex-row items-stretch justify-center gap-3 border-t-[3px] border-black pt-8">

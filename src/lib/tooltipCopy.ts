@@ -1,33 +1,37 @@
-/** Micro-copy dos tooltips de instrução — Home e página do anúncio */
+/** Micro-copy dos tooltips — tom de UX Writer, claro e acionável */
 export const TOOLTIP_COPY = {
   title:
-    "Escreva o nome do produto de forma direta. Aparece em destaque no bloco Bento da landing page.",
+    "Título curto e objetivo. É a primeira coisa que o comprador lê no hero Bento.",
   price:
-    "Digite apenas os números. O sistema formata automaticamente em R$ BRL com letras em tamanho de destaque.",
+    "Digite só números — formatamos em R$ automaticamente. Em cobrança recorrente, exibimos '/mês'.",
   description:
-    "Detalhe o estado do produto e informações importantes. Texto claro ajuda na divulgação.",
+    "Detalhes que vendem: estado, entrega, garantia ou o que está incluso no serviço.",
   icon:
-    "Escolha um emoji que represente seu produto ou serviço — aparece grande no card Bento.",
+    "Ícone que representa seu produto ou serviço — aparece grande no hero Bento.",
   theme:
-    "Define o gradiente premium da landing page e a cor do QR Code. Escolha o visual que combina com seu anúncio.",
+    "Gradiente da landing e cor do QR Code. Escolha o visual da sua marca.",
   nativeShare:
-    "Abre a gaveta nativa de compartilhamento do seu celular (Android/iOS) com o card de texto pronto — ideal para WhatsApp, Instagram e mais.",
+    "Abre o compartilhamento nativo do celular com texto pronto — ideal para WhatsApp e redes.",
   pix:
-    "Sua chave Pix serve para gerar o pagamento direto. Ela fica salva com total privacidade apenas na URL do link.",
+    "Cole o Pix copia e cola. Fica só na URL — sem servidor, sem cadastro.",
   adType:
-    "Escolha se você vende um produto, oferece um serviço ou cria uma vaquinha. Isso ajusta os textos e o visual da página.",
+    "Define rótulos, ícone padrão e exemplos. Você pode mudar a qualquer momento.",
   billing:
-    "Valor único para compras pontuais. Recorrente adiciona '/mês' ao preço — ideal para assinaturas e serviços mensais.",
+    "Único: pagamento pontual. Recorrente: exibe '/mês' no preço.",
   phone:
-    "Seu WhatsApp aparece na página do comprador para tirar dúvidas. Só quem abrir o link verá o número.",
+    "WhatsApp ou telefone na landing. Só quem abrir o link verá o número.",
   cardLink:
-    "Cole o link do Mercado Pago, Stripe ou similar. O comprador abre direto para pagar com cartão.",
+    "Link de checkout externo. O comprador abre e paga no cartão.",
   generateAd:
-    "Processa emoji, tema e dados direto na URL — sem upload, sem cadastro, zero mídia externa.",
+    "Gera landing + link + QR Code. Tudo codificado na URL — sem upload e sem banco.",
   printPoster:
-    "Imprime um panfleto A4 com o card Bento, dados completos, telefone e QR Code com logo AnúncioLink.",
+    "Cartaz A4 com QR em destaque, título, preço e telefone — pronto para imprimir.",
   socialCard:
-    "Baixa um card idêntico à landing page com emoji, tema, telefone e QR Code — ideal para status e redes.",
+    "Card PNG idêntico à landing — ideal para status e redes sociais.",
   linkShortener:
-    "Nosso link carrega todos os dados de graça — por isso fica longo. Encurte gratuitamente no Bitly ou TinyURL para bios e redes.",
+    "Nosso link carrega tudo de graça — por isso é longo. Encurte no Bitly ou TinyURL para bios.",
+  formRequired:
+    "Campos mínimos para publicar. Com eles você já gera link e QR funcionais.",
+  formOptional:
+    "Visual e pagamento. Preencha agora ou depois — cada novo link reflete o que você enviar.",
 } as const;

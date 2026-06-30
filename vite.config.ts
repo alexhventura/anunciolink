@@ -31,10 +31,11 @@ export default defineConfig(({ mode }) => {
       target: "es2020",
       cssMinify: true,
       minify: "esbuild",
+      modulePreload: { polyfill: true },
       rollupOptions: {
         output: {
           manualChunks(id) {
-            if (id.includes("node_modules/lucide-react")) return "icons";
+            if (id.includes("node_modules/qrcode.react")) return "qrcode";
             if (id.includes("node_modules/fflate")) return "codec";
             if (id.includes("node_modules/react-dom")) return "react-dom";
             if (id.includes("node_modules/react/")) return "react";

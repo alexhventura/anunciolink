@@ -14,6 +14,9 @@ interface AdQrCodeSectionProps {
   /** Adia render para não competir com AdSense no first paint */
   deferMs?: number;
   compact?: boolean;
+  /** Estilo secundário na landing do comprador */
+  landing?: boolean;
+  headingId?: string;
 }
 
 function QrPlaceholder({ compact }: { compact?: boolean }) {
@@ -36,6 +39,8 @@ export function AdQrCodeSection({
   theme,
   deferMs = 120,
   compact = false,
+  landing = false,
+  headingId,
 }: AdQrCodeSectionProps) {
   const themeDef = resolveAdTheme(theme);
   const [ready, setReady] = useState(false);
@@ -74,17 +79,23 @@ export function AdQrCodeSection({
     }
   }, []);
 
-  const qrSize = compact ? 168 : 208;
+  const qrSize = compact || landing ? 168 : 208;
   const logoSize = Math.round(qrSize * 0.22);
 
   return (
-    <section className="ad-qr-section neo-card-white p-6 space-y-4" aria-label="QR Code do anúncio">
-      <div className="text-center space-y-1">
-        <h3 className="text-sm font-black uppercase text-zinc-900">QR Code da página</h3>
-        <p className="text-xs font-medium text-zinc-600">
-          Escaneie para abrir esta landing page — ideal para impressão e vitrine física.
+    <section
+      className={`ad-qr-section neo-card-white ${landing ? "ad-qr-section--landing" : ""}`}
+      aria-labelledby={headingId}
+      aria-label={headingId ? undefined : "QR Code do anúncio"}
+    >
+      <header className="ad-landing-section__header ad-landing-section__header--center">
+        <h2 id={headingId} className="ad-landing-section__title ad-landing-section__title--sm">
+          Compartilhar esta página
+        </h2>
+        <p className="ad-landing-section__lead ad-landing-section__lead--center">
+          QR Code para vitrine, impressão ou enviar o link por outro canal.
         </p>
-      </div>
+      </header>
 
       <div className="flex justify-center">
         {ready ? (
@@ -102,18 +113,20 @@ export function AdQrCodeSection({
         )}
       </div>
 
-      <button
-        type="button"
-        onClick={() => void handleDownload()}
-        disabled={!ready || downloading}
-        id="btn-download-qr-png"
-        className="btn-accent w-full gap-2"
-        aria-busy={downloading}
-        aria-label="Baixar QR Code em PNG"
-      >
-        <Download className="h-5 w-5 shrink-0" strokeWidth={2} aria-hidden="true" />
-        {downloading ? "Salvando…" : "Baixar QR Code (PNG)"}
-      </button>
+      <div className="ad-qr-section__actions">
+        <button
+          type="button"
+          onClick={() => void handleDownload()}
+          disabled={!ready || downloading}
+          id="btn-download-qr-png"
+          className="ad-landing-cta btn-accent w-full gap-2"
+          aria-busy={downloading}
+          aria-label="Baixar QR Code em PNG"
+        >
+          <Download className="h-5 w-5 shrink-0" strokeWidth={2} aria-hidden="true" />
+          {downloading ? "Salvando…" : "Baixar QR Code (PNG)"}
+        </button>
+      </div>
     </section>
   );
 }

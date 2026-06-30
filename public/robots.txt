@@ -1,3 +1,4 @@
+# Anuncio Link — https://www.anunciolink.com.br
 User-agent: *
 Allow: /
 Allow: /como-funciona
@@ -6,4 +7,11 @@ Allow: /privacidade
 Allow: /termos
 Allow: /a/
 
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# Anúncios em /a/* são gerados por usuários — indexáveis, fora do sitemap estático
 Sitemap: https://www.anunciolink.com.br/sitemap.xml

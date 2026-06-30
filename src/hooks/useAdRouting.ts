@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
 import type { AdData, AppView } from "../types/ad";
-import { decodeAdData } from "../lib/adCodec";
 import {
   extractPayloadFromLocation,
   isAdPathname,
@@ -8,85 +7,108 @@ import {
   navigateToHome,
   upgradeHashRouteToPath,
 } from "../lib/adRoutes";
-import { applyDocumentMetaForView } from "../lib/documentMeta";
+import { DocumentHeadService } from "../lib/documentHeadService";
+import { getBootstrapAdResult } from "../lib/bootstrappedAd";
 import {
   getInstitutionalViewFromPathname,
   isInstitutionalView,
   navigateToInstitutionalPage,
 } from "../lib/siteRoutes";
 
-function resolveRoute(): { view: AppView; ad: AdData | null; payload: string } {
+function resolveInitialRoute(): { view: AppView; ad: AdData | null } {
   if (typeof window === "undefined") {
-    return { view: "home", ad: null, payload: "" };
+    return { view: "home", ad: null };
   }
 
   upgradeHashRouteToPath();
-  const payload = extractPayloadFromLocation();
-  if (payload) {
-    const ad = decodeAdData(payload);
-    if (ad) return { view: "anuncio", ad, payload };
-    return { view: "home", ad: null, payload: "" };
+  const bootstrap = getBootstrapAdResult();
+  if (bootstrap.payload && bootstrap.ad) {
+    return { view: "anuncio", ad: bootstrap.ad };
   }
 
   const institutionalView = getInstitutionalViewFromPathname(window.location.pathname);
   if (institutionalView) {
-    return { view: institutionalView, ad: null, payload: "" };
+    return { view: institutionalView, ad: null };
   }
 
-  return { view: "home", ad: null, payload: "" };
+  return { view: "home", ad: null };
 }
 
-const initialRoute = resolveRoute();
+const initialRoute = resolveInitialRoute();
 
-function applyRouteFromLocation(): { view: AppView; ad: AdData | null; payload: string } {
+async function decodePayload(payload: string): Promise<AdData | null> {
+  const { decodeAdData } = await import("../lib/adCodec");
+  return decodeAdData(payload);
+}
+
+function applyRouteFromLocation(): { view: AppView; ad: AdData | null } {
   upgradeHashRouteToPath();
   const payload = extractPayloadFromLocation();
 
   if (payload) {
-    const data = decodeAdData(payload);
-    if (data) {
-      applyDocumentMetaForView("anuncio", data);
-      return { view: "anuncio", ad: data, payload };
+    const bootstrap = getBootstrapAdResult();
+    if (bootstrap.payload === payload && bootstrap.ad) {
+      DocumentHeadService.apply("anuncio", bootstrap.ad);
+      return { view: "anuncio", ad: bootstrap.ad };
     }
   }
 
   const institutionalView = getInstitutionalViewFromPathname(window.location.pathname);
   if (institutionalView) {
-    applyDocumentMetaForView(institutionalView, null);
-    return { view: institutionalView, ad: null, payload: "" };
+    DocumentHeadService.apply(institutionalView, null);
+    return { view: institutionalView, ad: null };
   }
 
   if (!isAdPathname(window.location.pathname)) {
-    applyDocumentMetaForView("home", null);
+    DocumentHeadService.apply("home", null);
   }
 
-  return { view: "home", ad: null, payload: "" };
+  return { view: "home", ad: null };
 }
 
 export function useAdRouting() {
   const [currentView, setCurrentView] = useState<AppView>(initialRoute.view);
-  const [adPayload, setAdPayload] = useState(initialRoute.payload);
   const [decodedAd, setDecodedAd] = useState<AdData | null>(initialRoute.ad);
 
-  const syncFromLocation = useCallback(() => {
+  const syncFromLocation = useCallback(async () => {
+    const payload = extractPayloadFromLocation();
+    if (payload) {
+      const bootstrap = getBootstrapAdResult();
+      if (bootstrap.payload === payload && bootstrap.ad) {
+        DocumentHeadService.apply("anuncio", bootstrap.ad);
+        setDecodedAd(bootstrap.ad);
+        setCurrentView("anuncio");
+        return;
+      }
+
+      const data = await decodePayload(payload);
+      if (data) {
+        DocumentHeadService.apply("anuncio", data);
+        setDecodedAd(data);
+        setCurrentView("anuncio");
+        return;
+      }
+    }
+
     const route = applyRouteFromLocation();
-    setAdPayload(route.payload);
     setDecodedAd(route.ad);
     setCurrentView(route.view);
   }, []);
 
   useEffect(() => {
     if (initialRoute.view !== "home" || initialRoute.ad) {
-      applyDocumentMetaForView(initialRoute.view, initialRoute.ad);
+      DocumentHeadService.apply(initialRoute.view, initialRoute.ad);
     }
   }, []);
 
   useEffect(() => {
-    window.addEventListener("popstate", syncFromLocation);
-    window.addEventListener("hashchange", syncFromLocation);
+    const onPopState = () => void syncFromLocation();
+    const onHashChange = () => void syncFromLocation();
+    window.addEventListener("popstate", onPopState);
+    window.addEventListener("hashchange", onHashChange);
     return () => {
-      window.removeEventListener("popstate", syncFromLocation);
-      window.removeEventListener("hashchange", syncFromLocation);
+      window.removeEventListener("popstate", onPopState);
+      window.removeEventListener("hashchange", onHashChange);
     };
   }, [syncFromLocation]);
 
@@ -96,13 +118,13 @@ export function useAdRouting() {
         const parsed = new URL(url, window.location.origin);
         if (isAdPathname(parsed.pathname)) {
           history.pushState(null, "", `${parsed.pathname}${parsed.search}`);
-          syncFromLocation();
+          void syncFromLocation();
           return;
         }
         if (parsed.hash.startsWith("#dados=")) {
           const payload = parsed.hash.substring(7);
           navigateToAdPath(payload, true);
-          syncFromLocation();
+          void syncFromLocation();
           return;
         }
         window.location.assign(url);
@@ -115,54 +137,42 @@ export function useAdRouting() {
 
   const resetToHome = useCallback(() => {
     navigateToHome(true);
-    applyDocumentMetaForView("home", null);
-    setAdPayload("");
+    DocumentHeadService.apply("home", null);
     setDecodedAd(null);
     setCurrentView("home");
   }, []);
 
   const backToEdit = useCallback(() => {
     navigateToHome(true);
-    applyDocumentMetaForView("home", null);
+    DocumentHeadService.apply("home", null);
     setCurrentView("home");
   }, []);
 
-  const goToAd = useCallback((payload: string) => {
-    navigateToAdPath(payload, true);
-    const ad = decodeAdData(payload);
-    if (ad) {
-      applyDocumentMetaForView("anuncio", ad);
-      setAdPayload(payload);
-      setDecodedAd(ad);
-      setCurrentView("anuncio");
-    }
-  }, []);
+  const navigateToPage = useCallback(
+    (view: AppView) => {
+      if (view === "anuncio" || view === "success") return;
 
-  const navigateToPage = useCallback((view: AppView) => {
-    if (view === "anuncio" || view === "success") return;
+      if (view === "home") {
+        resetToHome();
+        return;
+      }
 
-    if (view === "home") {
-      resetToHome();
-      return;
-    }
-
-    navigateToInstitutionalPage(view);
-    applyDocumentMetaForView(view, null);
-    setAdPayload("");
-    setDecodedAd(null);
-    setCurrentView(view);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [resetToHome]);
+      navigateToInstitutionalPage(view);
+      DocumentHeadService.apply(view, null);
+      setDecodedAd(null);
+      setCurrentView(view);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    },
+    [resetToHome]
+  );
 
   return {
     currentView,
     setCurrentView,
-    adPayload,
     decodedAd,
     openSavedAdUrl,
     resetToHome,
     backToEdit,
-    goToAd,
     navigateToPage,
     isInstitutionalView: isInstitutionalView(currentView),
   };

@@ -28,6 +28,18 @@ export function formatPhoneNumber(phone: string): string {
   return phone;
 }
 
+export function formatPixInput(value: string): string {
+  return value.replace(/\s+/g, "").trim();
+}
+
+/** Adiciona https:// ao colar link sem protocolo */
+export function normalizePaymentUrlInput(value: string): string {
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  return `https://${trimmed}`;
+}
+
 export function formatBRL(value: string): string {
   const digits = value.replace(/\D/g, "");
   if (!digits) return "";
@@ -55,8 +67,9 @@ export async function copyToClipboard(text: string): Promise<boolean> {
 
 export function isValidPaymentUrl(url: string): boolean {
   if (!url.trim()) return true;
+  if (/^\s*(javascript|data|vbscript|file|blob|about)\s*:/i.test(url)) return false;
   try {
-    const parsed = new URL(url);
+    const parsed = new URL(url.trim());
     return parsed.protocol === "https:" || parsed.protocol === "http:";
   } catch {
     return false;

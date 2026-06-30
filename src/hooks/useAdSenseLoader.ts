@@ -17,6 +17,20 @@ function notifyAdSenseReady() {
 function injectAdSenseScript(clientId: string): void {
   if (adsenseScriptInjected) return;
 
+  if (!document.querySelector('link[data-adsense-preconnect="true"]')) {
+    const preconnect = document.createElement("link");
+    preconnect.rel = "preconnect";
+    preconnect.href = "https://pagead2.googlesyndication.com";
+    preconnect.crossOrigin = "anonymous";
+    preconnect.setAttribute("data-adsense-preconnect", "true");
+    document.head.appendChild(preconnect);
+
+    const dnsPrefetch = document.createElement("link");
+    dnsPrefetch.rel = "dns-prefetch";
+    dnsPrefetch.href = "https://pagead2.googlesyndication.com";
+    document.head.appendChild(dnsPrefetch);
+  }
+
   const existing = document.querySelector('script[data-adsense="true"]') as HTMLScriptElement | null;
   if (existing) {
     adsenseScriptInjected = true;

@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { MessageCircle, Zap } from "lucide-react";
+import { useEffect, useId, useState } from "react";
+import { CreditCard, MessageCircle, Share2, Zap } from "lucide-react";
 import type { AdData } from "../types/ad";
 import { isAdExpired } from "../lib/adExpiry";
 import { AdSenseSlot } from "./AdSenseSlot";
@@ -22,6 +22,9 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
   const [pixCopied, setPixCopied] = useState(false);
   const [isExpired, setIsExpired] = useState(false);
   const [pageUrl, setPageUrl] = useState("");
+  const actionsHeadingId = useId();
+  const qrHeadingId = useId();
+  const promoHeadingId = useId();
 
   useEffect(() => {
     setIsExpired(isAdExpired(ad));
@@ -42,69 +45,101 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
 
   const hasPayment = Boolean(ad.pix || ad.cardLink);
   const safeCardLink = ad.cardLink;
+  const showActions = !isExpired && (hasPayment || ad.phone);
 
   return (
     <ViewEnter
       as="article"
-      className="max-w-xl mx-auto pb-8"
+      className="ad-landing-page mx-auto w-full max-w-2xl px-4 sm:px-6 pb-10 sm:pb-14"
       itemScope
       itemType="https://schema.org/Product"
     >
-      <AdBrandedSurface variant="create" contentClassName="space-y-6">
+      {showActions && (
+        <a
+          href="#landing-actions"
+          className="ad-landing-skip sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-4 focus:left-4 focus:rounded-lg focus:border-2 focus:border-black focus:bg-amber-400 focus:px-4 focus:py-2 focus:text-sm focus:font-bold"
+        >
+          Ir para pagamento e contato
+        </a>
+      )}
+
+      <AdBrandedSurface variant="create" contentClassName="ad-landing-page__content">
         <AdSenseSlot slot="topo" ready={adsenseReady} />
 
         {isExpired && <AdExpiredBanner />}
 
-        <AdPreviewCard
-          adType={ad.t}
-          title={ad.title}
-          price={ad.price}
-          description={ad.desc}
-          icon={ad.icon}
-          theme={ad.theme}
-          billingType={ad.billingType}
-          showSecurityBadge
-          premium
-          className={isExpired ? "opacity-95" : ""}
-        />
-
-        {!isExpired && pageUrl && (
-          <AdQrCodeSection url={pageUrl} theme={ad.theme} deferMs={180} />
-        )}
+        <section className="ad-landing-page__hero" aria-label="Resumo do anúncio">
+          <AdPreviewCard
+            adType={ad.t}
+            title={ad.title}
+            price={ad.price}
+            description={ad.desc}
+            icon={ad.icon}
+            theme={ad.theme}
+            billingType={ad.billingType}
+            showSecurityBadge
+            premium
+            landing
+            className={isExpired ? "opacity-95" : ""}
+          />
+        </section>
 
         {isExpired ? (
-          <div className="view-enter-delayed">
+          <div className="ad-landing-page__cta-stack view-enter-delayed">
             <button
               type="button"
               onClick={onCreateOwn}
               id="btn-buyer-expired-cta"
-              className="btn-primary w-full !min-h-[72px] !text-base gap-3"
+              className="ad-landing-cta ad-landing-cta--primary btn-primary w-full"
               aria-label="Criar meu anúncio grátis no AnúncioLink"
             >
               <Zap className="h-6 w-6 shrink-0 fill-amber-500 stroke-black" strokeWidth={2.5} aria-hidden="true" />
-              <span className="text-left">
-                <span className="block text-xs font-bold uppercase opacity-80">
-                  Quer vender algo rápido assim também?
-                </span>
-                <span className="block font-black">Criar minha Landing Page Grátis</span>
+              <span className="ad-landing-cta__copy">
+                <span className="ad-landing-cta__eyebrow">Quer vender algo rápido assim também?</span>
+                <span className="ad-landing-cta__label">Criar minha landing page grátis</span>
               </span>
+            </button>
+            <button
+              type="button"
+              disabled
+              id="btn-buyer-ad-closed"
+              className="btn-ad-closed w-full"
+              aria-disabled="true"
+              aria-label="Anúncio encerrado"
+            >
+              Anúncio encerrado
             </button>
           </div>
         ) : (
-          (hasPayment || ad.phone) && (
-            <section className="neo-card-white p-6 md:p-8 space-y-4" aria-label="Pagamento e contato do vendedor">
-              <div className="flex justify-center">
-                <SecurityBadge compact />
-              </div>
+          <>
+            {showActions && (
+              <section
+                id="landing-actions"
+                className="ad-landing-page__actions neo-card-white"
+                aria-labelledby={actionsHeadingId}
+              >
+                <header className="ad-landing-section__header">
+                  <h2 id={actionsHeadingId} className="ad-landing-section__title">
+                    Pagamento e contato
+                  </h2>
+                  <p className="ad-landing-section__lead">
+                    {hasPayment && ad.phone
+                      ? "Pague agora ou fale direto com quem publicou."
+                      : hasPayment
+                        ? "Escolha como pagar abaixo."
+                        : "Tire dúvidas com quem publicou o anúncio."}
+                  </p>
+                  <SecurityBadge compact className="mt-3" />
+                </header>
 
-              {hasPayment && (
-                <div className="space-y-4">
+                <div className="ad-landing-page__cta-stack">
                   {ad.pix && (
                     <PixPaymentSection
                       pixCode={ad.pix}
                       copied={pixCopied}
                       onCopy={handleCopyPix}
                       layout={safeCardLink ? "split" : "full"}
+                      primary
                     />
                   )}
 
@@ -114,64 +149,70 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
                       target="_blank"
                       rel="noopener noreferrer"
                       id={ad.pix ? "link-buyer-card-split" : "link-buyer-card-full"}
-                      className="btn-payment-card w-full"
-                      aria-label="Pagar com cartão em site externo do vendedor"
+                      className={`ad-landing-cta ad-landing-cta--card btn-payment-card w-full ${ad.pix ? "ad-landing-cta--secondary" : ""}`}
+                      aria-label="Pagar com cartão em site externo do vendedor — abre em nova aba"
                     >
+                      <CreditCard className="h-5 w-5 shrink-0" strokeWidth={2.25} aria-hidden="true" />
                       Pagar com cartão
                     </a>
                   )}
+
+                  {ad.phone && (
+                    <a
+                      href={`https://wa.me/${ad.phone}?text=${encodeURIComponent(
+                        `Olá! Vi seu anúncio "${ad.title}" no AnúncioLink. Gostaria de combinar a compra.`
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      id="btn-wa-buyer-contact"
+                      className={`ad-landing-cta btn-whatsapp w-full ${hasPayment ? "ad-landing-cta--secondary" : "ad-landing-cta--primary"}`}
+                      aria-label="Conversar com o vendedor via WhatsApp — abre em nova aba"
+                    >
+                      <MessageCircle className="h-5 w-5 shrink-0" strokeWidth={2.5} aria-hidden="true" />
+                      <span className="ad-landing-cta__label">Falar no WhatsApp</span>
+                    </a>
+                  )}
                 </div>
-              )}
 
-              {ad.phone && (
-                <a
-                  href={`https://wa.me/${ad.phone}?text=${encodeURIComponent(
-                    `Olá! Vi seu anúncio "${ad.title}" no AnúncioLink. Gostaria de combinar a compra.`
-                  )}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  id="btn-wa-buyer-contact"
-                  className="btn-whatsapp"
-                  aria-label="Conversar com o vendedor via WhatsApp em nova aba"
-                >
-                  <MessageCircle className="h-5 w-5 shrink-0" strokeWidth={2.5} aria-hidden="true" />
-                  Conversar com o Vendedor via WhatsApp
-                </a>
-              )}
+                {hasPayment && (
+                  <p className="ad-landing-page__trust-note" role="note">
+                    Pagamento direto ao vendedor · link seguro, sem intermediário
+                  </p>
+                )}
+              </section>
+            )}
 
-              {hasPayment && (
-                <p className="text-[11px] font-semibold text-zinc-600 text-center">
-                  Pagamento direto ao vendedor · dados criptografados no link
-                </p>
-              )}
-            </section>
-          )
-        )}
-
-        {isExpired && (
-          <button
-            type="button"
-            disabled
-            id="btn-buyer-ad-closed"
-            className="btn-ad-closed w-full"
-            aria-disabled="true"
-            aria-label="Anúncio encerrado"
-          >
-            Anúncio Encerrado
-          </button>
+            {pageUrl && (
+              <AdQrCodeSection
+                url={pageUrl}
+                theme={ad.theme}
+                deferMs={180}
+                landing
+                headingId={qrHeadingId}
+              />
+            )}
+          </>
         )}
 
         <AdSenseSlot slot="rodape" ready={adsenseReady} />
 
         {!isExpired && (
-          <aside className="neo-card-muted text-center space-y-3 p-6 no-print">
-            <h3 className="text-sm font-black uppercase text-black">Anuncie em segundos</h3>
-            <p className="text-xs font-medium text-zinc-700 max-w-xs mx-auto">Grátis, sem cadastro.</p>
+          <aside
+            className="ad-landing-page__promo neo-card-muted no-print"
+            aria-labelledby={promoHeadingId}
+          >
+            <Share2 className="ad-landing-page__promo-icon h-5 w-5" strokeWidth={2.25} aria-hidden="true" />
+            <h2 id={promoHeadingId} className="ad-landing-section__title ad-landing-section__title--sm">
+              Quer vender assim também?
+            </h2>
+            <p className="ad-landing-section__lead ad-landing-section__lead--center">
+              Crie sua landing page grátis em segundos — sem cadastro.
+            </p>
             <button
               type="button"
               onClick={onCreateOwn}
               id="btn-buyer-create-own-ad"
-              className="btn-ghost"
+              className="ad-landing-cta btn-ghost w-full sm:w-auto sm:min-w-[220px]"
               aria-label="Criar minha landing page grátis"
             >
               Criar minha página

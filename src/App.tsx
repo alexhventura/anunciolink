@@ -1,22 +1,25 @@
-import { Suspense, lazy, useCallback, useState } from "react";
+import { Suspense, lazy, useCallback, useEffect, useState } from "react";
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
-import { HomeView } from "./components/HomeView";
-import { SuccessView } from "./components/SuccessView";
-import { AdViewPage } from "./components/AdViewPage";
 import { useAdRouting } from "./hooks/useAdRouting";
 import { useAdForm } from "./hooks/useAdForm";
 import { useDocumentMeta } from "./hooks/useDocumentMeta";
 import { useAdSenseLoader } from "./hooks/useAdSenseLoader";
 import { useAdHistory } from "./hooks/useAdHistory";
-import {
-  AdCodecError,
-  buildAdUrl,
-  encodeAdData,
-  fitAdToUrlLength,
-} from "./lib/adCodec";
 import { saveAdToHistory } from "./lib/adHistory";
+import { focusMainContent } from "./lib/focusMainContent";
+import { AdBuilder } from "./lib/adBuilder";
+import { AdCodecError } from "./lib/adCodec";
 
+const HomeView = lazy(() =>
+  import("./components/HomeView").then((m) => ({ default: m.HomeView }))
+);
+const SuccessView = lazy(() =>
+  import("./components/SuccessView").then((m) => ({ default: m.SuccessView }))
+);
+const AdViewPage = lazy(() =>
+  import("./components/AdViewPage").then((m) => ({ default: m.AdViewPage }))
+);
 const HowItWorksPage = lazy(() =>
   import("./components/pages/HowItWorksPage").then((m) => ({ default: m.HowItWorksPage }))
 );
@@ -33,7 +36,7 @@ const TermsPage = lazy(() =>
 function PageFallback() {
   return (
     <div className="neo-card-white p-10 text-center" role="status" aria-live="polite">
-      <p className="text-sm font-bold text-zinc-700">Carregando…</p>
+      <p className="text-sm font-bold text-zinc-700">Carregando página…</p>
     </div>
   );
 }
@@ -49,7 +52,7 @@ export default function App() {
     navigateToPage,
     isInstitutionalView,
   } = useAdRouting();
-  const { state: form, setField, setSubmitError, reset: resetForm, toAdData } = useAdForm();
+  const { state: form, setField, setSubmitError, reset: resetForm } = useAdForm();
   const { refresh: refreshHistory } = useAdHistory();
   const [generatedLink, setGeneratedLink] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -62,6 +65,10 @@ export default function App() {
   const themeClass = "theme-create";
 
   useDocumentMeta(decodedAd, currentView);
+
+  useEffect(() => {
+    focusMainContent();
+  }, [currentView]);
 
   const handleResetHome = useCallback(() => {
     resetForm();
@@ -76,19 +83,16 @@ export default function App() {
     setTextOptimizedWarning(false);
 
     try {
-      const rawAd = toAdData();
-      const { ad: adObject, hash: hashResult, textOptimized } =
-        await fitAdToUrlLength(rawAd, encodeAdData);
+      const { ad: adObject, hash: hashResult, textOptimized, url: finalLink } =
+        await AdBuilder.build(form);
 
-      const finalLink = buildAdUrl(hashResult);
-
-      saveAdToHistory({
+      const saved = saveAdToHistory({
         title: adObject.title,
         price: adObject.price,
         url: finalLink,
         type: adObject.t,
       });
-      refreshHistory();
+      if (saved) refreshHistory();
 
       setGeneratedLink(finalLink);
       setTextOptimizedWarning(textOptimized);
@@ -97,12 +101,14 @@ export default function App() {
       const message =
         err instanceof AdCodecError
           ? err.message
-          : "Não foi possível gerar o anúncio. Tente reduzir o texto.";
+          : err instanceof Error
+            ? err.message
+            : "Não foi possível gerar o anúncio. Tente reduzir o texto.";
       setSubmitError(message);
     } finally {
       setIsSubmitting(false);
     }
-  }, [toAdData, setSubmitError, setCurrentView, refreshHistory]);
+  }, [form, setSubmitError, setCurrentView, refreshHistory]);
 
   return (
     <div className={`min-h-screen font-sans antialiased ${themeClass}`}>
@@ -118,30 +124,36 @@ export default function App() {
       >
         <div key={currentView}>
           {currentView === "home" && (
-            <HomeView
-              form={form}
-              isSubmitting={isSubmitting}
-              adsenseReady={adsenseReady}
-              onFieldChange={setField}
-              onSubmitError={setSubmitError}
-              onSubmit={handleGenerate}
-              onOpenSavedAd={openSavedAdUrl}
-            />
+            <Suspense fallback={<PageFallback />}>
+              <HomeView
+                form={form}
+                isSubmitting={isSubmitting}
+                adsenseReady={adsenseReady}
+                onFieldChange={setField}
+                onSubmitError={setSubmitError}
+                onSubmit={handleGenerate}
+                onOpenSavedAd={openSavedAdUrl}
+              />
+            </Suspense>
           )}
 
           {currentView === "success" && (
-            <SuccessView
-              form={form}
-              generatedLink={generatedLink}
-              adsenseReady={adsenseReady}
-              textOptimizedWarning={textOptimizedWarning}
-              onBackToEdit={backToEdit}
-              onResetHome={handleResetHome}
-            />
+            <Suspense fallback={<PageFallback />}>
+              <SuccessView
+                form={form}
+                generatedLink={generatedLink}
+                adsenseReady={adsenseReady}
+                textOptimizedWarning={textOptimizedWarning}
+                onBackToEdit={backToEdit}
+                onResetHome={handleResetHome}
+              />
+            </Suspense>
           )}
 
           {currentView === "anuncio" && decodedAd && (
-            <AdViewPage ad={decodedAd} adsenseReady={adsenseReady} onCreateOwn={handleResetHome} />
+            <Suspense fallback={<PageFallback />}>
+              <AdViewPage ad={decodedAd} adsenseReady={adsenseReady} onCreateOwn={handleResetHome} />
+            </Suspense>
           )}
 
           {currentView === "como-funciona" && (

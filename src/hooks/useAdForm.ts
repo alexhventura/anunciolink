@@ -1,7 +1,8 @@
 import { useCallback, useReducer } from "react";
 import type { AdData, AdType, AdThemeId, BillingType } from "../types/ad";
 import { computeExpiresAt } from "../lib/adExpiry";
-import { ALL_AD_ICONS, DEFAULT_AD_ICON, resolveAdIcon } from "../lib/adIcons";
+import type { AdIconId } from "../lib/adIcons";
+import { DEFAULT_AD_ICON_ID, isValidAdIconId, resolveAdIconId } from "../lib/adIcons";
 import { DEFAULT_AD_THEME } from "../lib/adThemes";
 import { sanitizePhone } from "../lib/formatters";
 import { sanitizeAdData } from "../lib/sanitizeAd";
@@ -15,7 +16,7 @@ export interface AdFormState {
   phone: string;
   pix: string;
   cardLink: string;
-  icon: string;
+  icon: AdIconId;
   theme: AdThemeId;
   submitError: string | null;
 }
@@ -34,7 +35,7 @@ const initialState: AdFormState = {
   phone: "",
   pix: "",
   cardLink: "",
-  icon: DEFAULT_AD_ICON.venda,
+  icon: DEFAULT_AD_ICON_ID.venda,
   theme: DEFAULT_AD_THEME,
   submitError: null,
 };
@@ -45,8 +46,8 @@ function adFormReducer(state: AdFormState, action: AdFormAction): AdFormState {
       const next = { ...state, [action.field]: action.value };
       if (action.field === "adType" && typeof action.value === "string") {
         const adType = action.value as AdType;
-        if (!ALL_AD_ICONS.includes(next.icon) || next.icon === DEFAULT_AD_ICON[state.adType]) {
-          next.icon = DEFAULT_AD_ICON[adType];
+        if (!isValidAdIconId(next.icon) || next.icon === DEFAULT_AD_ICON_ID[state.adType]) {
+          next.icon = DEFAULT_AD_ICON_ID[adType];
         }
       }
       return next;
@@ -86,7 +87,7 @@ export function useAdForm() {
       phone: state.phone.trim() ? sanitizePhone(state.phone) : "",
       pix: state.pix.trim() || undefined,
       cardLink: state.cardLink.trim() || undefined,
-      icon: resolveAdIcon(state.icon, state.adType),
+      icon: resolveAdIconId(state.icon, state.adType),
       theme: state.theme,
       timestamp: now,
       expiresAt: computeExpiresAt(now),

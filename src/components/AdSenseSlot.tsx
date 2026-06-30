@@ -11,6 +11,7 @@ interface AdSenseSlotProps {
 export function AdSenseSlot({ slot, ready }: AdSenseSlotProps) {
   const pushedRef = useRef(false);
   const insRef = useRef<HTMLElement | null>(null);
+  const asideRef = useRef<HTMLElement | null>(null);
   const config = ADSENSE_SLOTS[slot];
   const hasRealSlot = Boolean(ADSENSE_CLIENT && config.slotId);
 
@@ -25,12 +26,37 @@ export function AdSenseSlot({ slot, ready }: AdSenseSlotProps) {
   }, [slot, hasRealSlot]);
 
   useEffect(() => {
-    tryPush();
+    if (!ready || !hasRealSlot || !asideRef.current) return;
+
+    const aside = asideRef.current;
+
+    if (typeof IntersectionObserver === "undefined") {
+      tryPush();
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          observer.disconnect();
+          if (typeof requestIdleCallback !== "undefined") {
+            requestIdleCallback(() => tryPush());
+          } else {
+            window.setTimeout(tryPush, 0);
+          }
+        }
+      },
+      { rootMargin: "120px 0px", threshold: 0.01 }
+    );
+
+    observer.observe(aside);
+    return () => observer.disconnect();
   }, [ready, hasRealSlot]);
 
   return (
     <aside
-      className={`adsense-slot adsense-slot--${slot} w-full overflow-hidden`}
+      ref={asideRef}
+      className={`adsense-slot adsense-slot--${slot} no-print w-full overflow-hidden`}
       aria-label={`Espaço reservado para anúncio (${config.label})`}
       data-ad-slot={slot}
     >

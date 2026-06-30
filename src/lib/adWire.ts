@@ -1,8 +1,9 @@
 import type { AdData, AdType, AdThemeId, BillingType, CropTransform } from "../types/ad";
+import { decodeIconFromWire, iconIdForWire } from "./adIcons";
 import { isValidAdTheme } from "./adThemes";
 import { computeExpiresAt } from "./adExpiry";
 import { DEFAULT_CROP, isDefaultCrop } from "./imageCrop";
-import { expandImageFromWire, stripImageForWire } from "./imageUtils";
+import { expandImageFromWire } from "./imageUtils";
 
 /** Payload compacto na URL — chaves mínimas para reduzir bytes antes do deflate */
 export interface CompactAdWire {
@@ -16,8 +17,8 @@ export interface CompactAdWire {
   c?: string;
   /** w:webp ou j:jpeg + base64 sem prefixo data: (legado) */
   i?: string;
-  /** emoji do produto */
-  e?: string;
+  /** ID do ícone Lucide (0–119) */
+  e?: number;
   /** tema visual */
   th?: string;
   cz?: number;
@@ -57,11 +58,10 @@ export function toCompactWire(ad: AdData): CompactAdWire {
   if (ad.phone) wire.ph = ad.phone;
   if (ad.pix) wire.x = ad.pix;
   if (ad.cardLink) wire.c = ad.cardLink;
-  if (ad.icon) wire.e = ad.icon;
+  const wireIcon = iconIdForWire(ad.icon, ad.t);
+  if (wireIcon !== undefined) wire.e = wireIcon;
   if (ad.theme && ad.theme !== "amber") wire.th = ad.theme;
-  if (ad.img) wire.i = stripImageForWire(ad.img);
-  const cropFields = ad.crop ? encodeCrop(ad.crop) : undefined;
-  if (cropFields) Object.assign(wire, cropFields);
+  /** Encode de imagem/crop removido — decode legado preservado em fromCompactWire */
   if (ad.expiresAt) wire.ex = ad.expiresAt;
   return wire;
 }
@@ -76,7 +76,7 @@ export function fromCompactWire(wire: CompactAdWire): AdData {
     phone: wire.ph ?? "",
     pix: wire.x,
     cardLink: wire.c,
-    icon: wire.e,
+    icon: decodeIconFromWire(wire.e),
     theme: wire.th && isValidAdTheme(wire.th) ? (wire.th as AdThemeId) : undefined,
     img: wire.i ? expandImageFromWire(wire.i) : undefined,
     crop: decodeCrop(wire),
@@ -114,7 +114,10 @@ export function normalizeLegacyAd(parsed: Record<string, unknown>): AdData | nul
     pix: legacy.pix,
     cardLink: legacy.cardLink,
     img: legacy.img,
-    icon: typeof legacy.icon === "string" ? legacy.icon : undefined,
+    icon:
+      typeof legacy.icon === "number"
+        ? decodeIconFromWire(legacy.icon)
+        : decodeIconFromWire(legacy.icon as unknown),
     theme:
       typeof legacy.theme === "string" && isValidAdTheme(legacy.theme)
         ? legacy.theme

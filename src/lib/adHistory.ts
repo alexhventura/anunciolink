@@ -23,15 +23,29 @@ function readAll(): SavedAdEntry[] {
   }
 }
 
-function writeAll(entries: SavedAdEntry[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(entries.slice(0, MAX_ENTRIES)));
+function writeAll(entries: SavedAdEntry[]): boolean {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries.slice(0, MAX_ENTRIES)));
+    return true;
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "QuotaExceededError") {
+      try {
+        const trimmed = entries.slice(0, Math.max(5, Math.floor(MAX_ENTRIES / 2)));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed));
+        return true;
+      } catch {
+        return false;
+      }
+    }
+    return false;
+  }
 }
 
 export function listSavedAds(): SavedAdEntry[] {
   return readAll().sort((a, b) => b.createdAt - a.createdAt);
 }
 
-export function saveAdToHistory(entry: Omit<SavedAdEntry, "id" | "createdAt">): SavedAdEntry {
+export function saveAdToHistory(entry: Omit<SavedAdEntry, "id" | "createdAt">): SavedAdEntry | null {
   const items = readAll();
   const duplicate = items.find((item) => item.url === entry.url);
   if (duplicate) {
@@ -39,7 +53,7 @@ export function saveAdToHistory(entry: Omit<SavedAdEntry, "id" | "createdAt">): 
     duplicate.price = entry.price;
     duplicate.type = entry.type;
     duplicate.createdAt = Date.now();
-    writeAll(items);
+    if (!writeAll(items)) return null;
     return duplicate;
   }
 
@@ -48,7 +62,7 @@ export function saveAdToHistory(entry: Omit<SavedAdEntry, "id" | "createdAt">): 
     createdAt: Date.now(),
     ...entry,
   };
-  writeAll([newEntry, ...items]);
+  if (!writeAll([newEntry, ...items])) return null;
   return newEntry;
 }
 
@@ -57,5 +71,9 @@ export function deleteSavedAd(id: string): void {
 }
 
 export function clearSavedAds(): void {
-  localStorage.removeItem(STORAGE_KEY);
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    /* quota ou modo privado */
+  }
 }

@@ -1,20 +1,4 @@
-/** Helpers legados para wire de imagem embutida (anúncios antigos) */
-
-const ALLOWED_IMAGE_MIME = new Set([
-  "image/jpeg",
-  "image/jpg",
-  "image/png",
-  "image/webp",
-  "image/gif",
-  "image/bmp",
-  "image/heic",
-  "image/heif",
-]);
-
-export function isAllowedImageFile(file: File): boolean {
-  if (file.type && ALLOWED_IMAGE_MIME.has(file.type.toLowerCase())) return true;
-  return /\.(jpe?g|png|webp|gif|bmp|heic|heif)$/i.test(file.name);
-}
+/** Helpers para wire de imagem embutida (anúncios legados) */
 
 export function isEmbeddedImageData(value: string): boolean {
   if (!value?.trim()) return false;

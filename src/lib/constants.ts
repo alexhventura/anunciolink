@@ -2,7 +2,6 @@ export const SITE_NAME = "Anuncio Link";
 export const SITE_DOMAIN = "www.anunciolink.com.br";
 export const SITE_URL = `https://${SITE_DOMAIN}`;
 
-export const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 export const MAX_TITLE_LENGTH = 100;
 export const MAX_DESC_LENGTH = 1000;
 export const MAX_PIX_LENGTH = 500;

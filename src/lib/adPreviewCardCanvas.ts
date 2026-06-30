@@ -1,5 +1,7 @@
 import type { AdType, AdThemeId } from "../types/ad";
-import { resolveAdIcon } from "./adIcons";
+import type { AdIconId } from "./adIcons";
+import { resolveAdIconId } from "./adIcons";
+import { drawAdIconOnCanvas } from "./adIconCanvas";
 import { resolveAdTheme, type AdThemeDefinition } from "./adThemes";
 import { formatPhoneNumber } from "./formatters";
 
@@ -34,7 +36,7 @@ export interface PreviewCardCanvasInput {
   title: string;
   price: string;
   description: string;
-  icon?: string;
+  icon?: AdIconId;
   theme?: AdThemeId;
   billingRecorrente?: boolean;
   phone?: string;
@@ -90,7 +92,7 @@ function wrapParagraph(
   return cy;
 }
 
-function drawBentoHero(
+async function drawBentoHero(
   ctx: CanvasRenderingContext2D,
   x: number,
   y: number,
@@ -98,7 +100,7 @@ function drawBentoHero(
   h: number,
   theme: AdThemeDefinition,
   themeId: AdThemeId,
-  emoji: string,
+  iconId: AdIconId,
   title: string,
   priceLabel: string
 ) {
@@ -112,13 +114,11 @@ function drawBentoHero(
   ctx.lineWidth = 3;
   ctx.strokeRect(x + 1.5, y + 1.5, w - 3, h - 3);
 
-  ctx.font = `${Math.round(w * 0.2)}px "Apple Color Emoji", "Segoe UI Emoji", sans-serif`;
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText(emoji, x + w / 2, y + h * 0.38);
+  const iconSize = Math.round(w * 0.22);
+  const iconColor = THEME_HERO_TEXT[themeId];
+  await drawAdIconOnCanvas(ctx, iconId, x + w / 2, y + h * 0.38, iconSize, iconColor);
 
-  const textColor = THEME_HERO_TEXT[themeId];
-  ctx.fillStyle = textColor;
+  ctx.fillStyle = iconColor;
   ctx.font = "900 28px system-ui, sans-serif";
   ctx.textBaseline = "top";
   wrapParagraph(ctx, title || "Título", x + 24, y + h * 0.58, w - 48, 34, 2);
@@ -137,7 +137,7 @@ export async function renderPreviewCardCanvas(input: PreviewCardCanvasInput): Pr
 
   const themeId = input.theme ?? "amber";
   const themeDef = resolveAdTheme(themeId);
-  const emoji = resolveAdIcon(input.icon, input.adType);
+  const iconId = resolveAdIconId(input.icon, input.adType);
   const priceLabel = input.price + (input.billingRecorrente ? " /mês" : "");
   const typeLabel = TYPE_LABEL[input.adType].toUpperCase();
   const phoneDisplay = input.phone ? formatPhoneNumber(input.phone) : "";
@@ -179,7 +179,7 @@ export async function renderPreviewCardCanvas(input: PreviewCardCanvasInput): Pr
   ctx.lineWidth = 3;
   ctx.strokeRect(cardX, y, cardW, cardH);
 
-  drawBentoHero(ctx, cardX, y, cardW, heroH, themeDef, themeId, emoji, input.title, priceLabel);
+  await drawBentoHero(ctx, cardX, y, cardW, heroH, themeDef, themeId, iconId, input.title, priceLabel);
 
   y += heroH;
   ctx.fillStyle = AMBER_500;

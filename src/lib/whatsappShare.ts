@@ -1,7 +1,5 @@
 import { sanitizePlainText } from "./sanitize";
 
-export const DEFAULT_OG_IMAGE_PATH = "/og-default.jpg";
-
 /** Garante prefixo único R$ para exibição na mensagem */
 export function formatPriceForShare(price: string): string {
   const trimmed = price.trim();
@@ -19,8 +17,8 @@ export function shortenDescriptionForShare(description: string, maxLen = 280): s
 }
 
 /**
- * Card de texto para compartilhar no WhatsApp.
- * O visual completo fica na página do link.
+ * Card de texto para compartilhar no WhatsApp e apps compatíveis.
+ * O visual completo fica na landing page do link.
  */
 export function buildWhatsAppShareMessage(
   title: string,
@@ -33,11 +31,10 @@ export function buildWhatsAppShareMessage(
   const safeDesc = shortenDescriptionForShare(sanitizePlainText(description, 500));
 
   return (
-    `🛍️ *NOVO ANÚNCIO NO ANÚNCIOLINK*\n\n` +
-    `📦 *${safeTitle}*\n` +
-    `💰 *Preço:* ${safePrice}\n` +
-    `📝 *Descrição:* ${safeDesc}\n\n` +
-    `🔗 _Acesse o link para ver o card completo e pagar:_\n` +
+    `🛍️ *${safeTitle}*\n` +
+    `💰 ${safePrice}\n` +
+    `📝 ${safeDesc}\n\n` +
+    `🔗 Ver landing page e pagar:\n` +
     `${adUrl}`
   );
 }

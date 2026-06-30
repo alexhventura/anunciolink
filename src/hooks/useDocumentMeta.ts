@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import type { AdData, AppView } from "../types/ad";
-import { applyDocumentMetaForView } from "../lib/documentMeta";
+import { DocumentHeadService } from "../lib/documentHeadService";
 
 /** Mantém <head> sincronizado quando a view React muda */
 export function useDocumentMeta(ad: AdData | null, currentView: AppView) {
   useEffect(() => {
-    applyDocumentMetaForView(currentView, ad);
+    DocumentHeadService.apply(currentView, ad);
   }, [ad, currentView]);
 }

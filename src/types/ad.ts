@@ -1,3 +1,5 @@
+import type { AdIconId } from "../lib/adIcons";
+
 export type AdType = "venda" | "servico" | "vaquinha";
 export type BillingType = "unico" | "recorrente";
 export type AdThemeId = "amber" | "midnight" | "sunset" | "purple" | "minimal";
@@ -26,8 +28,8 @@ export interface AdData {
   phone: string;
   pix?: string;
   cardLink?: string;
-  /** Emoji do produto/serviço */
-  icon?: string;
+  /** ID compacto do ícone Lucide (catálogo adIcons) */
+  icon?: AdIconId;
   /** Tema visual Bento */
   theme?: AdThemeId;
   /** Legado — ignorado em novos anúncios */
@@ -35,9 +37,4 @@ export interface AdData {
   crop?: CropTransform;
   timestamp: number;
   expiresAt?: number;
-}
-
-export interface ImageUploadError {
-  code: "INVALID_TYPE" | "FILE_TOO_LARGE" | "READ_FAILED" | "COMPRESS_FAILED";
-  message: string;
 }

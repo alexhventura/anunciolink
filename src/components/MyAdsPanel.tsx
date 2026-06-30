@@ -52,10 +52,25 @@ export function MyAdsPanel({ onOpenAd }: MyAdsPanelProps) {
             </div>
 
             <div className="flex shrink-0 gap-2">
-              <button type="button" onClick={() => handleCopy(entry)} className="btn-accent text-xs !py-2" aria-live="polite">
+              <button
+                type="button"
+                onClick={() => handleCopy(entry)}
+                className="btn-accent text-xs !py-2"
+                aria-live="polite"
+                aria-label={
+                  copiedId === entry.id
+                    ? `Link de ${entry.title} copiado`
+                    : `Copiar link do anúncio ${entry.title}`
+                }
+              >
                 {copiedId === entry.id ? "Copiado" : "Copiar"}
               </button>
-              <button type="button" onClick={() => onOpenAd(entry.url)} className="btn-ghost text-xs !py-2">
+              <button
+                type="button"
+                onClick={() => onOpenAd(entry.url)}
+                className="btn-ghost text-xs !py-2"
+                aria-label={`Abrir anúncio ${entry.title}`}
+              >
                 Abrir
               </button>
               <button

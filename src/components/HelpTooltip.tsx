@@ -5,6 +5,7 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type KeyboardEvent,
   type MouseEvent,
   type PointerEvent,
   type ReactNode,
@@ -15,6 +16,8 @@ interface HelpTooltipProps {
   text: string;
   placement?: "top" | "bottom";
   variant?: "default" | "on-dark";
+  /** Rótulo acessível do botão — contextual para leitores de tela */
+  triggerLabel?: string;
 }
 
 const VIEWPORT_PAD = 12;
@@ -28,7 +31,12 @@ function clampBubbleLeft(centerX: number, bubbleWidth: number): number {
   return Math.max(min, Math.min(max, centerX));
 }
 
-export function HelpTooltip({ text, placement = "top", variant = "default" }: HelpTooltipProps) {
+export function HelpTooltip({
+  text,
+  placement = "top",
+  variant = "default",
+  triggerLabel = "Informação adicional",
+}: HelpTooltipProps) {
   const [open, setOpen] = useState(false);
   const [bubbleStyle, setBubbleStyle] = useState<CSSProperties>({});
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -97,6 +105,14 @@ export function HelpTooltip({ text, placement = "top", variant = "default" }: He
     setOpen((v) => !v);
   };
 
+  const handleKeyDown = (e: KeyboardEvent<HTMLButtonElement>) => {
+    if (e.key === "Escape" && open) {
+      e.preventDefault();
+      setOpen(false);
+      triggerRef.current?.focus();
+    }
+  };
+
   const bubbleClass =
     variant === "on-dark" ? "help-tooltip__bubble help-tooltip__bubble--on-dark" : "help-tooltip__bubble";
 
@@ -106,12 +122,18 @@ export function HelpTooltip({ text, placement = "top", variant = "default" }: He
         ref={triggerRef}
         type="button"
         className={`help-tooltip__trigger ${variant === "on-dark" ? "help-tooltip__trigger--on-dark" : ""}`}
-        aria-label="Ver instrução"
+        aria-label={triggerLabel}
         aria-describedby={open ? tooltipId : undefined}
+        aria-controls={tooltipId}
         aria-expanded={open}
         onPointerDown={(e) => e.stopPropagation()}
         onClick={toggle}
-        onBlur={() => setOpen(false)}
+        onKeyDown={handleKeyDown}
+        onBlur={(e) => {
+          if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
+            setOpen(false);
+          }
+        }}
       >
         <span aria-hidden="true">!</span>
       </button>
@@ -136,6 +158,7 @@ export function HelpTooltip({ text, placement = "top", variant = "default" }: He
 interface FieldLabelWithHintProps {
   htmlFor?: string;
   hint: string;
+  fieldLabel?: string;
   className?: string;
   labelClassName?: string;
   children: ReactNode;
@@ -144,10 +167,13 @@ interface FieldLabelWithHintProps {
 export function FieldLabelWithHint({
   htmlFor,
   hint,
+  fieldLabel,
   className = "",
   labelClassName = "label-field mb-0",
   children,
 }: FieldLabelWithHintProps) {
+  const triggerLabel = fieldLabel ? `Ajuda: ${fieldLabel}` : "Informação adicional sobre este campo";
+
   return (
     <span className={`inline-flex items-center gap-1.5 flex-wrap ${className}`}>
       {htmlFor ? (
@@ -157,21 +183,24 @@ export function FieldLabelWithHint({
       ) : (
         <span className={labelClassName}>{children}</span>
       )}
-      <HelpTooltip text={hint} placement="top" />
+      <HelpTooltip text={hint} placement="top" triggerLabel={triggerLabel} />
     </span>
   );
 }
 
 interface FieldLegendWithHintProps {
   hint: string;
+  fieldLabel?: string;
   children: ReactNode;
 }
 
-export function FieldLegendWithHint({ hint, children }: FieldLegendWithHintProps) {
+export function FieldLegendWithHint({ hint, fieldLabel, children }: FieldLegendWithHintProps) {
+  const triggerLabel = fieldLabel ? `Ajuda: ${fieldLabel}` : "Informação adicional sobre este campo";
+
   return (
     <legend className="label-field inline-flex items-center gap-1.5 flex-wrap w-full mb-0">
       {children}
-      <HelpTooltip text={hint} placement="top" />
+      <HelpTooltip text={hint} placement="top" triggerLabel={triggerLabel} />
     </legend>
   );
 }
@@ -218,7 +247,7 @@ export function ActionButtonWithHint({
         {children}
       </button>
       <span className="action-btn-hint__icon">
-        <HelpTooltip text={hint} placement="top" variant={hintVariant} />
+        <HelpTooltip text={hint} placement="top" variant={hintVariant} triggerLabel="Ajuda sobre esta ação" />
       </span>
     </span>
   );

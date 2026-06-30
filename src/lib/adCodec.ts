@@ -1,14 +1,13 @@
 import { compressSync, decompressSync, strFromU8, strToU8 } from "fflate";
 import type { AdData } from "../types/ad";
-import { MAX_SHARE_URL_LENGTH, MAX_SHARE_URL_SAFE } from "./constants";
 import { fromCompactWire, normalizeLegacyAd, toCompactWire } from "./adWire";
-import { URL_FIT_COMPRESSION_STEPS, compressImageAtStep } from "./imageCompressor";
-import { isEmbeddedImageData } from "./imageUtils";
 import { estimateAdUrlLength } from "./adRoutes";
 import { sanitizeAdData } from "./sanitizeAd";
+import type { FitAdResult } from "./adSerializer";
 
 export { buildAdUrl, buildAdPath, extractPayloadFromLocation } from "./adRoutes";
 export { MAX_SHARE_URL_LENGTH, MAX_SHARE_URL_SAFE } from "./constants";
+export type { FitAdResult } from "./adSerializer";
 
 export class AdCodecError extends Error {
   constructor(message: string) {
@@ -62,6 +61,10 @@ function decompressV2Payload(encoded: string): AdData | null {
   }
 }
 
+function isValidAd(ad: AdData): boolean {
+  return Boolean(ad.t && ad.title?.trim() && ad.price?.trim() && ad.desc?.trim());
+}
+
 /** Codifica anúncio: JSON compacto → Deflate (fflate) → Base64 URL-safe */
 export function encodeAdData(data: AdData): string {
   try {
@@ -97,10 +100,6 @@ export function decodeAdData(payload: string): AdData | null {
   return null;
 }
 
-function isValidAd(ad: AdData): boolean {
-  return Boolean(ad.t && ad.title?.trim() && ad.price?.trim() && ad.desc?.trim());
-}
-
 export function buildAdHashPayload(ad: AdData, includeImage = true): AdData {
   if (includeImage) return ad;
   return { ...ad, img: undefined, crop: undefined };
@@ -110,93 +109,11 @@ export function estimateUrlLength(payload: string): number {
   return estimateAdUrlLength(payload);
 }
 
-function urlFits(payload: string): boolean {
-  return estimateUrlLength(payload) <= MAX_SHARE_URL_SAFE;
-}
-
-function truncateDescription(desc: string, maxLen: number): string {
-  if (desc.length <= maxLen) return desc;
-  if (maxLen <= 1) return "…";
-  return `${desc.slice(0, maxLen - 1).trimEnd()}…`;
-}
-
-export interface FitAdResult {
-  ad: AdData;
-  hash: string;
-  imageStripped: boolean;
-  textOptimized: boolean;
-}
-
-/**
- * Garante URL ≤ 2048 chars (checagem em 2000): re-comprime foto, remove imagem
- * ou trunca descrição até caber no WhatsApp/mobile.
- */
+/** @deprecated Use AdSerializer.fitForShareUrl */
 export async function fitAdToUrlLength(
   ad: AdData,
-  encodeFn: (ad: AdData) => string
+  _encodeFn?: (ad: AdData) => string
 ): Promise<FitAdResult> {
-  let current: AdData = { ...ad };
-  let imageStripped = false;
-  let textOptimized = false;
-  const originalDesc = current.desc;
-
-  if (current.img && isEmbeddedImageData(current.img)) {
-    const source = current.img;
-    for (const step of URL_FIT_COMPRESSION_STEPS) {
-      const compressed = await compressImageAtStep(source, step);
-      current = { ...current, img: compressed };
-      const hash = encodeFn(current);
-      if (urlFits(hash)) {
-        return { ad: current, hash, imageStripped, textOptimized };
-      }
-    }
-  }
-
-  let hash = encodeFn(current);
-  if (urlFits(hash)) {
-    return { ad: current, hash, imageStripped, textOptimized };
-  }
-
-  if (current.img) {
-    imageStripped = true;
-    current = { ...current, img: undefined, crop: undefined };
-    hash = encodeFn(current);
-    if (urlFits(hash)) {
-      return { ad: current, hash, imageStripped, textOptimized };
-    }
-  }
-
-  let maxDesc = originalDesc.length;
-  while (maxDesc > 60) {
-    const trialDesc = truncateDescription(originalDesc, maxDesc);
-    const trialHash = encodeFn({ ...current, desc: trialDesc });
-    if (urlFits(trialHash)) {
-      textOptimized = trialDesc.length < originalDesc.length;
-      current = { ...current, desc: trialDesc };
-      hash = trialHash;
-      break;
-    }
-    maxDesc -= 40;
-  }
-
-  if (!urlFits(hash)) {
-    if (current.pix && current.pix.length > 120) {
-      current = { ...current, pix: current.pix.slice(0, 120) };
-      hash = encodeFn(current);
-    }
-  }
-
-  if (!urlFits(hash)) {
-    throw new AdCodecError(
-      "Anúncio muito grande para o link do WhatsApp. Encurte o título, a descrição ou o Pix."
-    );
-  }
-
-  if (estimateUrlLength(hash) > MAX_SHARE_URL_LENGTH) {
-    throw new AdCodecError(
-      "Anúncio muito grande para o link do WhatsApp. Encurte o título, a descrição ou o Pix."
-    );
-  }
-
-  return { ad: current, hash, imageStripped, textOptimized };
+  const { AdSerializer } = await import("./adSerializer");
+  return AdSerializer.fitForShareUrl(ad);
 }

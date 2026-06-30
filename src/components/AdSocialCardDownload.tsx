@@ -1,11 +1,9 @@
 import { useCallback, useState } from "react";
 import { Download } from "lucide-react";
 import type { AdData } from "../types/ad";
-import { resolveAdTheme } from "../lib/adThemes";
 import { TOOLTIP_COPY } from "../lib/tooltipCopy";
-import { renderPreviewCardBlob } from "../lib/adPreviewCardCanvas";
-import { renderQrToCanvas } from "../lib/qrCanvas";
-import { downloadBlob, slugifyFilename } from "../lib/socialCardRenderer";
+import { generateShareCardBlob, shareCardFilename } from "../lib/shareImage";
+import { downloadBlob } from "../lib/socialCardRenderer";
 import { ActionButtonWithHint } from "./HelpTooltip";
 
 interface AdSocialCardDownloadProps {
@@ -23,34 +21,20 @@ export function AdSocialCardDownload({
 }: AdSocialCardDownloadProps) {
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const themeDef = resolveAdTheme(ad.theme);
 
   const handleDownload = useCallback(async () => {
     setGenerating(true);
     setError(null);
 
     try {
-      await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
-
-      const qrCanvas = await renderQrToCanvas(qrUrl, 120, themeDef.qrFg);
-      const blob = await renderPreviewCardBlob({
-        adType: ad.t,
-        title: ad.title,
-        price: ad.price,
-        description: ad.desc,
-        icon: ad.icon,
-        theme: ad.theme,
-        billingRecorrente: ad.billingType === "recorrente",
-        phone: ad.phone,
-        qrCanvas,
-        width: 1080,
-      });
-
-      downloadBlob(blob, `anunciolink-${slugifyFilename(ad.title)}.png`);
+      const blob = await generateShareCardBlob(ad, qrUrl);
+      downloadBlob(blob, shareCardFilename(ad));
     } catch {
       setError("Não foi possível gerar o card. Tente novamente.");
+    } finally {
+      setGenerating(false);
     }
-  }, [ad, qrUrl, themeDef.qrFg]);
+  }, [ad, qrUrl]);
 
   return (
     <>
