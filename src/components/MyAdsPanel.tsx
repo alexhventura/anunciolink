@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import { Printer } from "lucide-react";
 import type { SavedAdEntry } from "../lib/adHistory";
+import { isLockedPayload } from "../lib/adLock";
 import { AdSerializer } from "../lib/adSerializer";
 import { extractPayloadFromAdUrl } from "../lib/adRoutes";
 import { copyToClipboard } from "../lib/formatters";
@@ -31,6 +32,10 @@ export function MyAdsPanel({ onOpenAd }: MyAdsPanelProps) {
       const payload = extractPayloadFromAdUrl(entry.url);
       if (!payload) {
         throw new Error("Não foi possível ler os dados deste anúncio.");
+      }
+
+      if (isLockedPayload(payload)) {
+        throw new Error("Este anúncio está protegido por senha. Abra o link e desbloqueie antes de imprimir.");
       }
 
       const ad = AdSerializer.decode(payload);

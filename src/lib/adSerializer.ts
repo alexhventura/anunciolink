@@ -3,6 +3,7 @@ import { MAX_SHARE_URL_LENGTH, MAX_SHARE_URL_SAFE } from "./constants";
 import { buildAdUrl, estimateAdUrlLength } from "./adRoutes";
 import { decodeAdData, encodeAdData, AdCodecError } from "./adCodec";
 import { fromCompactWire, toCompactWire, type CompactAdWire } from "./adWire";
+import { encryptAdPayload, isValidAdPassword, sanitizeAdPassword } from "./adLock";
 import { sanitizeAdData } from "./sanitizeAd";
 
 /** Limite seguro para QR Code nível M */
@@ -89,7 +90,7 @@ export const AdSerializer = {
   },
 
   /** Garante URL de compartilhamento ≤ limites WhatsApp/mobile */
-  async fitForShareUrl(ad: AdData): Promise<FitAdResult> {
+  async fitForShareUrl(ad: AdData, password?: string): Promise<FitAdResult> {
     let current = this.normalize(ad);
     let imageStripped = false;
     let textOptimized = false;
@@ -139,6 +140,21 @@ export const AdSerializer = {
       throw new AdCodecError(
         "Anúncio muito grande para o link do WhatsApp. Encurte o título, a descrição ou o Pix."
       );
+    }
+
+    const lockKey = password?.trim() ? sanitizeAdPassword(password) : "";
+    if (lockKey) {
+      if (!isValidAdPassword(lockKey)) {
+        throw new AdCodecError(
+          "Use uma senha de 1 a 4 caracteres — apenas letras e números."
+        );
+      }
+      hash = encryptAdPayload(hash, lockKey);
+      if (!urlFitsShare(hash) || estimateAdUrlLength(hash) > MAX_SHARE_URL_LENGTH) {
+        throw new AdCodecError(
+          "Com a senha, o link ficou grande demais. Encurte título, descrição ou Pix."
+        );
+      }
     }
 
     return { ad: current, hash, imageStripped, textOptimized };

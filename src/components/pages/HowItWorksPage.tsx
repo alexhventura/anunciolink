@@ -2,6 +2,7 @@ import {
   Clock3,
   FilePenLine,
   Link2,
+  Lock,
   QrCode,
   Share2,
   Shapes,
@@ -43,6 +44,16 @@ export function HowItWorksPage({ adsenseReady }: HowItWorksPageProps) {
 
       <StepCard
         step={3}
+        icon={<Lock className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />}
+        title="Senha opcional no link"
+      >
+        Nos campos extras, você pode definir uma <strong>senha de até 4 caracteres</strong> (letras e
+        números). O anúncio é criptografado na própria URL com AES — sem servidor. Quem receber o link
+        vê uma tela de desbloqueio; só com a senha correta o card, Pix e WhatsApp aparecem.
+      </StepCard>
+
+      <StepCard
+        step={4}
         icon={<Link2 className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />}
         title="Gere o link do anúncio"
       >
@@ -52,7 +63,7 @@ export function HowItWorksPage({ adsenseReady }: HowItWorksPageProps) {
       </StepCard>
 
       <StepCard
-        step={4}
+        step={5}
         icon={<Share2 className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />}
         title="Divulgue em qualquer canal"
       >
@@ -62,7 +73,7 @@ export function HowItWorksPage({ adsenseReady }: HowItWorksPageProps) {
       </StepCard>
 
       <StepCard
-        step={5}
+        step={6}
         icon={<QrCode className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />}
         title="QR Code, card PNG e cartaz A4"
       >
@@ -72,7 +83,7 @@ export function HowItWorksPage({ adsenseReady }: HowItWorksPageProps) {
       </StepCard>
 
       <StepCard
-        step={6}
+        step={7}
         icon={<Smartphone className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />}
         title="O comprador abre a página do anúncio"
       >
@@ -83,7 +94,7 @@ export function HowItWorksPage({ adsenseReady }: HowItWorksPageProps) {
       </StepCard>
 
       <StepCard
-        step={7}
+        step={8}
         icon={<Clock3 className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />}
         title="Validade e histórico local"
       >
@@ -101,6 +112,7 @@ export function HowItWorksPage({ adsenseReady }: HowItWorksPageProps) {
           <li>QR Code com logo {SITE_NAME}</li>
           <li>Card PNG 1080×1080 para redes sociais</li>
           <li>Cartaz A4 para impressão</li>
+          <li>Senha opcional (até 4 caracteres) com criptografia na URL</li>
           <li>Compartilhamento em múltiplos canais</li>
           <li>Indicador de peso do link (payload) na prévia</li>
         </ul>

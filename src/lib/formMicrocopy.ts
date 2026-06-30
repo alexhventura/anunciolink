@@ -8,7 +8,7 @@ export const FORM_SECTION_COPY = {
   },
   optional: {
     title: "Extras",
-    subtitle: "Visual, Pix e cartão — deixe do jeito que você vende.",
+    subtitle: "Visual, pagamento e senha — deixe do jeito que você vende.",
     badge: "Opcional",
   },
   preview: {
@@ -46,4 +46,6 @@ export const FIELD_MICROCOPY = {
   phone: "Aparece no anúncio para contato direto.",
   pix: "Quem abrir o link vê QR Pix e copia o código na hora.",
   cardLink: "Mercado Pago, Stripe, PagSeguro ou checkout similar.",
+  password:
+    "Deixe em branco para link público. Com senha, só quem souber desbloqueia — máx. 4 letras ou números.",
 } as const;

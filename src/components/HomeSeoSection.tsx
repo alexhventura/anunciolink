@@ -1,4 +1,4 @@
-import { QrCode, ShieldCheck, Zap } from "lucide-react";
+import { Lock, QrCode, ShieldCheck, Zap } from "lucide-react";
 
 /** Blocos semânticos para SEO — palavras-chave sem poluir o formulário */
 export function HomeSeoSection() {
@@ -28,6 +28,19 @@ export function HomeSeoSection() {
         <p className="home-seo__text">
           Cada anúncio gera QR Code automaticamente. Baixe em PNG, imprima cartaz A4 ou cole em
           panfletos e cartões de visita — gerador de QR Code integrado, sem aplicativo extra.
+        </p>
+      </section>
+
+      <section className="home-seo__block neo-card-white" aria-labelledby="home-seo-password">
+        <div className="home-seo__icon" aria-hidden="true">
+          <Lock className="h-6 w-6" strokeWidth={2.5} />
+        </div>
+        <h2 id="home-seo-password" className="home-seo__title">
+          Anúncio protegido por senha (opcional)
+        </h2>
+        <p className="home-seo__text">
+          Quer restringir quem vê título, preço e Pix? Crie uma senha de até 4 caracteres no formulário.
+          O anúncio fica criptografado na URL — só quem souber a senha desbloqueia, 100% no navegador.
         </p>
       </section>
 

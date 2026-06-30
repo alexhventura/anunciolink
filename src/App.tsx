@@ -17,6 +17,9 @@ const HomeView = lazy(() =>
 const SuccessView = lazy(() =>
   import("./components/SuccessView").then((m) => ({ default: m.SuccessView }))
 );
+const AdUnlockPage = lazy(() =>
+  import("./components/AdUnlockPage").then((m) => ({ default: m.AdUnlockPage }))
+);
 const AdViewPage = lazy(() =>
   import("./components/AdViewPage").then((m) => ({ default: m.AdViewPage }))
 );
@@ -46,6 +49,8 @@ export default function App() {
     currentView,
     setCurrentView,
     decodedAd,
+    lockedPayload,
+    unlockAd,
     openSavedAdUrl,
     resetToHome,
     backToEdit,
@@ -154,6 +159,12 @@ export default function App() {
                 onBackToEdit={backToEdit}
                 onResetHome={handleResetHome}
               />
+            </Suspense>
+          )}
+
+          {currentView === "anuncio" && lockedPayload && !decodedAd && (
+            <Suspense fallback={<PageFallback />}>
+              <AdUnlockPage onUnlock={unlockAd} />
             </Suspense>
           )}
 

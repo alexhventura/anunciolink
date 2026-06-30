@@ -9,29 +9,40 @@ import {
 } from "../lib/adRoutes";
 import { DocumentHeadService } from "../lib/documentHeadService";
 import { getBootstrapAdResult } from "../lib/bootstrappedAd";
+import { isLockedPayload, tryUnlockAdData } from "../lib/adLock";
 import {
   getInstitutionalViewFromPathname,
   isInstitutionalView,
   navigateToInstitutionalPage,
 } from "../lib/siteRoutes";
 
-function resolveInitialRoute(): { view: AppView; ad: AdData | null } {
+function resolveInitialRoute(): {
+  view: AppView;
+  ad: AdData | null;
+  lockedPayload: string | null;
+} {
   if (typeof window === "undefined") {
-    return { view: "home", ad: null };
+    return { view: "home", ad: null, lockedPayload: null };
   }
 
   upgradeHashRouteToPath();
+  const payload = extractPayloadFromLocation();
+
+  if (payload && isLockedPayload(payload)) {
+    return { view: "anuncio", ad: null, lockedPayload: payload };
+  }
+
   const bootstrap = getBootstrapAdResult();
   if (bootstrap.payload && bootstrap.ad) {
-    return { view: "anuncio", ad: bootstrap.ad };
+    return { view: "anuncio", ad: bootstrap.ad, lockedPayload: null };
   }
 
   const institutionalView = getInstitutionalViewFromPathname(window.location.pathname);
   if (institutionalView) {
-    return { view: institutionalView, ad: null };
+    return { view: institutionalView, ad: null, lockedPayload: null };
   }
 
-  return { view: "home", ad: null };
+  return { view: "home", ad: null, lockedPayload: null };
 }
 
 const initialRoute = resolveInitialRoute();
@@ -69,10 +80,21 @@ function applyRouteFromLocation(): { view: AppView; ad: AdData | null } {
 export function useAdRouting() {
   const [currentView, setCurrentView] = useState<AppView>(initialRoute.view);
   const [decodedAd, setDecodedAd] = useState<AdData | null>(initialRoute.ad);
+  const [lockedPayload, setLockedPayload] = useState<string | null>(initialRoute.lockedPayload);
 
   const syncFromLocation = useCallback(async () => {
     const payload = extractPayloadFromLocation();
     if (payload) {
+      if (isLockedPayload(payload)) {
+        DocumentHeadService.applyLocked();
+        setLockedPayload(payload);
+        setDecodedAd(null);
+        setCurrentView("anuncio");
+        return;
+      }
+
+      setLockedPayload(null);
+
       const bootstrap = getBootstrapAdResult();
       if (bootstrap.payload === payload && bootstrap.ad) {
         DocumentHeadService.apply("anuncio", bootstrap.ad);
@@ -88,6 +110,8 @@ export function useAdRouting() {
         setCurrentView("anuncio");
         return;
       }
+    } else {
+      setLockedPayload(null);
     }
 
     const route = applyRouteFromLocation();
@@ -95,7 +119,24 @@ export function useAdRouting() {
     setCurrentView(route.view);
   }, []);
 
+  const unlockAd = useCallback(
+    (password: string): boolean => {
+      if (!lockedPayload) return false;
+      const ad = tryUnlockAdData(lockedPayload, password);
+      if (!ad) return false;
+      DocumentHeadService.apply("anuncio", ad);
+      setDecodedAd(ad);
+      setLockedPayload(null);
+      return true;
+    },
+    [lockedPayload]
+  );
+
   useEffect(() => {
+    if (initialRoute.lockedPayload) {
+      DocumentHeadService.applyLocked();
+      return;
+    }
     if (initialRoute.view !== "home" || initialRoute.ad) {
       DocumentHeadService.apply(initialRoute.view, initialRoute.ad);
     }
@@ -139,6 +180,7 @@ export function useAdRouting() {
     navigateToHome(true);
     DocumentHeadService.apply("home", null);
     setDecodedAd(null);
+    setLockedPayload(null);
     setCurrentView("home");
   }, []);
 
@@ -160,6 +202,7 @@ export function useAdRouting() {
       navigateToInstitutionalPage(view);
       DocumentHeadService.apply(view, null);
       setDecodedAd(null);
+      setLockedPayload(null);
       setCurrentView(view);
       window.scrollTo({ top: 0, behavior: "smooth" });
     },
@@ -170,6 +213,8 @@ export function useAdRouting() {
     currentView,
     setCurrentView,
     decodedAd,
+    lockedPayload,
+    unlockAd,
     openSavedAdUrl,
     resetToHome,
     backToEdit,

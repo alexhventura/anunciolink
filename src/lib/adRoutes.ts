@@ -1,4 +1,11 @@
+import { LEGACY_LOCKED_HASH_PREFIX, LOCKED_PAYLOAD_PREFIX } from "./adLock";
 import { SITE_URL } from "./constants";
+
+function payloadFromLegacyLockedHash(hash: string): string | null {
+  if (!hash.startsWith(LEGACY_LOCKED_HASH_PREFIX)) return null;
+  const cipher = hash.slice(LEGACY_LOCKED_HASH_PREFIX.length);
+  return cipher ? `${LOCKED_PAYLOAD_PREFIX}${cipher}` : null;
+}
 
 /** Prefixo de rota indexável (path) — preferido sobre #hash */
 export const AD_PATH_PREFIX = "/a/";
@@ -34,6 +41,9 @@ export function extractPayloadFromAdUrl(url: string): string | null {
       }
     }
 
+    const locked = payloadFromLegacyLockedHash(parsed.hash);
+    if (locked) return locked;
+
     if (parsed.hash.startsWith("#dados=")) {
       return parsed.hash.substring(7);
     }
@@ -57,6 +67,9 @@ export function extractPayloadFromLocation(loc: Location = window.location): str
     }
   }
 
+  const locked = payloadFromLegacyLockedHash(loc.hash);
+  if (locked) return locked;
+
   if (loc.hash.startsWith("#dados=")) {
     return loc.hash.substring(7);
   }
@@ -70,6 +83,13 @@ export function upgradeHashRouteToPath(): string | null {
   if (isAdPathname(window.location.pathname)) return null;
 
   const hash = window.location.hash;
+
+  const locked = payloadFromLegacyLockedHash(hash);
+  if (locked) {
+    history.replaceState({ adPayload: locked }, "", buildAdPath(locked));
+    return locked;
+  }
+
   if (!hash.startsWith("#dados=")) return null;
 
   const payload = hash.substring(7);

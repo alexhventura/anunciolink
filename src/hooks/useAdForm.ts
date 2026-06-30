@@ -16,6 +16,8 @@ export interface AdFormState {
   pix: string;
   cardLink: string;
   icon: AdIconId;
+  /** Senha opcional (1–4 caracteres alfanuméricos) para proteger o link */
+  password: string;
   submitError: string | null;
 }
 
@@ -34,6 +36,7 @@ const initialState: AdFormState = {
   pix: "",
   cardLink: "",
   icon: DEFAULT_AD_ICON_ID.venda,
+  password: "",
   submitError: null,
 };
 

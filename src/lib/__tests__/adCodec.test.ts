@@ -33,6 +33,10 @@ describe("adCodec", () => {
     }
   });
 
+  it("retorna null para payload protegido por senha", () => {
+    expect(decodeAdData("locked.U2FsdGVkX1-fake")).toBeNull();
+  });
+
   it("golden snapshot — payload mínimo estável", () => {
     const payload = encodeAdData(MINIMAL_AD);
     expect(payload).toMatch(/^v2\.[A-Za-z0-9_-]+$/);

@@ -10,6 +10,7 @@ import {
 } from "./jsonLd";
 import {
   buildAdPageSeo,
+  buildLockedAdPageSeo,
   HOME_SEO,
   INSTITUTIONAL_SEO,
   SEO_SITE,
@@ -122,6 +123,13 @@ export const DocumentHeadService = {
     const meta = buildAdPageSeo(ad, canonicalUrl);
     applyCommonSocialMeta(meta);
     injectJsonLd("ad-jsonld", buildAdProductJsonLd(ad, canonicalUrl, meta.priceAmount));
+  },
+
+  applyLocked(): void {
+    if (typeof document === "undefined") return;
+    const meta = buildLockedAdPageSeo(getAdCanonicalUrl());
+    applyCommonSocialMeta(meta);
+    injectJsonLd("ad-jsonld", buildSiteJsonLd(meta.description));
   },
 
   applyHome(): void {

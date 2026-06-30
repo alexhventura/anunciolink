@@ -32,6 +32,7 @@ function formToValues(state: AdFormState): AdFormValues {
     phone: state.phone,
     pix: state.pix,
     cardLink: state.cardLink,
+    password: state.password,
   };
 }
 
@@ -63,7 +64,7 @@ export const AdBuilder = {
     }
 
     const ad = this.fromFormState(state);
-    const result = await AdSerializer.fitForShareUrl(ad);
+    const result = await AdSerializer.fitForShareUrl(ad, state.password.trim() || undefined);
     return {
       ...result,
       url: buildAdUrl(result.hash),

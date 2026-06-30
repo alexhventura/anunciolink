@@ -24,6 +24,7 @@ import {
   validateAdFormField,
 } from "../lib/formValidation";
 import { MAX_DESC_LENGTH, MAX_PIX_LENGTH, MAX_TITLE_LENGTH } from "../lib/constants";
+import { AD_PASSWORD_MAX_LENGTH, sanitizeAdPassword } from "../lib/adLock";
 import { TOOLTIP_COPY } from "../lib/tooltipCopy";
 import { AdFormField } from "./AdFormField";
 import { AdPreviewCard } from "./AdPreviewCard";
@@ -65,6 +66,7 @@ function toFormValues(form: AdFormState) {
     phone: form.phone,
     pix: form.pix,
     cardLink: form.cardLink,
+    password: form.password,
   };
 }
 
@@ -116,16 +118,16 @@ export function HomeView({
 
     const allTouched = REQUIRED_FIELDS.reduce(
       (acc, field) => ({ ...acc, [field]: true }),
-      { phone: true, pix: true, cardLink: true } as Partial<Record<AdFormFieldKey, boolean>>
+      { phone: true, pix: true, cardLink: true, password: true } as Partial<Record<AdFormFieldKey, boolean>>
     );
     setTouched(allTouched);
 
     const errors = validateAdForm(formValues);
     if (hasAdFormErrors(errors)) {
       onSubmitError(firstAdFormError(errors) ?? "Revise os campos em destaque.");
-      const firstInvalid = (["title", "price", "description", "phone", "pix", "cardLink"] as const).find(
-        (field) => errors[field]
-      );
+      const firstInvalid = (
+        ["title", "price", "description", "phone", "pix", "cardLink", "password"] as const
+      ).find((field) => errors[field]);
       if (firstInvalid) {
         queueMicrotask(() => focusFirstField(firstInvalid));
       }
@@ -464,6 +466,30 @@ export function HomeView({
                         }}
                         placeholder="https://link.mercadopago.com.br/…"
                         className={`${inputClass("cardLink")} font-mono text-sm`}
+                      />
+                    </AdFormField>
+                  </div>
+
+                  <div className="ad-form-bento__cell">
+                    <AdFormField
+                      id="password-input"
+                      label="Proteger com senha"
+                      hint={TOOLTIP_COPY.adPassword}
+                      microcopy={FIELD_MICROCOPY.password}
+                      error={fieldErrors.password}
+                      optional
+                    >
+                      <input
+                        type="password"
+                        id="password-input"
+                        inputMode="text"
+                        autoComplete="new-password"
+                        maxLength={AD_PASSWORD_MAX_LENGTH}
+                        value={form.password}
+                        onChange={(e) => onFieldChange("password", sanitizeAdPassword(e.target.value))}
+                        onBlur={() => handleBlur("password")}
+                        placeholder="Ex.: A1b2"
+                        className={`${inputClass("password")} font-mono text-sm tracking-widest uppercase`}
                       />
                     </AdFormField>
                   </div>

@@ -128,3 +128,16 @@ export function buildAdPageSeo(ad: AdData, canonicalUrl: string): PageSeoMeta {
     priceCurrency: "BRL",
   };
 }
+
+export function buildLockedAdPageSeo(canonicalUrl: string): PageSeoMeta {
+  return {
+    title: buildSeoTitle("Anúncio protegido por senha"),
+    description: buildSeoDescription(
+      "Este anúncio está criptografado na URL. Digite a senha de 1 a 4 caracteres para visualizar título, preço e Pix."
+    ),
+    canonicalUrl,
+    robots: "noindex, nofollow",
+    ogType: "website",
+    imageAlt: `Anúncio protegido — ${SITE_NAME}`,
+  };
+}

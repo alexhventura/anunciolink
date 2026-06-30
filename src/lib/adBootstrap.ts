@@ -1,3 +1,4 @@
+import { isLockedPayload } from "./adLock";
 import { decodeAdData } from "./adCodec";
 import { DocumentHeadService } from "./documentHeadService";
 import { setBootstrapAdResult } from "./bootstrappedAd";
@@ -10,6 +11,12 @@ export function bootstrapAdFromUrl(): AdData | null {
   const payload = extractPayloadFromLocation();
   if (!payload) {
     setBootstrapAdResult(null, "");
+    return null;
+  }
+
+  if (isLockedPayload(payload)) {
+    DocumentHeadService.applyLocked();
+    setBootstrapAdResult(null, payload);
     return null;
   }
 

@@ -2,6 +2,7 @@ import { compressSync, decompressSync, strFromU8, strToU8 } from "fflate";
 import type { AdData } from "../types/ad";
 import { fromCompactWire, normalizeLegacyAd, toCompactWire } from "./adWire";
 import { estimateAdUrlLength } from "./adRoutes";
+import { isLockedPayload } from "./adLock";
 import { sanitizeAdData } from "./sanitizeAd";
 import type { FitAdResult } from "./adSerializer";
 
@@ -88,6 +89,8 @@ export function decodeAdData(payload: string): AdData | null {
   if (!payload?.trim()) return null;
 
   const trimmed = payload.trim();
+
+  if (isLockedPayload(trimmed)) return null;
 
   if (trimmed.startsWith(V2_PREFIX)) {
     const ad = decompressV2Payload(trimmed.slice(V2_PREFIX.length));

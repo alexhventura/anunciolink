@@ -1,8 +1,16 @@
+import { isValidAdPassword, sanitizeAdPassword } from "./adLock";
 import type { AdType } from "../types/ad";
 import { MAX_DESC_LENGTH, MAX_PIX_LENGTH, MAX_TITLE_LENGTH } from "./constants";
 import { isValidPaymentUrl, parsePriceToNumber } from "./formatters";
 
-export type AdFormFieldKey = "title" | "price" | "description" | "phone" | "pix" | "cardLink";
+export type AdFormFieldKey =
+  | "title"
+  | "price"
+  | "description"
+  | "phone"
+  | "pix"
+  | "cardLink"
+  | "password";
 
 export type AdFormFieldErrors = Partial<Record<AdFormFieldKey, string>>;
 
@@ -14,6 +22,7 @@ export interface AdFormValues {
   phone: string;
   pix: string;
   cardLink: string;
+  password: string;
 }
 
 function phoneDigits(phone: string): string {
@@ -67,6 +76,14 @@ export function validateAdFormField(field: AdFormFieldKey, values: AdFormValues)
       }
       return null;
     }
+    case "password": {
+      if (!values.password.trim()) return null;
+      const normalized = sanitizeAdPassword(values.password);
+      if (!isValidAdPassword(normalized)) {
+        return "Use 1 a 4 caracteres — apenas letras e números.";
+      }
+      return null;
+    }
     default:
       return null;
   }
@@ -83,7 +100,7 @@ export function validateRequiredAdForm(values: AdFormValues): AdFormFieldErrors 
 
 export function validateOptionalAdForm(values: AdFormValues): AdFormFieldErrors {
   const errors: AdFormFieldErrors = {};
-  for (const field of ["phone", "pix", "cardLink"] as const) {
+  for (const field of ["phone", "pix", "cardLink", "password"] as const) {
     const message = validateAdFormField(field, values);
     if (message) errors[field] = message;
   }
@@ -99,7 +116,15 @@ export function hasAdFormErrors(errors: AdFormFieldErrors): boolean {
 }
 
 export function firstAdFormError(errors: AdFormFieldErrors): string | null {
-  const order: AdFormFieldKey[] = ["title", "price", "description", "phone", "pix", "cardLink"];
+  const order: AdFormFieldKey[] = [
+    "title",
+    "price",
+    "description",
+    "phone",
+    "pix",
+    "cardLink",
+    "password",
+  ];
   for (const key of order) {
     if (errors[key]) return errors[key]!;
   }

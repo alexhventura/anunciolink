@@ -35,6 +35,11 @@ export function PrivacyPage({ adsenseReady }: PrivacyPageProps) {
           O histórico <strong>Meus anúncios</strong> fica salvo apenas no armazenamento local do seu navegador
           (localStorage), na sua máquina — não sincronizamos entre dispositivos.
         </p>
+        <p>
+          Se você usar a <strong>senha opcional</strong>, o conteúdo do anúncio é criptografado na URL com AES
+          no seu navegador. A senha não é enviada a nenhum servidor — quem desbloqueia precisa digitá-la
+          localmente.
+        </p>
       </InstitutionalSection>
 
       <InstitutionalSection title="Cookies e anúncios">

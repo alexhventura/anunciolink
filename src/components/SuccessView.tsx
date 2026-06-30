@@ -1,5 +1,5 @@
 import { lazy, Suspense, useId, useState } from "react";
-import { Check, Lightbulb, Share2, Zap } from "lucide-react";
+import { Check, Lightbulb, Lock, Share2, Zap } from "lucide-react";
 import type { AdFormState } from "../hooks/useAdForm";
 import type { AdData } from "../types/ad";
 import { AdSenseSlot } from "./AdSenseSlot";
@@ -102,6 +102,19 @@ export function SuccessView({
             Texto otimizado para caber no link do WhatsApp.
           </div>
         )}
+
+        {form.password.trim() ? (
+          <div
+            role="status"
+            className="rounded-lg border-[3px] border-black bg-amber-100 px-4 py-3 text-xs font-bold text-black text-left neo-shadow-sm flex gap-2 items-start"
+          >
+            <Lock className="h-4 w-4 shrink-0 mt-0.5" strokeWidth={2.5} aria-hidden="true" />
+            <p>
+              Link protegido por senha. Envie a senha separadamente para quem deve ver o anúncio — ela
+              não fica salva em servidor, só na memória de quem criou.
+            </p>
+          </div>
+        ) : null}
 
         <div className="space-y-6 text-left">
           <Suspense fallback={<div className="neo-inset p-6 text-center text-xs font-bold text-zinc-500">Carregando canais…</div>}>

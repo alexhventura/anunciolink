@@ -31,5 +31,7 @@ export const TOOLTIP_COPY = {
   formRequired:
     "Campos mínimos para publicar. Com eles você já gera link e QR funcionais.",
   formOptional:
-    "Visual e pagamento. Preencha agora ou depois — cada novo link reflete o que você enviar.",
+    "Visual, pagamento e senha opcional. Preencha agora ou depois — cada novo link reflete o que você enviar.",
+  adPassword:
+    "Opcional: até 4 caracteres (letras e números). Quem abrir o link precisa da senha para ver o anúncio. Tudo criptografado na URL — sem servidor.",
 } as const;
