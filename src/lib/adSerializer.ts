@@ -170,7 +170,6 @@ export const AdSerializer = {
       billingType: candidate.billingType,
       cardLink: candidate.cardLink,
       icon: candidate.icon,
-      theme: candidate.theme,
     };
     return urlForAd(candidate);
   },

@@ -8,8 +8,6 @@ export const TOOLTIP_COPY = {
     "Detalhes que vendem: estado, entrega, garantia ou o que está incluso no serviço.",
   icon:
     "Ícone que representa seu produto ou serviço — aparece grande no hero Bento.",
-  theme:
-    "Gradiente da landing e cor do QR Code. Escolha o visual da sua marca.",
   nativeShare:
     "Abre o compartilhamento nativo do celular com texto pronto — ideal para WhatsApp e redes.",
   pix:
@@ -19,15 +17,15 @@ export const TOOLTIP_COPY = {
   billing:
     "Único: pagamento pontual. Recorrente: exibe '/mês' no preço.",
   phone:
-    "WhatsApp ou telefone na landing. Só quem abrir o link verá o número.",
+    "WhatsApp ou telefone no anúncio. Só quem abrir o link verá o número.",
   cardLink:
     "Link de checkout externo. O comprador abre e paga no cartão.",
   generateAd:
-    "Gera landing + link + QR Code. Tudo codificado na URL — sem upload e sem banco.",
+    "Gera anúncio + link + QR Code. Tudo codificado na URL — sem upload e sem banco.",
   printPoster:
-    "Cartaz A4 com ícone, título, resumo e QR em destaque — pronto para imprimir.",
+    "Cartaz A4 no layout do anúncio, com QR centralizado — pronto para imprimir.",
   socialCard:
-    "Card PNG idêntico à landing — ideal para status e redes sociais.",
+    "Card PNG idêntico ao anúncio — ideal para status e redes sociais.",
   linkShortener:
     "Nosso link carrega tudo de graça — por isso é longo. Encurte no Bitly ou TinyURL para bios.",
   formRequired:

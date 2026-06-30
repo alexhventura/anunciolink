@@ -2,7 +2,8 @@ import { Printer } from "lucide-react";
 import { createPortal } from "react-dom";
 import { QRCodeSVG } from "qrcode.react";
 import type { AdData } from "../types/ad";
-import { resolveAdTheme } from "../lib/adThemes";
+import { SITE_DOMAIN } from "../lib/constants";
+import { AD_QR_FOREGROUND } from "../lib/adThemes";
 import { isQrUrlSafe } from "../lib/qrShareUrl";
 import { TOOLTIP_COPY } from "../lib/tooltipCopy";
 import { ActionButtonWithHint } from "./HelpTooltip";
@@ -15,7 +16,14 @@ interface AdPrintPosterProps {
   hintVariant?: "default" | "on-dark";
 }
 
-const POSTER_DESC_MAX = 140;
+const TYPE_LABEL = {
+  venda: "Venda",
+  servico: "Serviço",
+  vaquinha: "Vaquinha",
+} as const;
+
+const POSTER_DESC_MAX = 200;
+const QR_SIZE = 196;
 
 function summarizeDescription(text: string, maxLen = POSTER_DESC_MAX): string {
   const clean = text.replace(/\s+/g, " ").trim();
@@ -26,7 +34,7 @@ function summarizeDescription(text: string, maxLen = POSTER_DESC_MAX): string {
   return `${base.trim()}…`;
 }
 
-/** Cartaz A4 dedicado — renderizado no body para impressão correta */
+/** Cartaz A4 — layout do card do anúncio + QR centralizado */
 export function AdPrintPoster({
   ad,
   qrUrl,
@@ -34,10 +42,9 @@ export function AdPrintPoster({
   hintVariant = "on-dark",
 }: AdPrintPosterProps) {
   const qrSafe = isQrUrlSafe(qrUrl);
-  const themeDef = resolveAdTheme(ad.theme);
   const summary = summarizeDescription(ad.desc);
-  const qrSize = 248;
-  const logoSize = Math.round(qrSize * 0.22);
+  const priceLabel = ad.price + (ad.billingType === "recorrente" ? " /mês" : "");
+  const logoSize = Math.round(QR_SIZE * 0.22);
 
   const handlePrint = () => {
     document.documentElement.classList.add("printing-a4");
@@ -50,42 +57,45 @@ export function AdPrintPoster({
     createPortal(
       <div className="a4-poster" aria-hidden="true">
         <div className="a4-poster__sheet">
-          <div className="a4-poster__brand-mark" aria-hidden="true">
-            AnúncioLink
+          <div className="a4-poster__stage">
+            <article className="a4-poster__card">
+              <header className="a4-poster__hero">
+                <div className="a4-poster__icon-well">
+                  <AdProductIcon iconId={ad.icon} adType={ad.t} size={72} strokeWidth={2.5} color="#18181b" />
+                </div>
+                <h1 className="a4-poster__title">{ad.title}</h1>
+                <p className="a4-poster__price">{priceLabel}</p>
+              </header>
+
+              <section className="a4-poster__body">
+                <span className="a4-poster__chip">{TYPE_LABEL[ad.t]}</span>
+                {summary && <p className="a4-poster__desc">{summary}</p>}
+              </section>
+
+              <footer className="a4-poster__qr-panel">
+                <div className="a4-poster__qr-frame">
+                  <QRCodeSVG
+                    value={qrUrl}
+                    size={QR_SIZE}
+                    level="H"
+                    includeMargin
+                    marginSize={3}
+                    bgColor="#ffffff"
+                    fgColor={AD_QR_FOREGROUND}
+                    imageSettings={{
+                      src: "/qr-logo.svg",
+                      height: logoSize,
+                      width: logoSize,
+                      excavate: true,
+                    }}
+                  />
+                </div>
+                <p className="a4-poster__scan-instruction">Escaneie para abrir este anúncio.</p>
+              </footer>
+            </article>
+
+            <p className="a4-poster__site-footer">{SITE_DOMAIN}</p>
           </div>
-
-          <main className="a4-poster__main">
-            <div className="a4-poster__icon-frame">
-              <AdProductIcon iconId={ad.icon} adType={ad.t} size={88} strokeWidth={2.5} color="#18181b" />
-            </div>
-
-            <h1 className="a4-poster__title">{ad.title}</h1>
-
-            {summary && <p className="a4-poster__desc">{summary}</p>}
-
-            <div className="a4-poster__qr-frame">
-              <QRCodeSVG
-                value={qrUrl}
-                size={qrSize}
-                level="H"
-                includeMargin={false}
-                bgColor="#ffffff"
-                fgColor={themeDef.qrFg}
-                imageSettings={{
-                  src: "/qr-logo.svg",
-                  height: logoSize,
-                  width: logoSize,
-                  excavate: true,
-                }}
-              />
-            </div>
-
-            <p className="a4-poster__scan-instruction">Escaneie para abrir este anúncio.</p>
-          </main>
-
-          <footer className="a4-poster__footer">
-            <p className="a4-poster__attribution">Gerado gratuitamente por AnúncioLink</p>
-          </footer>
         </div>
       </div>,
       document.body

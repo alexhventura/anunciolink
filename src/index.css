@@ -209,7 +209,7 @@
   transform: translate(2px, 2px);
   box-shadow: 2px 2px 0 0 #000;
   background-color: #20bd5a;
-  border-color: var(--color-neo-lime);
+  border-color: #18181b;
 }
 
 @utility btn-share-print {
@@ -386,6 +386,42 @@
   font-weight: 900;
   line-height: 1.1;
   letter-spacing: -0.03em;
+}
+
+.ad-bento-hero--brand {
+  background: linear-gradient(145deg, #fbbf24 0%, #fde68a 42%, #fffbeb 100%);
+}
+
+.ad-bento-hero__icon-well {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 5.25rem;
+  height: 5.25rem;
+  margin-bottom: 0.875rem;
+  border: 3px solid #18181b;
+  border-radius: 1rem;
+  background: #ffffff;
+  box-shadow: 3px 3px 0 0 #18181b;
+}
+
+.ad-bento-hero--lg .ad-bento-hero__icon-well {
+  width: 6.25rem;
+  height: 6.25rem;
+}
+
+.ad-bento-hero__icon-well .ad-bento-hero__emoji {
+  width: auto;
+  height: auto;
+  margin-bottom: 0;
+  filter: none;
+}
+
+.ad-bento-hero--brand .ad-bento-hero__title,
+.ad-bento-hero--brand .ad-bento-hero__price {
+  color: #18181b;
 }
 
 .ad-theme-gradient--amber {
@@ -1019,11 +1055,11 @@
   width: 210mm;
   height: 297mm;
   margin: 0;
-  padding: 14mm 16mm 12mm;
-  background: #ffffff;
+  padding: 10mm 12mm;
+  background: #fffbeb;
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
   font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
   color: #18181b;
@@ -1031,46 +1067,46 @@
   print-color-adjust: exact;
 }
 
-.a4-poster__brand-mark {
-  flex-shrink: 0;
-  text-align: center;
-  font-size: 8pt;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  color: #a1a1aa;
-  margin-bottom: 4mm;
-}
-
-.a4-poster__main {
-  flex: 1 1 auto;
+.a4-poster__stage {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 2mm 0;
-  min-height: 0;
-  gap: 0;
+  width: 100%;
+  max-width: 168mm;
 }
 
-.a4-poster__icon-frame {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32mm;
-  height: 32mm;
-  margin-bottom: 6mm;
+.a4-poster__card {
+  width: 100%;
   border: 1.2mm solid #18181b;
   border-radius: 2mm;
-  background: #f59e0b;
-  box-shadow: 2mm 2mm 0 0 #18181b;
+  overflow: hidden;
+  background: #ffffff;
+  box-shadow: 3mm 3mm 0 0 #18181b;
+}
+
+.a4-poster__hero {
+  background: linear-gradient(145deg, #fbbf24 0%, #fde68a 42%, #fffbeb 100%);
+  border-bottom: 0.8mm solid #18181b;
+  padding: 7mm 6mm 6mm;
+  text-align: center;
+}
+
+.a4-poster__icon-well {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24mm;
+  height: 24mm;
+  margin: 0 auto 4mm;
+  border: 0.9mm solid #18181b;
+  border-radius: 2mm;
+  background: #ffffff;
+  box-shadow: 1.5mm 1.5mm 0 0 #18181b;
 }
 
 .a4-poster__title {
-  margin: 0 0 4mm;
-  max-width: 170mm;
-  font-size: 20pt;
+  margin: 0 0 2mm;
+  font-size: 17pt;
   font-weight: 900;
   line-height: 1.15;
   letter-spacing: -0.03em;
@@ -1080,49 +1116,85 @@
   hyphens: auto;
 }
 
+.a4-poster__price {
+  margin: 0;
+  font-size: 20pt;
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: #18181b;
+  font-variant-numeric: tabular-nums;
+}
+
+.a4-poster__body {
+  background: #f59e0b;
+  padding: 4.5mm 6mm 5mm;
+  border-bottom: 0.8mm solid #18181b;
+  text-align: left;
+}
+
+.a4-poster__chip {
+  display: inline-block;
+  margin-bottom: 3mm;
+  padding: 1mm 3mm;
+  border: 0.45mm solid #18181b;
+  background: #18181b;
+  color: #fbbf24;
+  font-size: 7.5pt;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
 .a4-poster__desc {
-  margin: 0 0 8mm;
-  max-width: 155mm;
-  font-size: 11pt;
+  margin: 0;
+  font-size: 10.5pt;
   font-weight: 600;
   line-height: 1.5;
-  color: #3f3f46;
+  color: rgba(24, 24, 27, 0.9);
+}
+
+.a4-poster__qr-panel {
+  background: #ffffff;
+  padding: 5mm 6mm 6mm;
+  text-align: center;
 }
 
 .a4-poster__qr-frame {
-  flex-shrink: 0;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 5mm;
-  border: 1.4mm solid #18181b;
-  border-radius: 2mm;
+  padding: 3mm;
+  border: 0.9mm solid #18181b;
+  border-radius: 1.5mm;
   background: #ffffff;
-  box-shadow: 3mm 3mm 0 0 #18181b;
+  box-shadow: 2mm 2mm 0 0 #18181b;
+  line-height: 0;
+}
+
+.a4-poster__qr-frame svg {
+  display: block;
+  width: auto !important;
+  height: auto !important;
+  max-width: 100%;
 }
 
 .a4-poster__scan-instruction {
-  margin: 7mm 0 0;
-  font-size: 14pt;
+  margin: 5mm 0 0;
+  font-size: 12pt;
   font-weight: 900;
-  letter-spacing: 0.04em;
-  color: #18181b;
-  text-transform: none;
-}
-
-.a4-poster__footer {
-  flex-shrink: 0;
-  text-align: center;
-  padding-top: 6mm;
-  border-top: 0.5mm solid #e4e4e7;
-}
-
-.a4-poster__attribution {
-  margin: 0;
-  font-size: 8.5pt;
-  font-weight: 700;
-  color: #71717a;
   letter-spacing: 0.02em;
+  color: #18181b;
+}
+
+.a4-poster__site-footer {
+  margin: 6mm 0 0;
+  font-size: 9.5pt;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #18181b;
+  text-align: center;
 }
 
 @media print {
@@ -1201,7 +1273,9 @@
     break-inside: avoid !important;
   }
 
-  html.printing-a4 .a4-poster__qr-frame {
+  html.printing-a4 .a4-poster__card,
+  html.printing-a4 .a4-poster__qr-frame,
+  html.printing-a4 .a4-poster__icon-well {
     box-shadow: none !important;
   }
 }
@@ -1484,7 +1558,7 @@
   outline-offset: 2px;
 }
 
-.share-channel--whatsapp { background: #dcfce7; }
+.share-channel--whatsapp { background: #ffffff; }
 .share-channel--telegram { background: #e0f2fe; }
 .share-channel--facebook { background: #dbeafe; }
 .share-channel--linkedin { background: #e0e7ff; }

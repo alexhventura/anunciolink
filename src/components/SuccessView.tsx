@@ -70,7 +70,6 @@ export function SuccessView({
     pix: form.pix || undefined,
     cardLink: form.cardLink || undefined,
     icon: form.icon,
-    theme: form.theme,
     timestamp: Date.now(),
   };
 
@@ -124,7 +123,7 @@ export function SuccessView({
             </ActionButtonWithHint>
           )}
 
-          <AdQrCodeSection url={generatedLink} theme={form.theme} deferMs={200} headingId={qrHeadingId} />
+          <AdQrCodeSection url={generatedLink} deferMs={200} headingId={qrHeadingId} />
 
           <Suspense fallback={<div className="neo-inset p-6 text-center text-xs font-bold text-zinc-500">Carregando ferramentas…</div>}>
             <AdShareTools ad={adSnapshot} />
@@ -209,7 +208,6 @@ export function SuccessView({
           price={form.price}
           description={form.description}
           icon={form.icon}
-          theme={form.theme}
           billingType={form.billingType}
           premium
         />

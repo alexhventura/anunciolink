@@ -60,7 +60,7 @@ export function toCompactWire(ad: AdData): CompactAdWire {
   if (ad.cardLink) wire.c = ad.cardLink;
   const wireIcon = iconIdForWire(ad.icon, ad.t);
   if (wireIcon !== undefined) wire.e = wireIcon;
-  if (ad.theme && ad.theme !== "amber") wire.th = ad.theme;
+  /** Tema removido da UI — não codifica mais (decode legado preservado) */
   /** Encode de imagem/crop removido — decode legado preservado em fromCompactWire */
   if (ad.expiresAt) wire.ex = ad.expiresAt;
   return wire;

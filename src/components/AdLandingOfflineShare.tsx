@@ -1,7 +1,6 @@
 import { lazy, Suspense, useEffect, useId, useRef, useState } from "react";
 import { Check, Copy, QrCode } from "lucide-react";
-import type { AdThemeId } from "../types/ad";
-import { resolveAdTheme } from "../lib/adThemes";
+import { AD_QR_FOREGROUND } from "../lib/adThemes";
 import { copyToClipboard } from "../lib/formatters";
 import { downloadQrPng } from "../lib/qrDownload";
 
@@ -11,7 +10,6 @@ const LazyQrCanvas = lazy(() =>
 
 interface AdLandingOfflineShareProps {
   url: string;
-  theme?: AdThemeId;
   headingId?: string;
 }
 
@@ -24,10 +22,9 @@ function QrPlaceholder() {
 }
 
 /** Na landing do comprador: copiar link em destaque; QR discreto para vitrine física */
-export function AdLandingOfflineShare({ url, theme, headingId }: AdLandingOfflineShareProps) {
+export function AdLandingOfflineShare({ url, headingId }: AdLandingOfflineShareProps) {
   const fallbackHeadingId = useId();
   const resolvedHeadingId = headingId ?? fallbackHeadingId;
-  const themeDef = resolveAdTheme(theme);
   const [copied, setCopied] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -102,7 +99,7 @@ export function AdLandingOfflineShare({ url, theme, headingId }: AdLandingOfflin
                 ref={canvasRef}
                 url={url}
                 size={qrSize}
-                fgColor={themeDef.qrFg}
+                fgColor={AD_QR_FOREGROUND}
                 logoSize={logoSize}
               />
             </Suspense>

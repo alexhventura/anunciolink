@@ -15,7 +15,7 @@ describe("adCodec", () => {
     expect(decoded?.title).toBe(FULL_AD.title);
     expect(decoded?.price).toBe(FULL_AD.price);
     expect(decoded?.icon).toBe(FULL_AD.icon);
-    expect(decoded?.theme).toBe(FULL_AD.theme);
+    expect(decoded?.theme).toBeUndefined();
     expect(decoded?.pix).toBe(FULL_AD.pix);
   });
 

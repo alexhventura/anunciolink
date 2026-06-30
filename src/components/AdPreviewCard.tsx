@@ -1,8 +1,7 @@
 import type { ReactNode } from "react";
 import { Phone } from "lucide-react";
 import type { AdIconId } from "../lib/adIcons";
-import type { AdType, AdThemeId, BillingType } from "../types/ad";
-import { resolveAdTheme } from "../lib/adThemes";
+import type { AdType, BillingType } from "../types/ad";
 import { formatPhoneNumber } from "../lib/formatters";
 import { AdBentoHero } from "./AdBentoHero";
 import { SecurityBadge } from "./SecurityBadge";
@@ -19,7 +18,6 @@ interface AdPreviewCardProps {
   price: string;
   description: string;
   icon?: AdIconId;
-  theme?: AdThemeId;
   billingType?: BillingType;
   phone?: string;
   showSecurityBadge?: boolean;
@@ -31,14 +29,13 @@ interface AdPreviewCardProps {
   className?: string;
 }
 
-/** Landing page Bento — ícone + tema + dados do anúncio */
+/** Card Bento — ícone + dados do anúncio */
 export function AdPreviewCard({
   adType,
   title,
   price,
   description,
   icon,
-  theme,
   billingType = "unico",
   phone,
   showSecurityBadge = false,
@@ -48,7 +45,6 @@ export function AdPreviewCard({
   landing = false,
   className = "",
 }: AdPreviewCardProps) {
-  const themeDef = resolveAdTheme(theme);
   const phoneDisplay = phone ? formatPhoneNumber(phone) : "";
 
   return (
@@ -68,7 +64,6 @@ export function AdPreviewCard({
         title={title}
         price={price}
         icon={icon}
-        theme={theme}
         billingType={billingType}
         size={landing ? "lg" : "card"}
         headingLevel={landing ? "h1" : "h3"}
@@ -76,7 +71,7 @@ export function AdPreviewCard({
 
       <div className={`ad-preview-card__body p-5 sm:p-6 md:p-8 min-w-0 bg-amber-500 ${landing ? "ad-preview-card__body--landing" : "space-y-3"}`}>
         <p className="ad-preview-card__eyebrow">
-          <span className={`chip ${themeDef.chipClass}`}>{TYPE_LABEL[adType]}</span>
+          <span className="chip !bg-black !text-amber-400">{TYPE_LABEL[adType]}</span>
         </p>
         <div className={`ad-preview-card__desc ${landing ? "ad-preview-card__desc--landing" : ""}`}>
           <h2 className="sr-only">Descrição do anúncio</h2>

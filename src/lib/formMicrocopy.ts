@@ -40,10 +40,10 @@ export function descriptionPlaceholder(adType: AdType): string {
 }
 
 export const FIELD_MICROCOPY = {
-  title: "Curto e direto — é o destaque do bloco Bento na landing.",
+  title: "Curto e direto — é o destaque do card do anúncio.",
   price: "Só números; formatamos em Real automaticamente.",
   description: "Quanto mais claro, mais rápido o comprador decide.",
-  phone: "Aparece na landing para contato direto.",
+  phone: "Aparece no anúncio para contato direto.",
   pix: "Quem abrir o link vê QR Pix e copia o código na hora.",
   cardLink: "Mercado Pago, Stripe, PagSeguro ou checkout similar.",
 } as const;

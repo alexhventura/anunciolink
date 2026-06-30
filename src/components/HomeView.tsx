@@ -27,7 +27,6 @@ import { MAX_DESC_LENGTH, MAX_PIX_LENGTH, MAX_TITLE_LENGTH } from "../lib/consta
 import { TOOLTIP_COPY } from "../lib/tooltipCopy";
 import { AdFormField } from "./AdFormField";
 import { AdPreviewCard } from "./AdPreviewCard";
-import { ThemePicker } from "./ThemePicker";
 import { MyAdsPanel } from "./MyAdsPanel";
 import { AdSenseSlot } from "./AdSenseSlot";
 import { PayloadScoreIndicator } from "./PayloadScoreIndicator";
@@ -155,12 +154,11 @@ export function HomeView({
         </div>
 
         <p className="home-landing__tagline text-base sm:text-lg font-semibold text-black max-w-md mx-auto leading-snug tracking-tight">
-          Landing page profissional com ícone, tema, Pix e QR Code — pronta para compartilhar.
+          Anúncio profissional com ícone, Pix e QR Code — pronto para compartilhar.
         </p>
 
         <ul className="home-landing__features" aria-label="Recursos incluídos">
           <li className="home-landing__feature">Ícone</li>
-          <li className="home-landing__feature">Tema</li>
           <li className="home-landing__feature">Pix</li>
           <li className="home-landing__feature">QR Code</li>
         </ul>
@@ -365,10 +363,6 @@ export function HomeView({
                     </Suspense>
                   </div>
 
-                  <div className="ad-form-bento__cell ad-form-bento__cell--wide">
-                    <ThemePicker value={form.theme} onChange={(theme) => onFieldChange("theme", theme)} />
-                  </div>
-
                   <div className="ad-form-bento__cell">
                     <AdFormField
                       id="phone-input"
@@ -455,9 +449,9 @@ export function HomeView({
               disabled={isSubmitting}
               className="btn-primary"
               aria-busy={isSubmitting}
-              aria-label={isSubmitting ? "Gerando página" : "Gerar landing page grátis"}
+              aria-label={isSubmitting ? "Gerando anúncio" : "Gerar anúncio grátis"}
             >
-              {isSubmitting ? "Gerando…" : "Gerar landing page grátis"}
+              {isSubmitting ? "Gerando…" : "Gerar anúncio grátis"}
             </ActionButtonWithHint>
           </div>
 
@@ -473,7 +467,6 @@ export function HomeView({
                 price={form.price}
                 description={form.description}
                 icon={form.icon}
-                theme={form.theme}
                 billingType={form.billingType}
                 premium
               />

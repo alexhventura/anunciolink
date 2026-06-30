@@ -51,7 +51,6 @@ export const AdBuilder = {
       pix: state.pix.trim() || undefined,
       cardLink: state.cardLink.trim() || undefined,
       icon: resolveAdIconId(state.icon, state.adType),
-      theme: state.theme,
       timestamp: now,
       expiresAt: computeExpiresAt(now),
     });

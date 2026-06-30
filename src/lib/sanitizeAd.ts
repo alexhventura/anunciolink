@@ -1,7 +1,6 @@
 import type { AdData } from "../types/ad";
 import { MAX_DESC_LENGTH, MAX_PIX_LENGTH, MAX_TITLE_LENGTH } from "./constants";
 import { isValidAdIconId } from "./adIcons";
-import { isValidAdTheme } from "./adThemes";
 import { sanitizePhone } from "./formatters";
 import { sanitizeHttpUrl, sanitizePlainText } from "./sanitize";
 
@@ -9,7 +8,6 @@ import { sanitizeHttpUrl, sanitizePlainText } from "./sanitize";
 export function sanitizeAdData(ad: AdData): AdData {
   const phoneRaw = sanitizePlainText(ad.phone ?? "", 32);
   const icon = ad.icon !== undefined && isValidAdIconId(ad.icon) ? ad.icon : undefined;
-  const theme = ad.theme && isValidAdTheme(ad.theme) ? ad.theme : undefined;
   return {
     ...ad,
     title: sanitizePlainText(ad.title, MAX_TITLE_LENGTH),
@@ -19,7 +17,7 @@ export function sanitizeAdData(ad: AdData): AdData {
     pix: ad.pix ? sanitizePlainText(ad.pix, MAX_PIX_LENGTH) : undefined,
     cardLink: sanitizeHttpUrl(ad.cardLink),
     icon,
-    theme,
+    theme: undefined,
     img: undefined,
   };
 }

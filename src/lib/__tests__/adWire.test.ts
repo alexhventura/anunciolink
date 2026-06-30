@@ -12,10 +12,10 @@ describe("adWire", () => {
     expect(wire.i).toBeUndefined();
   });
 
-  it("inclui ícone e tema quando definidos", () => {
+  it("inclui ícone quando definido e não codifica tema", () => {
     const wire = toCompactWire(FULL_AD);
     expect(wire.e).toBe(42);
-    expect(wire.th).toBe("sunset");
+    expect(wire.th).toBeUndefined();
     expect(wire.b).toBe("recorrente");
   });
 
@@ -29,11 +29,16 @@ describe("adWire", () => {
     expect(wire.cz).toBeUndefined();
   });
 
-  it("round-trip wire compacto", () => {
+  it("round-trip wire compacto preserva dados principais", () => {
     const ad = fromCompactWire(toCompactWire(FULL_AD));
     expect(ad.title).toBe(FULL_AD.title);
     expect(ad.icon).toBe(FULL_AD.icon);
-    expect(ad.theme).toBe(FULL_AD.theme);
+    expect(ad.theme).toBeUndefined();
+  });
+
+  it("decodifica tema legado quando presente no wire", () => {
+    const ad = fromCompactWire({ ...COMPACT_WIRE, th: "sunset" });
+    expect(ad.theme).toBe("sunset");
   });
 
   it("decodifica wire legado expandido", () => {

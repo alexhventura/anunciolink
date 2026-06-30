@@ -64,6 +64,9 @@ export const AD_THEMES: AdThemeDefinition[] = [
 
 export const DEFAULT_AD_THEME: AdThemeId = "amber";
 
+/** Cor fixa do QR — independente de tema legado */
+export const AD_QR_FOREGROUND = "#18181b";
+
 const THEME_MAP = new Map(AD_THEMES.map((t) => [t.id, t]));
 
 export const ALL_THEME_IDS = AD_THEMES.map((t) => t.id);

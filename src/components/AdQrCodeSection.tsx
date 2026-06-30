@@ -1,7 +1,6 @@
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { Download } from "lucide-react";
-import type { AdThemeId } from "../types/ad";
-import { resolveAdTheme } from "../lib/adThemes";
+import { AD_QR_FOREGROUND } from "../lib/adThemes";
 import { downloadQrPng } from "../lib/qrDownload";
 
 const LazyQrCanvas = lazy(() =>
@@ -10,7 +9,6 @@ const LazyQrCanvas = lazy(() =>
 
 interface AdQrCodeSectionProps {
   url: string;
-  theme?: AdThemeId;
   /** Adia render para não competir com AdSense no first paint */
   deferMs?: number;
   compact?: boolean;
@@ -36,13 +34,11 @@ function QrPlaceholder({ compact }: { compact?: boolean }) {
 /** QR Code com logo AnúncioLink + download PNG */
 export function AdQrCodeSection({
   url,
-  theme,
   deferMs = 120,
   compact = false,
   landing = false,
   headingId,
 }: AdQrCodeSectionProps) {
-  const themeDef = resolveAdTheme(theme);
   const [ready, setReady] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -104,7 +100,7 @@ export function AdQrCodeSection({
               ref={canvasRef}
               url={url}
               size={qrSize}
-              fgColor={themeDef.qrFg}
+              fgColor={AD_QR_FOREGROUND}
               logoSize={logoSize}
             />
           </Suspense>

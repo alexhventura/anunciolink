@@ -75,7 +75,6 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
             price={ad.price}
             description={ad.desc}
             icon={ad.icon}
-            theme={ad.theme}
             billingType={ad.billingType}
             showSecurityBadge
             premium
@@ -96,7 +95,7 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
               <Zap className="h-6 w-6 shrink-0 fill-amber-500 stroke-black" strokeWidth={2.5} aria-hidden="true" />
               <span className="ad-landing-cta__copy">
                 <span className="ad-landing-cta__eyebrow">Quer vender algo rápido assim também?</span>
-                <span className="ad-landing-cta__label">Criar minha landing page grátis</span>
+                <span className="ad-landing-cta__label">Criar meu anúncio grátis</span>
               </span>
             </button>
             <button
@@ -183,7 +182,7 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
             )}
 
             {pageUrl && (
-              <AdLandingOfflineShare url={pageUrl} theme={ad.theme} headingId={qrHeadingId} />
+              <AdLandingOfflineShare url={pageUrl} headingId={qrHeadingId} />
             )}
           </>
         )}
@@ -200,14 +199,14 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
               Quer vender assim também?
             </h2>
             <p className="ad-landing-section__lead ad-landing-section__lead--center">
-              Crie sua landing page grátis em segundos — sem cadastro.
+              Crie seu anúncio grátis em segundos — sem cadastro.
             </p>
             <button
               type="button"
               onClick={onCreateOwn}
               id="btn-buyer-create-own-ad"
               className="ad-landing-cta btn-ghost w-full sm:w-auto sm:min-w-[220px]"
-              aria-label="Criar minha landing page grátis"
+              aria-label="Criar meu anúncio grátis"
             >
               Criar minha página
             </button>

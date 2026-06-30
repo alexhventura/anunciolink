@@ -145,7 +145,7 @@ export function ShareChannels({ ad, shareUrl, whatsAppMessage }: ShareChannelsPr
           Compartilhar em
         </h2>
         <p className="share-channels__lead">
-          WhatsApp, Telegram, redes sociais ou copie o link. A prévia usa Open Graph ao abrir a landing.
+          WhatsApp, Telegram, redes sociais ou copie o link. A prévia aparece ao abrir o anúncio.
         </p>
       </header>
 
@@ -177,7 +177,7 @@ export function ShareChannels({ ad, shareUrl, whatsAppMessage }: ShareChannelsPr
           onClick={() => void handleCopyLink()}
           className="share-channel share-channel--utility"
           aria-live="polite"
-          aria-label={linkCopied ? "Link copiado" : "Copiar link da landing page"}
+          aria-label={linkCopied ? "Link copiado" : "Copiar link do anúncio"}
         >
           <Link2 className="h-5 w-5 shrink-0" strokeWidth={2.25} aria-hidden="true" />
           {linkCopied ? "Link copiado" : "Copiar link"}

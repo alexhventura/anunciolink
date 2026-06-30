@@ -1,4 +1,4 @@
-import type { AdType, AdThemeId } from "../types/ad";
+import type { AdType } from "../types/ad";
 import type { AdIconId } from "./adIcons";
 import { resolveAdIconId } from "./adIcons";
 import { drawAdIconOnCanvas } from "./adIconCanvas";
@@ -24,7 +24,6 @@ export interface PreviewCardCanvasInput {
   price: string;
   description: string;
   icon?: AdIconId;
-  theme?: AdThemeId;
   billingRecorrente?: boolean;
   phone?: string;
   width?: number;
@@ -142,14 +141,19 @@ export async function renderPreviewCardCanvas(input: PreviewCardCanvasInput): Pr
   ctx.strokeStyle = INK;
   ctx.stroke();
 
-  const iconSize = 112;
-  await drawAdIconOnCanvas(ctx, iconId, cardX + cardW / 2, cardY + 78, iconSize, INK);
+  const iconBox = 128;
+  const iconBoxX = cardX + (cardW - iconBox) / 2;
+  const iconBoxY = cardY + 28;
+  ctx.fillStyle = WHITE;
+  ctx.fillRect(iconBoxX, iconBoxY, iconBox, iconBox);
+  drawStrokeRect(ctx, iconBoxX, iconBoxY, iconBox, iconBox, 4);
+  await drawAdIconOnCanvas(ctx, iconId, cardX + cardW / 2, iconBoxY + iconBox / 2 + 4, 72, INK);
 
   ctx.fillStyle = INK;
   ctx.textAlign = "center";
   ctx.textBaseline = "top";
   ctx.font = "900 42px system-ui, sans-serif";
-  drawWrappedText(ctx, title, cardX + cardW / 2, cardY + 150, safeW, 48, 2);
+  drawWrappedText(ctx, title, cardX + cardW / 2, iconBoxY + iconBox + 20, safeW, 48, 2);
 
   ctx.font = "900 36px system-ui, sans-serif";
   ctx.fillText(priceLabel || "—", cardX + cardW / 2, cardY + headerH - 58);

@@ -55,13 +55,13 @@ export interface PageSeoMeta {
 }
 
 export const HOME_SEO: Omit<PageSeoMeta, "canonicalUrl"> = {
-  title: buildSeoTitle("Landing page grátis com Pix e QR Code"),
+  title: buildSeoTitle("Anúncio online grátis com Pix e QR Code"),
   description: buildSeoDescription(
-    "Crie landing page com ícone, tema visual, Pix e QR Code. Link compartilhável no WhatsApp. Sem cadastro, sem taxas, 100% no navegador."
+    "Crie anúncio com ícone, Pix e QR Code. Link compartilhável no WhatsApp. Sem cadastro, sem taxas, 100% no navegador."
   ),
   robots: "index, follow, max-image-preview:large",
   ogType: "website",
-  imageAlt: `${SITE_NAME} — landing page grátis com Pix e QR Code`,
+  imageAlt: `${SITE_NAME} — anúncio online grátis com Pix e QR Code`,
 };
 
 export const INSTITUTIONAL_SEO: Record<
@@ -71,14 +71,14 @@ export const INSTITUTIONAL_SEO: Record<
   "como-funciona": {
     title: buildSeoTitle("Como funciona"),
     description: buildSeoDescription(
-      "Passo a passo para criar landing page com ícone, tema, Pix e QR Code. Compartilhe o link no WhatsApp. Sem cadastro e custo zero."
+      "Passo a passo para criar anúncio com ícone, Pix e QR Code. Compartilhe o link no WhatsApp. Sem cadastro e custo zero."
     ),
     breadcrumb: "Como funciona",
   },
   sobre: {
     title: buildSeoTitle("Sobre o Anuncio Link"),
     description: buildSeoDescription(
-      "Conheça o Anuncio Link: comércio digital direto com landing page instantânea, dados na URL e zero banco de dados."
+      "Conheça o Anuncio Link: comércio digital direto com anúncios instantâneos, dados na URL e zero banco de dados."
     ),
     breadcrumb: "Sobre",
   },

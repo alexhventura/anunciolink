@@ -18,7 +18,7 @@ export function shortenDescriptionForShare(description: string, maxLen = 280): s
 
 /**
  * Card de texto para compartilhar no WhatsApp e apps compatíveis.
- * O visual completo fica na landing page do link.
+ * O visual completo fica na página do anúncio.
  */
 export function buildWhatsAppShareMessage(
   title: string,
@@ -34,7 +34,7 @@ export function buildWhatsAppShareMessage(
     `🛍️ *${safeTitle}*\n` +
     `💰 ${safePrice}\n` +
     `📝 ${safeDesc}\n\n` +
-    `🔗 Ver landing page e pagar:\n` +
+    `🔗 Ver anúncio e pagar:\n` +
     `${adUrl}`
   );
 }
