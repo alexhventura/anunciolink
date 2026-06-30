@@ -20,9 +20,36 @@ function pdfFilename(ad: AdData): string {
   return shareCardFilename(ad).replace(/\.png$/i, "-a4.pdf");
 }
 
+function downloadBlob(blob: Blob, filename: string): void {
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  anchor.rel = "noopener";
+  anchor.style.display = "none";
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+}
+
+function openPdfPreview(blob: Blob): void {
+  const url = URL.createObjectURL(blob);
+  const opened = window.open(url, "_blank", "noopener,noreferrer");
+  if (!opened) return;
+  window.setTimeout(() => URL.revokeObjectURL(url), 120_000);
+}
+
 async function buildA4CardPdf(ad: AdData, qrUrl: string): Promise<jsPDF> {
   const cardBlob = await generateShareCardBlob(ad, qrUrl);
+  if (!cardBlob.size) {
+    throw new Error("A imagem do card não foi gerada.");
+  }
+
   const dataUrl = await blobToDataUrl(cardBlob);
+  if (!dataUrl.startsWith("data:image/")) {
+    throw new Error("Formato de imagem do card inválido.");
+  }
 
   const pdf = new jsPDF({
     orientation: "portrait",
@@ -40,70 +67,29 @@ async function buildA4CardPdf(ad: AdData, qrUrl: string): Promise<jsPDF> {
   const x = (A4_W_MM - cardMm) / 2;
   const y = (A4_H_MM - cardMm) / 2;
 
-  pdf.addImage(dataUrl, "PNG", x, y, cardMm, cardMm, undefined, "FAST");
+  pdf.addImage(dataUrl, "PNG", x, y, cardMm, cardMm, undefined, "MEDIUM");
 
   return pdf;
 }
 
-function printPdfBlob(blob: Blob): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(blob);
-    const iframe = document.createElement("iframe");
-    iframe.setAttribute("aria-hidden", "true");
-    iframe.style.cssText =
-      "position:fixed;right:0;bottom:0;width:0;height:0;border:0;opacity:0;pointer-events:none";
-
-    let settled = false;
-    const finish = (fn: () => void) => {
-      if (settled) return;
-      settled = true;
-      URL.revokeObjectURL(url);
-      iframe.remove();
-      fn();
-    };
-
-    iframe.onload = () => {
-      const win = iframe.contentWindow;
-      if (!win) {
-        finish(() => reject(new Error("Não foi possível abrir o diálogo de impressão.")));
-        return;
-      }
-
-      const onAfterPrint = () => finish(resolve);
-      win.addEventListener("afterprint", onAfterPrint, { once: true });
-      win.focus();
-      win.print();
-
-      window.setTimeout(() => {
-        if (!settled) finish(resolve);
-      }, 120_000);
-    };
-
-    iframe.onerror = () => {
-      finish(() => reject(new Error("Falha ao carregar PDF para impressão.")));
-    };
-
-    iframe.src = url;
-    document.body.appendChild(iframe);
-  });
-}
-
 /**
- * Gera PDF A4 com o card do anúncio centralizado (mesma arte do PNG social)
- * e abre o diálogo de impressão — no Chrome, use "Guardar como PDF".
+ * Gera PDF A4 com o card centralizado, baixa o arquivo e abre prévia em nova aba.
  */
 export async function printA4CardPdf(ad: AdData, qrUrl: string): Promise<void> {
   const pdf = await buildA4CardPdf(ad, qrUrl);
+  const filename = pdfFilename(ad);
+  const blob = pdf.output("blob") as Blob;
 
-  try {
-    await printPdfBlob(pdf.output("blob") as Blob);
-  } catch {
-    pdf.save(pdfFilename(ad));
+  if (!blob.size) {
+    throw new Error("O PDF do cartaz ficou vazio.");
   }
+
+  downloadBlob(blob, filename);
+  openPdfPreview(blob);
 }
 
-/** Baixa o PDF A4 sem abrir o diálogo de impressão */
+/** Baixa o PDF A4 sem abrir prévia */
 export async function downloadA4CardPdf(ad: AdData, qrUrl: string): Promise<void> {
   const pdf = await buildA4CardPdf(ad, qrUrl);
-  pdf.save(pdfFilename(ad));
+  downloadBlob(pdf.output("blob") as Blob, pdfFilename(ad));
 }

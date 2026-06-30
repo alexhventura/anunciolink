@@ -1,13 +1,17 @@
 import type { AdData } from "../types/ad";
 import { MAX_DESC_LENGTH, MAX_PIX_LENGTH, MAX_TITLE_LENGTH } from "./constants";
-import { isValidAdIconId } from "./adIcons";
+import { isBrandMarkIcon, isValidAdIconId } from "./adIcons";
 import { sanitizePhone } from "./formatters";
 import { sanitizeHttpUrl, sanitizePlainText } from "./sanitize";
 
 /** Sanitiza todos os campos de texto vindos da URL ou do formulário */
 export function sanitizeAdData(ad: AdData): AdData {
   const phoneRaw = sanitizePlainText(ad.phone ?? "", 32);
-  const icon = ad.icon !== undefined && isValidAdIconId(ad.icon) ? ad.icon : undefined;
+  const icon = isBrandMarkIcon(ad.icon)
+    ? ad.icon
+    : ad.icon !== undefined && isValidAdIconId(ad.icon)
+      ? ad.icon
+      : undefined;
   return {
     ...ad,
     title: sanitizePlainText(ad.title, MAX_TITLE_LENGTH),

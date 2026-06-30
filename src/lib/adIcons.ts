@@ -19,6 +19,11 @@ export enum AdIconCategoryId {
 /** IDs compactos no payload (0–119). Novos ícones só no fim da categoria. */
 export type AdIconId = number;
 
+/** Wire `e: -1` — marca AnúncioLink no lugar do ícone Lucide */
+export const AD_ICON_BRAND_MARK = -1 as const;
+
+export type AdIconChoice = AdIconId | typeof AD_ICON_BRAND_MARK;
+
 export const AD_ICON_COUNT = 120;
 
 /** Defaults por tipo — omitidos no wire quando iguais */
@@ -324,6 +329,14 @@ export function isValidAdIconId(value: unknown): value is AdIconId {
   return typeof value === "number" && Number.isInteger(value) && value >= 0 && value < AD_ICON_COUNT;
 }
 
+export function isBrandMarkIcon(icon: unknown): icon is typeof AD_ICON_BRAND_MARK {
+  return icon === AD_ICON_BRAND_MARK;
+}
+
+export function isAdIconChoice(value: unknown): value is AdIconChoice {
+  return isBrandMarkIcon(value) || isValidAdIconId(value);
+}
+
 export function getAdIconDefinition(id: AdIconId): AdIconDefinition | undefined {
   return ICON_BY_ID.get(id);
 }
@@ -334,7 +347,8 @@ export function resolveAdIconId(icon: AdIconId | undefined, adType: AdType): AdI
 }
 
 /** Decodifica wire `e` — número, string numérica ou emoji legado */
-export function decodeIconFromWire(value: unknown): AdIconId | undefined {
+export function decodeIconFromWire(value: unknown): AdIconChoice | undefined {
+  if (value === AD_ICON_BRAND_MARK) return AD_ICON_BRAND_MARK;
   if (typeof value === "number" && isValidAdIconId(value)) return value;
   if (typeof value === "string") {
     if (/^\d+$/.test(value)) {
@@ -346,10 +360,21 @@ export function decodeIconFromWire(value: unknown): AdIconId | undefined {
   return undefined;
 }
 
-/** Omite no wire quando igual ao default do tipo */
-export function iconIdForWire(icon: AdIconId | undefined, adType: AdType): AdIconId | undefined {
+/** Omite no wire quando igual ao default do tipo; `-1` codifica marca do site */
+export function iconIdForWire(icon: AdIconChoice | undefined, adType: AdType): number | undefined {
+  if (isBrandMarkIcon(icon)) return AD_ICON_BRAND_MARK;
   const resolved = resolveAdIconId(icon, adType);
   return resolved === DEFAULT_AD_ICON_ID[adType] ? undefined : resolved;
+}
+
+/** Normaliza escolha do formulário para payload do anúncio */
+export function normalizeAdIconChoice(
+  icon: AdIconChoice | undefined,
+  adType: AdType
+): AdIconChoice | undefined {
+  if (isBrandMarkIcon(icon)) return AD_ICON_BRAND_MARK;
+  if (icon !== undefined && isValidAdIconId(icon)) return icon;
+  return undefined;
 }
 
 export function searchAdIcons(query: string, categoryId?: AdIconCategoryId): AdIconDefinition[] {

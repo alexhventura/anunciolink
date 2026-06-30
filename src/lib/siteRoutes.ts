@@ -1,6 +1,7 @@
 import type { AppView } from "../types/ad";
 
 export const SITE_PAGE_PATHS = {
+  meusAnuncios: "/meus-anuncios",
   comoFunciona: "/como-funciona",
   sobre: "/sobre",
   privacidade: "/privacidade",
@@ -9,10 +10,11 @@ export const SITE_PAGE_PATHS = {
 
 export type InstitutionalView = Extract<
   AppView,
-  "como-funciona" | "sobre" | "privacidade" | "termos"
+  "meus-anuncios" | "como-funciona" | "sobre" | "privacidade" | "termos"
 >;
 
 const VIEW_TO_PATH: Record<InstitutionalView, string> = {
+  "meus-anuncios": SITE_PAGE_PATHS.meusAnuncios,
   "como-funciona": SITE_PAGE_PATHS.comoFunciona,
   sobre: SITE_PAGE_PATHS.sobre,
   privacidade: SITE_PAGE_PATHS.privacidade,
@@ -20,6 +22,7 @@ const VIEW_TO_PATH: Record<InstitutionalView, string> = {
 };
 
 const PATH_TO_VIEW: Record<string, InstitutionalView> = {
+  [SITE_PAGE_PATHS.meusAnuncios]: "meus-anuncios",
   [SITE_PAGE_PATHS.comoFunciona]: "como-funciona",
   [SITE_PAGE_PATHS.sobre]: "sobre",
   [SITE_PAGE_PATHS.privacidade]: "privacidade",

@@ -7,6 +7,8 @@ export interface SavedAdEntry {
   url: string;
   type: AdType;
   createdAt: number;
+  /** Payload codificado na URL — snapshot local para decode offline */
+  payload?: string;
 }
 
 const STORAGE_KEY = "anunciolink_my_ads";
@@ -53,6 +55,7 @@ export function saveAdToHistory(entry: Omit<SavedAdEntry, "id" | "createdAt">): 
     duplicate.price = entry.price;
     duplicate.type = entry.type;
     duplicate.createdAt = Date.now();
+    if (entry.payload) duplicate.payload = entry.payload;
     if (!writeAll(items)) return null;
     return duplicate;
   }

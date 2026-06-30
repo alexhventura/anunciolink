@@ -103,6 +103,45 @@ export function drawCanvasBrandFooter(
   ctx.restore();
 }
 
+/** Ícone compacto centralizado — card social / hero */
+export function drawCanvasBrandMarkCentered(
+  ctx: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  size: number
+) {
+  const box = size;
+  const x = cx - box / 2;
+  const y = cy - box / 2;
+  const r = box * 0.19;
+
+  strokeRoundRect(ctx, x, y, box, box, r, "#fbbf24");
+  ctx.strokeStyle = INK;
+  ctx.lineWidth = Math.max(2, box * 0.04);
+  roundRect(ctx, x, y, box, box, r);
+  ctx.stroke();
+
+  ctx.fillStyle = INK;
+  ctx.font = `900 ${box * 0.46}px Inter, Arial, sans-serif`;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText("A", cx, cy + box * 0.02);
+
+  ctx.beginPath();
+  ctx.fillStyle = MUSTARD_SOFT;
+  ctx.strokeStyle = INK;
+  ctx.lineWidth = Math.max(2, box * 0.035);
+  const zx = x + box - box * 0.2;
+  const zy = y + box * 0.12;
+  ctx.moveTo(zx, zy + box * 0.22);
+  ctx.lineTo(zx - box * 0.06, zy);
+  ctx.lineTo(zx + box * 0.04, zy + box * 0.09);
+  ctx.lineTo(zx - box * 0.1, zy + box * 0.09);
+  ctx.lineTo(zx, zy + box * 0.22);
+  ctx.fill();
+  ctx.stroke();
+}
+
 /** Ícone compacto no canto — card social */
 export function drawCanvasBrandMark(ctx: CanvasRenderingContext2D, x: number, y: number) {
   const box = 52;

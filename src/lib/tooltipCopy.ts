@@ -6,8 +6,7 @@ export const TOOLTIP_COPY = {
     "Digite só números — formatamos em R$ automaticamente. Em cobrança recorrente, exibimos '/mês'.",
   description:
     "Detalhes que vendem: estado, entrega, garantia ou o que está incluso no serviço.",
-  icon:
-    "Ícone que representa seu produto ou serviço — aparece grande no hero Bento.",
+  icon: "Ícone que representa seu produto ou serviço no card.",
   nativeShare:
     "Abre o compartilhamento nativo do celular com texto pronto — ideal para WhatsApp e redes.",
   pix:
@@ -23,7 +22,7 @@ export const TOOLTIP_COPY = {
   generateAd:
     "Gera anúncio + link + QR Code. Tudo codificado na URL — sem upload e sem banco.",
   printPoster:
-    "Gera PDF A4 com a imagem do card centralizada — imprima ou salve como PDF.",
+    "Baixa PDF A4 com a imagem do card centralizada — o arquivo abre para você visualizar ou imprimir.",
   socialCard:
     "Card PNG idêntico ao anúncio — ideal para status e redes sociais.",
   linkShortener:

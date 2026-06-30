@@ -140,7 +140,10 @@ export const DocumentHeadService = {
   },
 
   applyInstitutional(
-    view: Extract<AppView, "como-funciona" | "sobre" | "privacidade" | "termos">
+    view: Extract<
+      AppView,
+      "meus-anuncios" | "como-funciona" | "sobre" | "privacidade" | "termos"
+    >
   ): void {
     if (typeof document === "undefined") return;
     const seo = INSTITUTIONAL_SEO[view];

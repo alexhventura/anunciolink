@@ -37,6 +37,13 @@ describe("adWire", () => {
     expect(wire.cz).toBeUndefined();
   });
 
+  it("codifica marca do site como e: -1", () => {
+    const wire = toCompactWire({ ...MINIMAL_AD, icon: -1 });
+    expect(wire.e).toBe(-1);
+    const ad = fromCompactWire(wire);
+    expect(ad.icon).toBe(-1);
+  });
+
   it("round-trip wire compacto preserva dados principais", () => {
     const ad = fromCompactWire(toCompactWire(FULL_AD));
     expect(ad.title).toBe(FULL_AD.title);

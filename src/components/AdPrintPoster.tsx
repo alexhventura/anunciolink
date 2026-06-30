@@ -2,7 +2,6 @@ import { Printer } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import type { AdData } from "../types/ad";
 import { printA4CardPdf } from "../lib/a4CardPdf";
-import { isQrUrlSafe } from "../lib/qrShareUrl";
 import { TOOLTIP_COPY } from "../lib/tooltipCopy";
 import { ActionButtonWithHint } from "./HelpTooltip";
 
@@ -20,7 +19,6 @@ export function AdPrintPoster({
   triggerClassName = "btn-share-print",
   hintVariant = "on-dark",
 }: AdPrintPosterProps) {
-  const qrSafe = isQrUrlSafe(qrUrl);
   const [printing, setPrinting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,18 +27,18 @@ export function AdPrintPoster({
   }, [ad, qrUrl]);
 
   const handlePrint = useCallback(async () => {
-    if (!qrSafe || printing) return;
+    if (!qrUrl.trim() || printing) return;
     setPrinting(true);
     setError(null);
     try {
       await printA4CardPdf(ad, qrUrl);
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Não foi possível abrir a impressão.";
+      const message = err instanceof Error ? err.message : "Não foi possível gerar o cartaz.";
       setError(message);
     } finally {
       setPrinting(false);
     }
-  }, [ad, qrSafe, printing, qrUrl]);
+  }, [ad, printing, qrUrl]);
 
   return (
     <div className="space-y-2">
@@ -50,12 +48,12 @@ export function AdPrintPoster({
         onClick={() => void handlePrint()}
         id="btn-print-a4-poster"
         className={`${triggerClassName} no-print`}
-        disabled={!qrSafe || printing}
+        disabled={!qrUrl.trim() || printing}
         aria-busy={printing}
-        aria-label="Gerar cartaz A4 para imprimir com QR Code em destaque"
+        aria-label="Baixar cartaz A4 em PDF com a imagem do card"
       >
         <Printer className="h-5 w-5 shrink-0" strokeWidth={2} aria-hidden="true" />
-        {printing ? "Preparando cartaz…" : "Gerar Cartaz A4 para Imprimir"}
+        {printing ? "Gerando PDF…" : "Baixar Cartaz A4 (PDF)"}
       </ActionButtonWithHint>
       {error ? (
         <p className="text-xs font-bold text-red-700" role="alert">

@@ -7,10 +7,12 @@ import { AdSocialCardDownload } from "./AdSocialCardDownload";
 
 interface AdShareToolsProps {
   ad: AdData;
+  /** Link gerado (inclui locked.) — QR do card e cartaz usam este URL quando informado */
+  shareUrl?: string;
 }
 
-export function AdShareTools({ ad }: AdShareToolsProps) {
-  const qrUrl = useMemo(() => buildQrShareUrl(ad), [ad]);
+export function AdShareTools({ ad, shareUrl }: AdShareToolsProps) {
+  const qrUrl = useMemo(() => shareUrl ?? buildQrShareUrl(ad), [ad, shareUrl]);
 
   return (
     <section className="neo-card-white space-y-5" aria-labelledby="share-tools-heading">

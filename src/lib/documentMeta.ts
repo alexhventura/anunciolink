@@ -11,7 +11,10 @@ export function applyHomeDocumentMeta() {
 }
 
 export function applyInstitutionalDocumentMeta(
-  view: Extract<AppView, "como-funciona" | "sobre" | "privacidade" | "termos">
+  view: Extract<
+    AppView,
+    "meus-anuncios" | "como-funciona" | "sobre" | "privacidade" | "termos"
+  >
 ) {
   DocumentHeadService.applyInstitutional(view);
 }

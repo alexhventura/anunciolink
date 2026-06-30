@@ -419,6 +419,16 @@
   filter: none;
 }
 
+.ad-bento-hero__brand-mark {
+  width: 4.25rem !important;
+  height: 4.25rem !important;
+}
+
+.ad-bento-hero__brand-mark--lg {
+  width: 5rem !important;
+  height: 5rem !important;
+}
+
 .ad-bento-hero--brand .ad-bento-hero__title,
 .ad-bento-hero--brand .ad-bento-hero__price {
   color: #18181b;
@@ -1267,6 +1277,239 @@
 
 .ad-form-field--invalid .label-field {
   color: #b91c1c;
+}
+
+.ad-form-submit-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  margin: 0;
+  padding: 0.875rem 1rem;
+  border: 2px solid #18181b;
+  border-radius: 0.5rem;
+  background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%);
+  box-shadow: 2px 2px 0 0 #18181b;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #52525b;
+  line-height: 1.45;
+}
+
+.ad-form-submit-note__icon {
+  flex-shrink: 0;
+  width: 1.125rem;
+  height: 1.125rem;
+  margin-top: 0.1rem;
+  color: #18181b;
+}
+
+/* ——— Meus Anúncios ——— */
+.my-ads-teaser__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0.625rem 1.25rem;
+}
+
+.my-ads-empty {
+  padding: 2.5rem 1.5rem;
+}
+
+.my-ads-empty__text {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: #18181b;
+  line-height: 1.45;
+  max-width: 22rem;
+  margin-inline: auto;
+}
+
+.my-ads-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.my-ads-item {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  border: 3px solid #18181b;
+  border-radius: 0.5rem;
+  background: #fffbeb;
+  box-shadow: 4px 4px 0 0 #18181b;
+}
+
+.my-ads-item__headline {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #18181b;
+  line-height: 1.25;
+  cursor: pointer;
+  word-break: break-word;
+}
+
+.my-ads-item__headline:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.my-ads-item__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.my-ads-item__delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0.5rem 1rem;
+  border: 3px solid #18181b;
+  border-radius: 0.5rem;
+  background: #18181b;
+  color: #fbbf24;
+  font-size: 0.75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  box-shadow: 3px 3px 0 0 #18181b;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.my-ads-item__delete:hover {
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0 0 #18181b;
+}
+
+.delete-ad-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.delete-ad-dialog__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(24, 24, 27, 0.55);
+  cursor: pointer;
+}
+
+.delete-ad-dialog__panel {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 24rem);
+  padding: 1.75rem 1.5rem;
+  border: 3px solid #18181b;
+  border-radius: 0.75rem;
+  background: #fffbeb;
+  box-shadow: 6px 6px 0 0 #18181b;
+  text-align: center;
+}
+
+.delete-ad-dialog__icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  margin: 0 auto 1rem;
+  border: 3px solid #18181b;
+  border-radius: 0.5rem;
+  background: #ffffff;
+  box-shadow: 3px 3px 0 0 #18181b;
+}
+
+.delete-ad-dialog__icon {
+  width: 1.75rem;
+  height: 1.75rem;
+  color: #18181b;
+}
+
+.delete-ad-dialog__title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: #18181b;
+  line-height: 1.3;
+}
+
+.delete-ad-dialog__text {
+  margin: 0.875rem 0 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #52525b;
+  line-height: 1.5;
+}
+
+.delete-ad-dialog__ad-name {
+  margin: 0.75rem 0 0;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #71717a;
+  letter-spacing: 0.03em;
+}
+
+.delete-ad-dialog__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+}
+
+.delete-ad-dialog__confirm {
+  min-height: 44px;
+  padding: 0.625rem 1rem;
+  border: 3px solid #18181b;
+  border-radius: 0.5rem;
+  background: #18181b;
+  color: #fbbf24;
+  font-size: 0.75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  box-shadow: 3px 3px 0 0 #18181b;
+  cursor: pointer;
+}
+
+.delete-ad-dialog__cancel {
+  min-height: 44px;
+  padding: 0.625rem 1rem;
+  border: 3px solid #18181b;
+  border-radius: 0.5rem;
+  background: #ffffff;
+  color: #18181b;
+  font-size: 0.75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  box-shadow: 3px 3px 0 0 #18181b;
+  cursor: pointer;
 }
 
 /* ——— Canais de compartilhamento ——— */

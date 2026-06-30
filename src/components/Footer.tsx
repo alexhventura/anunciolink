@@ -15,6 +15,12 @@ export function Footer({ onNavigate }: FooterProps) {
       </p>
 
       <nav className="site-footer__nav mt-6 flex flex-wrap items-center justify-center gap-x-3 gap-y-2" aria-label="Links institucionais">
+        <SiteNavLink view="meus-anuncios" onNavigate={onNavigate}>
+          Meus Anúncios
+        </SiteNavLink>
+        <span className="text-zinc-400 select-none" aria-hidden="true">
+          ·
+        </span>
         <SiteNavLink view="como-funciona" onNavigate={onNavigate} highlight>
           Como Funciona
         </SiteNavLink>

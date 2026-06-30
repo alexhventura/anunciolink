@@ -1,30 +1,39 @@
 import { Search } from "lucide-react";
 import { useCallback, useId, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import type { AdType } from "../types/ad";
-import type { AdIconId } from "../lib/adIcons";
+import type { AdIconChoice } from "../lib/adIcons";
 import {
+  AD_ICON_BRAND_MARK,
   AD_ICON_CATEGORIES,
   AdIconCategoryId,
+  DEFAULT_AD_ICON_ID,
   getAdIconDefinition,
+  isBrandMarkIcon,
   resolveAdIconId,
   searchAdIcons,
 } from "../lib/adIcons";
 import { AdProductIcon } from "./AdProductIcon";
+import { BrandMark } from "./BrandMark";
 import { FieldLabelWithHint } from "./HelpTooltip";
 import { TOOLTIP_COPY } from "../lib/tooltipCopy";
 
 interface IconPickerProps {
   adType: AdType;
-  value: AdIconId;
-  onChange: (iconId: AdIconId) => void;
+  value: AdIconChoice;
+  onChange: (iconId: AdIconChoice) => void;
 }
+
+const segmentBase = "neo-segment";
+const segmentActive = "neo-segment-active";
+const segmentIdle = "neo-segment-idle";
 
 export function IconPicker({ adType, value, onChange }: IconPickerProps) {
   const [activeCategory, setActiveCategory] = useState<AdIconCategoryId>(AdIconCategoryId.Geral);
   const [query, setQuery] = useState("");
   const [focusIndex, setFocusIndex] = useState(0);
   const panelId = useId();
-  const selected = resolveAdIconId(value, adType);
+  const isBrandMode = isBrandMarkIcon(value);
+  const selected = isBrandMode ? DEFAULT_AD_ICON_ID[adType] : resolveAdIconId(value, adType);
   const selectedDef = getAdIconDefinition(selected);
   const itemRefs = useRef<Array<HTMLButtonElement | null>>([]);
 
@@ -97,106 +106,135 @@ export function IconPicker({ adType, value, onChange }: IconPickerProps) {
       </div>
 
       <div className="ad-form-field__control space-y-3">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3" role="group" aria-label="Estilo do ícone no card">
+          <button
+            type="button"
+            aria-pressed={isBrandMode}
+            onClick={() => onChange(AD_ICON_BRAND_MARK)}
+            className={`${segmentBase} ${isBrandMode ? segmentActive : segmentIdle}`}
+          >
+            Marca do site
+          </button>
+          <button
+            type="button"
+            aria-pressed={!isBrandMode}
+            onClick={() => onChange(selected)}
+            className={`${segmentBase} ${!isBrandMode ? "neo-segment-amber" : segmentIdle}`}
+          >
+            Escolher ícone
+          </button>
+        </div>
+
         <div className="emoji-picker__preview" aria-live="polite">
-          <AdProductIcon
-            iconId={selected}
-            adType={adType}
-            size={44}
-            strokeWidth={2.25}
-            className="emoji-picker__preview-icon shrink-0 text-zinc-900"
-          />
-          <p className="emoji-picker__preview-label">Prévia do ícone no card</p>
-          {selectedDef && (
+          {isBrandMode ? (
+            <BrandMark size="md" variant="bold" className="emoji-picker__preview-icon shrink-0" />
+          ) : (
+            <AdProductIcon
+              iconId={selected}
+              adType={adType}
+              size={44}
+              strokeWidth={2.25}
+              className="emoji-picker__preview-icon shrink-0 text-zinc-900"
+            />
+          )}
+          <p className="emoji-picker__preview-label">
+            {isBrandMode ? "Marca AnúncioLink no card" : "Prévia do ícone no card"}
+          </p>
+          {!isBrandMode && selectedDef && (
             <span className="sr-only">Ícone selecionado: {selectedDef.label}</span>
           )}
         </div>
 
-        <label className="emoji-picker__search">
-        <span className="sr-only">Buscar ícone</span>
-        <Search className="h-4 w-4 shrink-0 text-zinc-500" aria-hidden="true" />
-        <input
-          type="search"
-          value={query}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            setFocusIndex(0);
-          }}
-          placeholder="Buscar ícone (ex.: celular, pet, pizza…)"
-          className="emoji-picker__search-input"
-          autoComplete="off"
-          spellCheck={false}
-          aria-label="Buscar ícone por nome"
-        />
-      </label>
-
-      {!query.trim() && (
-        <div className="emoji-picker__tabs" role="tablist" aria-label="Categorias de ícones">
-          {AD_ICON_CATEGORIES.map((category) => {
-            const tabId = `icon-tab-${category.id}`;
-            const isActive = activeCategory === category.id;
-            return (
-              <button
-                key={category.id}
-                id={tabId}
-                type="button"
-                role="tab"
-                aria-selected={isActive}
-                aria-controls={panelId}
-                tabIndex={isActive ? 0 : -1}
-                onClick={() => {
-                  setActiveCategory(category.id);
+        {!isBrandMode && (
+          <>
+            <label className="emoji-picker__search">
+              <span className="sr-only">Buscar ícone</span>
+              <Search className="h-4 w-4 shrink-0 text-zinc-500" aria-hidden="true" />
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => {
+                  setQuery(e.target.value);
                   setFocusIndex(0);
                 }}
-                onKeyDown={(e) => handleTabKeyDown(e, category.id)}
-                className={`emoji-picker__tab ${isActive ? "emoji-picker__tab--active" : ""}`}
-              >
-                {category.label}
-              </button>
-            );
-          })}
-        </div>
-      )}
+                placeholder="Buscar ícone (ex.: celular, pet, pizza…)"
+                className="emoji-picker__search-input"
+                autoComplete="off"
+                spellCheck={false}
+                aria-label="Buscar ícone por nome"
+              />
+            </label>
 
-      <div
-        id={panelId}
-        role="tabpanel"
-        aria-label={
-          query.trim()
-            ? "Resultados da busca de ícones"
-            : `Ícones — ${AD_ICON_CATEGORIES.find((c) => c.id === activeCategory)?.label ?? "categoria"}`
-        }
-      >
-        <div
-          className="emoji-picker__grid"
-          role="listbox"
-          aria-label="Escolha um ícone"
-          onKeyDown={handleGridKeyDown}
-        >
-          {icons.length === 0 ? (
-            <p className="emoji-picker__empty">Nenhum ícone encontrado.</p>
-          ) : (
-            icons.map((def, index) => (
-              <button
-                key={def.id}
-                ref={(el) => {
-                  itemRefs.current[index] = el;
-                }}
-                type="button"
-                role="option"
-                aria-selected={selected === def.id}
-                aria-label={`Selecionar ${def.label}`}
-                title={def.label}
-                tabIndex={index === focusIndex ? 0 : -1}
-                onClick={() => onChange(def.id)}
-                onFocus={() => setFocusIndex(index)}
-                className={`emoji-picker__item ${selected === def.id ? "emoji-picker__item--selected" : ""}`}
+            {!query.trim() && (
+              <div className="emoji-picker__tabs" role="tablist" aria-label="Categorias de ícones">
+                {AD_ICON_CATEGORIES.map((category) => {
+                  const tabId = `icon-tab-${category.id}`;
+                  const isActive = activeCategory === category.id;
+                  return (
+                    <button
+                      key={category.id}
+                      id={tabId}
+                      type="button"
+                      role="tab"
+                      aria-selected={isActive}
+                      aria-controls={panelId}
+                      tabIndex={isActive ? 0 : -1}
+                      onClick={() => {
+                        setActiveCategory(category.id);
+                        setFocusIndex(0);
+                      }}
+                      onKeyDown={(e) => handleTabKeyDown(e, category.id)}
+                      className={`emoji-picker__tab ${isActive ? "emoji-picker__tab--active" : ""}`}
+                    >
+                      {category.label}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            <div
+              id={panelId}
+              role="tabpanel"
+              aria-label={
+                query.trim()
+                  ? "Resultados da busca de ícones"
+                  : `Ícones — ${AD_ICON_CATEGORIES.find((c) => c.id === activeCategory)?.label ?? "categoria"}`
+              }
+            >
+              <div
+                className="emoji-picker__grid"
+                role="listbox"
+                aria-label="Escolha um ícone"
+                onKeyDown={handleGridKeyDown}
               >
-                <AdProductIcon iconId={def.id} adType={adType} size={22} strokeWidth={2.25} />
-              </button>
-            ))
-          )}
-        </div>
-      </div>
+                {icons.length === 0 ? (
+                  <p className="emoji-picker__empty">Nenhum ícone encontrado.</p>
+                ) : (
+                  icons.map((def, index) => (
+                    <button
+                      key={def.id}
+                      ref={(el) => {
+                        itemRefs.current[index] = el;
+                      }}
+                      type="button"
+                      role="option"
+                      aria-selected={selected === def.id}
+                      aria-label={`Selecionar ${def.label}`}
+                      title={def.label}
+                      tabIndex={index === focusIndex ? 0 : -1}
+                      onClick={() => onChange(def.id)}
+                      onFocus={() => setFocusIndex(index)}
+                      className={`emoji-picker__item ${selected === def.id ? "emoji-picker__item--selected" : ""}`}
+                    >
+                      <AdProductIcon iconId={def.id} adType={adType} size={22} strokeWidth={2.25} />
+                    </button>
+                  ))
+                )}
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

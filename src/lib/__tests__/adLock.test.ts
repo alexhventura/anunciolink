@@ -42,4 +42,19 @@ describe("adLock", () => {
     expect(decryptAdPayload(locked, "9999")).toBeNull();
     expect(tryUnlockAdData(locked, "9999")).toBeNull();
   });
+
+  it("round-trip via URL com hash #locked_", async () => {
+    const { AdSerializer } = await import("../adSerializer");
+    const { buildAdUrl, extractPayloadFromAdUrl } = await import("../adRoutes");
+
+    const result = await AdSerializer.fitForShareUrl(MINIMAL_AD, "ab12");
+    const url = buildAdUrl(result.hash);
+    expect(url).toContain("#locked_");
+
+    const payload = extractPayloadFromAdUrl(url);
+    expect(payload).toBe(result.hash);
+
+    const ad = tryUnlockAdData(payload!, "ab12");
+    expect(ad?.title).toBe(MINIMAL_AD.title);
+  });
 });

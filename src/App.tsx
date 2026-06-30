@@ -35,6 +35,9 @@ const PrivacyPage = lazy(() =>
 const TermsPage = lazy(() =>
   import("./components/pages/TermsPage").then((m) => ({ default: m.TermsPage }))
 );
+const MyAdsPage = lazy(() =>
+  import("./components/pages/MyAdsPage").then((m) => ({ default: m.MyAdsPage }))
+);
 
 function PageFallback() {
   return (
@@ -96,6 +99,7 @@ export default function App() {
         price: adObject.price,
         url: finalLink,
         type: adObject.t,
+        payload: hashResult,
       });
       if (saved) refreshHistory();
 
@@ -144,7 +148,7 @@ export default function App() {
                 onFieldChange={setField}
                 onSubmitError={setSubmitError}
                 onSubmit={handleGenerate}
-                onOpenSavedAd={openSavedAdUrl}
+                onNavigate={navigateToPage}
               />
             </Suspense>
           )}
@@ -171,6 +175,16 @@ export default function App() {
           {currentView === "anuncio" && decodedAd && (
             <Suspense fallback={<PageFallback />}>
               <AdViewPage ad={decodedAd} adsenseReady={adsenseReady} onCreateOwn={handleResetHome} />
+            </Suspense>
+          )}
+
+          {currentView === "meus-anuncios" && (
+            <Suspense fallback={<PageFallback />}>
+              <MyAdsPage
+                adsenseReady={adsenseReady}
+                onOpenAd={openSavedAdUrl}
+                onCreateAd={handleResetHome}
+              />
             </Suspense>
           )}
 

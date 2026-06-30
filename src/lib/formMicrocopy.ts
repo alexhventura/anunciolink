@@ -39,6 +39,9 @@ export function descriptionPlaceholder(adType: AdType): string {
   return "Objetivo da arrecadação, prazo e como o valor será usado…";
 }
 
+export const FORM_SUBMIT_NOTICE =
+  "Cada geração cria um link novo. Se você editar e gerar de novo, o link anterior não muda — não há banco de dados.";
+
 export const FIELD_MICROCOPY = {
   title: "Curto e direto — é o destaque do card do anúncio.",
   price: "Só números; formatamos em Real automaticamente.",

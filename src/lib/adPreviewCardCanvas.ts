@@ -1,8 +1,9 @@
 import type { AdType } from "../types/ad";
 import { SITE_DOMAIN } from "./constants";
-import type { AdIconId } from "./adIcons";
-import { resolveAdIconId } from "./adIcons";
+import type { AdIconChoice } from "./adIcons";
+import { isBrandMarkIcon, resolveAdIconId } from "./adIcons";
 import { drawAdIconOnCanvas } from "./adIconCanvas";
+import { drawCanvasBrandMarkCentered } from "./brandCanvas";
 import { formatPhoneNumber } from "./formatters";
 
 const INK = "#18181b";
@@ -40,7 +41,7 @@ export interface PreviewCardCanvasInput {
   title: string;
   price: string;
   description: string;
-  icon?: AdIconId;
+  icon?: AdIconChoice;
   billingRecorrente?: boolean;
   phone?: string;
   width?: number;
@@ -143,7 +144,8 @@ export async function renderPreviewCardCanvas(input: PreviewCardCanvasInput): Pr
   const safeX = pad + 32;
   const safeW = innerW - 64;
 
-  const iconId = resolveAdIconId(input.icon, input.adType);
+  const useBrandMark = isBrandMarkIcon(input.icon);
+  const iconId = useBrandMark ? undefined : resolveAdIconId(input.icon, input.adType);
   const priceLabel = input.price + (input.billingRecorrente ? " /mês" : "");
   const typeLabel = TYPE_LABEL[input.adType].toUpperCase();
   const phoneDisplay = input.phone ? formatPhoneNumber(input.phone) : "";
@@ -183,7 +185,11 @@ export async function renderPreviewCardCanvas(input: PreviewCardCanvasInput): Pr
   ctx.fillStyle = WHITE;
   ctx.fillRect(iconBoxX, iconBoxY, iconBox, iconBox);
   drawStrokeRect(ctx, iconBoxX, iconBoxY, iconBox, iconBox, 4);
-  await drawAdIconOnCanvas(ctx, iconId, cardX + cardW / 2, iconBoxY + iconBox / 2 + 4, 72, INK);
+  if (useBrandMark) {
+    drawCanvasBrandMarkCentered(ctx, cardX + cardW / 2, iconBoxY + iconBox / 2 + 4, 72);
+  } else {
+    await drawAdIconOnCanvas(ctx, iconId!, cardX + cardW / 2, iconBoxY + iconBox / 2 + 4, 72, INK);
+  }
 
   ctx.fillStyle = INK;
   ctx.textAlign = "center";

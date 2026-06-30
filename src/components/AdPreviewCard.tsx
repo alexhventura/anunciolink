@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Phone } from "lucide-react";
-import type { AdIconId } from "../lib/adIcons";
+import type { AdIconChoice } from "../lib/adIcons";
 import type { AdType, BillingType } from "../types/ad";
 import { formatPhoneNumber } from "../lib/formatters";
 import { AdBentoHero } from "./AdBentoHero";
@@ -16,7 +16,7 @@ interface AdPreviewCardProps {
   title: string;
   price: string;
   description: string;
-  icon?: AdIconId;
+  icon?: AdIconChoice;
   billingType?: BillingType;
   phone?: string;
   exportMode?: boolean;

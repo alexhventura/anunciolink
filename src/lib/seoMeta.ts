@@ -69,6 +69,13 @@ export const INSTITUTIONAL_SEO: Record<
   InstitutionalView,
   { title: string; description: string; breadcrumb: string }
 > = {
+  "meus-anuncios": {
+    title: buildSeoTitle("Meus anúncios salvos"),
+    description: buildSeoDescription(
+      "Lista local dos anúncios que você criou neste navegador. Copie, compartilhe ou remova da sua lista — sem cadastro e sem banco de dados."
+    ),
+    breadcrumb: "Meus anúncios",
+  },
   "como-funciona": {
     title: buildSeoTitle("Como criar anúncio grátis"),
     description: buildSeoDescription(

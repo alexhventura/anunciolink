@@ -1,10 +1,11 @@
-import { ChevronDown, Sparkles } from "lucide-react";
+import { ChevronDown, Info, Sparkles } from "lucide-react";
 import { lazy, Suspense, useEffect, useRef, type FormEvent, useCallback, useMemo, useState } from "react";
 import type { AdFormState } from "../hooks/useAdForm";
 import { focusFirstField } from "../lib/focusMainContent";
 import {
   FIELD_MICROCOPY,
   FORM_SECTION_COPY,
+  FORM_SUBMIT_NOTICE,
   descriptionPlaceholder,
   priceLabel,
   titlePlaceholder,
@@ -28,7 +29,8 @@ import { AD_PASSWORD_MAX_LENGTH, sanitizeAdPassword } from "../lib/adLock";
 import { TOOLTIP_COPY } from "../lib/tooltipCopy";
 import { AdFormField } from "./AdFormField";
 import { AdPreviewCard } from "./AdPreviewCard";
-import { MyAdsPanel } from "./MyAdsPanel";
+import type { AppView } from "../types/ad";
+import { MyAdsHomeTeaser } from "./MyAdsHomeTeaser";
 import { AdSenseSlot } from "./AdSenseSlot";
 import { PayloadScoreIndicator } from "./PayloadScoreIndicator";
 import { ViewEnter } from "./ViewEnter";
@@ -46,7 +48,7 @@ interface HomeViewProps {
   onFieldChange: <K extends keyof AdFormState>(field: K, value: AdFormState[K]) => void;
   onSubmitError: (error: string | null) => void;
   onSubmit: () => void;
-  onOpenSavedAd: (url: string) => void;
+  onNavigate: (view: AppView) => void;
 }
 
 const AD_TYPES = [
@@ -77,7 +79,7 @@ export function HomeView({
   onFieldChange,
   onSubmitError,
   onSubmit,
-  onOpenSavedAd,
+  onNavigate,
 }: HomeViewProps) {
   const [touched, setTouched] = useState<Partial<Record<AdFormFieldKey, boolean>>>({});
   const [optionalOpen, setOptionalOpen] = useState(true);
@@ -184,7 +186,7 @@ export function HomeView({
 
       <HomeSeoSection />
 
-      <MyAdsPanel onOpenAd={onOpenSavedAd} />
+      <MyAdsHomeTeaser onNavigate={onNavigate} />
 
       <AdSenseSlot slot="topo" ready={adsenseReady} />
 
@@ -496,6 +498,11 @@ export function HomeView({
                 </div>
               )}
             </section>
+
+            <p className="ad-form-submit-note" role="note">
+              <Info className="ad-form-submit-note__icon" strokeWidth={2.5} aria-hidden="true" />
+              <span>{FORM_SUBMIT_NOTICE}</span>
+            </p>
 
             <ActionButtonWithHint
               hint={TOOLTIP_COPY.generateAd}

@@ -26,6 +26,11 @@ describe("AdSerializer", () => {
     );
   });
 
+  it("fitForShareUrl com senha gera payload locked.", async () => {
+    const result = await AdSerializer.fitForShareUrl(MINIMAL_AD, "ab12");
+    expect(result.hash.startsWith("locked.")).toBe(true);
+  });
+
   it("buildQrUrl respeita limite de 900 chars", () => {
     const url = AdSerializer.buildQrUrl(FULL_AD);
     expect(url.length).toBeLessThanOrEqual(QR_MAX_URL_CHARS);

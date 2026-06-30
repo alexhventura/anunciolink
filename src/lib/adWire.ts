@@ -17,7 +17,7 @@ export interface CompactAdWire {
   c?: string;
   /** w:webp ou j:jpeg + base64 sem prefixo data: (legado) */
   i?: string;
-  /** ID do ícone Lucide (0–119) */
+  /** ID do ícone Lucide (0–119) ou -1 para marca do site */
   e?: number;
   /** tema visual */
   th?: string;

@@ -158,13 +158,12 @@ export function useAdRouting() {
       try {
         const parsed = new URL(url, window.location.origin);
         if (isAdPathname(parsed.pathname)) {
-          history.pushState(null, "", `${parsed.pathname}${parsed.search}`);
+          history.pushState(null, "", `${parsed.pathname}${parsed.search}${parsed.hash}`);
           void syncFromLocation();
           return;
         }
-        if (parsed.hash.startsWith("#dados=")) {
-          const payload = parsed.hash.substring(7);
-          navigateToAdPath(payload, true);
+        if (parsed.hash.startsWith("#locked_") || parsed.hash.startsWith("#dados=")) {
+          history.pushState(null, "", `${parsed.pathname || "/"}${parsed.hash}`);
           void syncFromLocation();
           return;
         }

@@ -35,9 +35,23 @@ export function Header({ onResetHome, onNavigate }: HeaderProps) {
           </span>
         </button>
 
-        <SiteNavLink view="como-funciona" onNavigate={onNavigate} highlight className="text-[10px] sm:text-xs shrink-0 whitespace-nowrap">
-          Como Funciona
-        </SiteNavLink>
+        <nav className="flex shrink-0 items-center gap-2 sm:gap-3" aria-label="Navegação principal">
+          <SiteNavLink
+            view="meus-anuncios"
+            onNavigate={onNavigate}
+            className="text-[10px] sm:text-xs whitespace-nowrap"
+          >
+            Meus Anúncios
+          </SiteNavLink>
+          <SiteNavLink
+            view="como-funciona"
+            onNavigate={onNavigate}
+            highlight
+            className="text-[10px] sm:text-xs whitespace-nowrap"
+          >
+            Como Funciona
+          </SiteNavLink>
+        </nav>
       </div>
     </header>
   );

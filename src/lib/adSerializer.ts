@@ -91,13 +91,16 @@ export const AdSerializer = {
 
   /** Garante URL de compartilhamento ≤ limites WhatsApp/mobile */
   async fitForShareUrl(ad: AdData, password?: string): Promise<FitAdResult> {
+    const lockKey = password?.trim() ? sanitizeAdPassword(password) : "";
+    const mustLock = Boolean(lockKey);
+
     let current = this.normalize(ad);
     let imageStripped = false;
     let textOptimized = false;
     const originalDesc = current.desc;
 
     let hash = encodeNormalized(current);
-    if (urlFitsShare(hash)) {
+    if (urlFitsShare(hash) && !mustLock) {
       return { ad: current, hash, imageStripped, textOptimized };
     }
 
@@ -105,7 +108,7 @@ export const AdSerializer = {
       imageStripped = true;
       current = stripLegacyImageFields(current);
       hash = encodeNormalized(current);
-      if (urlFitsShare(hash)) {
+      if (urlFitsShare(hash) && !mustLock) {
         return { ad: current, hash, imageStripped, textOptimized };
       }
     }
@@ -142,14 +145,14 @@ export const AdSerializer = {
       );
     }
 
-    const lockKey = password?.trim() ? sanitizeAdPassword(password) : "";
-    if (lockKey) {
-      if (!isValidAdPassword(lockKey)) {
+    const lockKeyFinal = lockKey;
+    if (lockKeyFinal) {
+      if (!isValidAdPassword(lockKeyFinal)) {
         throw new AdCodecError(
           "Use uma senha de 1 a 4 caracteres — apenas letras e números."
         );
       }
-      hash = encryptAdPayload(hash, lockKey);
+      hash = encryptAdPayload(hash, lockKeyFinal);
       if (!urlFitsShare(hash) || estimateAdUrlLength(hash) > MAX_SHARE_URL_LENGTH) {
         throw new AdCodecError(
           "Com a senha, o link ficou grande demais. Encurte título, descrição ou Pix."

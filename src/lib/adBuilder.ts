@@ -1,7 +1,7 @@
 import type { AdData } from "../types/ad";
 import type { AdFormState } from "../hooks/useAdForm";
 import { computeExpiresAt } from "./adExpiry";
-import { resolveAdIconId } from "./adIcons";
+import { normalizeAdIconChoice } from "./adIcons";
 import { buildAdUrl } from "./adRoutes";
 import { sanitizePhone } from "./formatters";
 import {
@@ -51,7 +51,7 @@ export const AdBuilder = {
       phone: state.phone.trim() ? sanitizePhone(state.phone) : "",
       pix: state.pix.trim() || undefined,
       cardLink: state.cardLink.trim() || undefined,
-      icon: resolveAdIconId(state.icon, state.adType),
+      icon: normalizeAdIconChoice(state.icon, state.adType),
       timestamp: now,
       expiresAt: computeExpiresAt(now, state.adType),
     });

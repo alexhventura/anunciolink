@@ -139,7 +139,7 @@ export function SuccessView({
           <AdQrCodeSection url={generatedLink} deferMs={200} headingId={qrHeadingId} />
 
           <Suspense fallback={<div className="neo-inset p-6 text-center text-xs font-bold text-zinc-500">Carregando ferramentas…</div>}>
-            <AdShareTools ad={adSnapshot} />
+            <AdShareTools ad={adSnapshot} shareUrl={generatedLink} />
           </Suspense>
 
           <aside

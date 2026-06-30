@@ -85,7 +85,7 @@ export function AdUnlockPage({ onUnlock }: AdUnlockPageProps) {
                 placeholder="Até 4 caracteres"
                 aria-describedby={error ? errorId : undefined}
                 aria-invalid={error ? true : undefined}
-                className={`input-field text-center font-mono text-lg tracking-[0.35em] uppercase ${
+                className={`input-field text-center font-mono text-lg tracking-[0.35em] ${
                   error ? "input-field--error" : ""
                 }`}
               />

@@ -1,4 +1,4 @@
-import type { AdIconId } from "../lib/adIcons";
+import type { AdIconChoice } from "../lib/adIcons";
 
 export type AdType = "venda" | "servico" | "vaquinha";
 export type BillingType = "unico" | "recorrente";
@@ -8,6 +8,7 @@ export type AppView =
   | "home"
   | "success"
   | "anuncio"
+  | "meus-anuncios"
   | "como-funciona"
   | "sobre"
   | "privacidade"
@@ -28,8 +29,8 @@ export interface AdData {
   phone: string;
   pix?: string;
   cardLink?: string;
-  /** ID compacto do ícone Lucide (catálogo adIcons) */
-  icon?: AdIconId;
+  /** ID do ícone Lucide ou -1 para marca AnúncioLink no hero */
+  icon?: AdIconChoice;
   /** Tema visual Bento */
   theme?: AdThemeId;
   /** Legado — ignorado em novos anúncios */

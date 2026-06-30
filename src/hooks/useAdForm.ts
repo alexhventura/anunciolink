@@ -1,8 +1,13 @@
 import { useCallback, useReducer } from "react";
 import type { AdData, AdType, BillingType } from "../types/ad";
 import { computeExpiresAt } from "../lib/adExpiry";
-import type { AdIconId } from "../lib/adIcons";
-import { DEFAULT_AD_ICON_ID, isValidAdIconId, resolveAdIconId } from "../lib/adIcons";
+import type { AdIconChoice } from "../lib/adIcons";
+import {
+  DEFAULT_AD_ICON_ID,
+  isBrandMarkIcon,
+  isValidAdIconId,
+  normalizeAdIconChoice,
+} from "../lib/adIcons";
 import { sanitizePhone } from "../lib/formatters";
 import { sanitizeAdData } from "../lib/sanitizeAd";
 
@@ -15,7 +20,7 @@ export interface AdFormState {
   phone: string;
   pix: string;
   cardLink: string;
-  icon: AdIconId;
+  icon: AdIconChoice;
   /** Senha opcional (1–4 caracteres alfanuméricos) para proteger o link */
   password: string;
   submitError: string | null;
@@ -46,7 +51,9 @@ function adFormReducer(state: AdFormState, action: AdFormAction): AdFormState {
       const next = { ...state, [action.field]: action.value };
       if (action.field === "adType" && typeof action.value === "string") {
         const adType = action.value as AdType;
-        if (!isValidAdIconId(next.icon) || next.icon === DEFAULT_AD_ICON_ID[state.adType]) {
+        if (isBrandMarkIcon(next.icon)) {
+          // mantém marca do site ao trocar o tipo
+        } else if (!isValidAdIconId(next.icon) || next.icon === DEFAULT_AD_ICON_ID[state.adType]) {
           next.icon = DEFAULT_AD_ICON_ID[adType];
         }
       }
@@ -87,7 +94,7 @@ export function useAdForm() {
       phone: state.phone.trim() ? sanitizePhone(state.phone) : "",
       pix: state.pix.trim() || undefined,
       cardLink: state.cardLink.trim() || undefined,
-      icon: resolveAdIconId(state.icon, state.adType),
+      icon: normalizeAdIconChoice(state.icon, state.adType),
       timestamp: now,
       expiresAt: computeExpiresAt(now, state.adType),
     });
