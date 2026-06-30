@@ -16,6 +16,7 @@ vi.mock("../adExportCanvas", () => ({
 
 vi.mock("../shareImage", () => ({
   shareCardFilename: () => "anunciolink-teste.jpg",
+  exportPdfFilename: () => "anunciolink-teste.pdf",
 }));
 
 describe("a4CardPdf", () => {

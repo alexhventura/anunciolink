@@ -64,7 +64,7 @@ export function AdExportButtons({
         />
         <IconActionButton
           icon={ImageIcon}
-          label="Baixar card em JPG"
+          label="Baixar cartaz A4 em JPG"
           hint={TOOLTIP_COPY.socialCard}
           onClick={() => void handleJpg()}
           busy={jpgLoading}
@@ -101,7 +101,7 @@ export function AdExportButtons({
         disabled={jpgLoading}
         className={btnClass}
         aria-busy={jpgLoading}
-        aria-label="Baixar card em JPG"
+        aria-label="Baixar cartaz A4 em JPG"
       >
         <ImageIcon className="h-4 w-4 shrink-0" strokeWidth={2.25} aria-hidden="true" />
         {jpgLoading ? "JPG…" : "JPG"}

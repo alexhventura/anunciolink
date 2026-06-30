@@ -9,10 +9,7 @@ import { formatPhoneNumber } from "./formatters";
 import { renderQrToCanvas } from "./qrCanvas";
 import { AD_QR_FOREGROUND } from "./adThemes";
 
-/** Card quadrado para redes */
-export const CARD_EXPORT_SIZE = 1080;
-
-/** A4 retrato @ 150 DPI — 210×297 mm */
+/** A4 retrato @ 150 DPI — 210×297 mm (JPG e PDF usam a mesma base) */
 export const A4_EXPORT_WIDTH = 1240;
 export const A4_EXPORT_HEIGHT = 1754;
 
@@ -419,7 +416,7 @@ function drawFooterCell(
   }
 }
 
-/** Layout unificado — card quadrado ou A4, mesma composição */
+/** Layout unificado A4 — JPG e PDF compartilham a mesma composição */
 export async function renderAdExportCanvas(
   ad: AdData,
   qrCanvas: HTMLCanvasElement,
@@ -451,14 +448,6 @@ export async function renderAdExportCanvas(
   return canvas;
 }
 
-export async function renderCardExportCanvas(
-  ad: AdData,
-  qrCanvas: HTMLCanvasElement,
-  qrMode: ExportQrMode = "ad"
-) {
-  return renderAdExportCanvas(ad, qrCanvas, CARD_EXPORT_SIZE, CARD_EXPORT_SIZE, qrMode);
-}
-
 export async function renderA4ExportCanvas(
   ad: AdData,
   qrCanvas: HTMLCanvasElement,
@@ -467,26 +456,28 @@ export async function renderA4ExportCanvas(
   return renderAdExportCanvas(ad, qrCanvas, A4_EXPORT_WIDTH, A4_EXPORT_HEIGHT, qrMode);
 }
 
+const EXPORT_JPEG_QUALITY = 0.98;
+
 async function canvasToJpegBlob(canvas: HTMLCanvasElement): Promise<Blob> {
   return new Promise((resolve, reject) => {
     canvas.toBlob(
       (blob) => (blob ? resolve(blob) : reject(new Error("Falha ao gerar imagem."))),
       "image/jpeg",
-      0.92
+      EXPORT_JPEG_QUALITY
     );
   });
 }
 
-export async function renderCardExportBlob(ad: AdData, adUrl: string): Promise<Blob> {
-  const { value, mode } = resolveExportQr(ad, adUrl);
-  const qrCanvas = await renderQrToCanvas(value, 512, AD_QR_FOREGROUND);
-  const canvas = await renderCardExportCanvas(ad, qrCanvas, mode);
-  return canvasToJpegBlob(canvas);
-}
-
-export async function renderA4PosterBlob(ad: AdData, adUrl: string): Promise<Blob> {
+/** JPEG A4 — fonte única para JPG, PDF e compartilhamento nativo */
+export async function renderExportPosterBlob(ad: AdData, adUrl: string): Promise<Blob> {
   const { value, mode } = resolveExportQr(ad, adUrl);
   const qrCanvas = await renderQrToCanvas(value, 640, AD_QR_FOREGROUND);
   const canvas = await renderA4ExportCanvas(ad, qrCanvas, mode);
   return canvasToJpegBlob(canvas);
 }
+
+/** @deprecated Use renderExportPosterBlob */
+export const renderCardExportBlob = renderExportPosterBlob;
+
+/** @deprecated Use renderExportPosterBlob */
+export const renderA4PosterBlob = renderExportPosterBlob;

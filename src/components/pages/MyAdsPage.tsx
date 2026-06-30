@@ -1,5 +1,5 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react";
-import { Link2, Share2, Trash2 } from "lucide-react";
+import { Eye, Link2, Share2, Trash2 } from "lucide-react";
 import type { SavedAdEntry } from "../../lib/adHistory";
 import { copyToClipboard } from "../../lib/formatters";
 import { buildNativeShareText } from "../../lib/shareLinks";
@@ -142,6 +142,13 @@ export function MyAdsPage({ adsenseReady, onOpenAd, onCreateAd }: MyAdsPageProps
                   role="toolbar"
                   aria-label={`Ações para ${entry.title}`}
                 >
+                  <IconActionButton
+                    icon={Eye}
+                    label={`Visualizar anúncio ${entry.title}`}
+                    hint={TOOLTIP_COPY.viewSavedAd}
+                    onClick={() => onOpenAd(entry.url)}
+                  />
+
                   <IconActionButton
                     icon={Share2}
                     label={`Compartilhar anúncio ${entry.title}`}

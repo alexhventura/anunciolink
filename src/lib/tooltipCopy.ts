@@ -9,6 +9,7 @@ export const TOOLTIP_COPY = {
   icon: "Opcional — sem escolha, usamos o logo AnúncioLink no card.",
   nativeShare:
     "Abre o menu do celular para enviar a imagem do card junto com o link — WhatsApp, Instagram, Telegram e outros.",
+  viewSavedAd: "Abre a página completa do anúncio salvo neste navegador.",
   pix:
     "Cole o Pix copia e cola. Fica só na URL — sem servidor, sem cadastro.",
   adType:
@@ -22,9 +23,9 @@ export const TOOLTIP_COPY = {
   generateAd:
     "Gera anúncio + link + QR Code. Tudo codificado na URL — sem upload e sem banco.",
   printPoster:
-    "Baixa PDF A4 e abre prévia para impressão. Com Pix, o QR do rodapé vira pagamento.",
+    "Baixa cartaz A4 em PDF — mesma composição do JPG. Com Pix, o QR do rodapé vira pagamento.",
   socialCard:
-    "Baixa JPG quadrado e abre prévia para impressão. Com Pix, o QR do rodapé vira pagamento.",
+    "Baixa cartaz A4 em JPG — mesma composição do PDF, só muda a extensão. Com Pix, o QR vira pagamento.",
   linkShortener:
     "Nosso link carrega tudo de graça — por isso é longo. Encurte no Bitly ou TinyURL para bios.",
   formRequired:

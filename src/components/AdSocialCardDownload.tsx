@@ -46,7 +46,7 @@ export function AdSocialCardDownload({
         id="btn-download-social-card"
         className={triggerClassName}
         aria-busy={generating}
-        aria-label="Baixar card quadrado em JPG para postagem nas redes"
+        aria-label="Baixar cartaz A4 em JPG para impressão ou compartilhamento"
       >
         <Download className="h-5 w-5 shrink-0" strokeWidth={2} aria-hidden="true" />
         {generating ? "Gerando card…" : "Baixar Card (JPG)"}

@@ -55,7 +55,7 @@ export function SuccessView({
             </h1>
           </div>
           <p className="text-sm font-bold text-black max-w-sm mx-auto">
-            Compartilhe a imagem com o link, copie o endereço ou baixe PDF e JPG para impressão.
+            Compartilhe a imagem A4 com o link, copie o endereço ou baixe JPG e PDF — layout idêntico.
           </p>
         </div>
 

@@ -1,7 +1,7 @@
 import { jsPDF } from "jspdf";
 import type { AdData } from "../types/ad";
 import { renderA4PosterBlob } from "./adExportCanvas";
-import { shareCardFilename } from "./shareImage";
+import { exportPdfFilename, shareCardFilename } from "./shareImage";
 
 const A4_W_MM = 210;
 const A4_H_MM = 297;
@@ -17,7 +17,7 @@ function blobToDataUrl(blob: Blob): Promise<string> {
 }
 
 function pdfFilename(ad: AdData): string {
-  return shareCardFilename(ad).replace(/\.jpe?g$/i, "-a4.pdf");
+  return exportPdfFilename(ad);
 }
 
 function downloadBlob(blob: Blob, filename: string): void {
@@ -62,7 +62,7 @@ async function buildA4CardPdf(ad: AdData, qrUrl: string): Promise<jsPDF> {
   pdf.rect(0, 0, A4_W_MM, A4_H_MM, "F");
 
   const format = dataUrl.includes("image/png") ? "PNG" : "JPEG";
-  pdf.addImage(dataUrl, format, 0, 0, A4_W_MM, A4_H_MM, undefined, "MEDIUM");
+  pdf.addImage(dataUrl, format, 0, 0, A4_W_MM, A4_H_MM, undefined, "SLOW");
 
   return pdf;
 }

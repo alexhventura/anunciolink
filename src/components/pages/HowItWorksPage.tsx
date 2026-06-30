@@ -75,10 +75,10 @@ export function HowItWorksPage({ adsenseReady }: HowItWorksPageProps) {
       <StepCard
         step={6}
         icon={<QrCode className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />}
-        title="QR Code no favicon, card JPG e cartaz A4"
+        title="Cartaz A4 em JPG e PDF"
       >
-        O QR Code leva o favicon do site no centro. O <strong>JPG</strong> é o card quadrado para redes; o{" "}
-        <strong>PDF</strong> é o mesmo layout em folha A4 — prontos para imprimir ou salvar.
+        O QR Code leva o favicon do site no centro. <strong>JPG</strong> e <strong>PDF</strong> usam o
+        mesmo layout A4 — só muda a extensão. Ideal para impressão, compartilhamento e redes.
       </StepCard>
 
       <StepCard
@@ -110,8 +110,7 @@ export function HowItWorksPage({ adsenseReady }: HowItWorksPageProps) {
           <li>Ícone personalizado por categoria</li>
           <li>Pix, cartão e WhatsApp na página do comprador</li>
           <li>QR Code com favicon {SITE_NAME}</li>
-          <li>Card JPG 1080×1080 para redes sociais</li>
-          <li>Cartaz A4 em PDF para impressão</li>
+          <li>Cartaz A4 em JPG e PDF — layout idêntico</li>
           <li>Senha opcional (até 4 caracteres) com criptografia na URL</li>
           <li>Compartilhar nativo (imagem + link), copiar link, PDF e JPG</li>
           <li>Indicador de peso do link (payload) na prévia</li>

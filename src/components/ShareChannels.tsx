@@ -110,7 +110,7 @@ export function ShareChannels({ ad, shareUrl }: ShareChannelsProps) {
           Divulgue seu anúncio
         </h2>
         <p className="share-channels__lead">
-          Compartilhe a imagem com o link, copie só o endereço ou baixe PDF e JPG para impressão.
+          Compartilhe a imagem A4 com o link, copie só o endereço ou baixe JPG e PDF — layout idêntico.
         </p>
       </header>
 
@@ -165,7 +165,7 @@ export function ShareChannels({ ad, shareUrl }: ShareChannelsProps) {
           id="btn-export-jpg"
           className="share-channel share-channel--utility"
           aria-busy={jpgLoading}
-          aria-label="Baixar card quadrado em JPG e abrir para impressão"
+          aria-label="Baixar cartaz A4 em JPG e abrir para impressão"
         >
           <ImageIcon className="h-5 w-5 shrink-0" strokeWidth={2.25} aria-hidden="true" />
           {jpgLoading ? "Gerando…" : "JPG"}
