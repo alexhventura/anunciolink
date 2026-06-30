@@ -4,6 +4,12 @@ export const SITE_URL = `https://${SITE_DOMAIN}`;
 
 /** Logo central do QR — mesmo favicon do cabeçalho */
 export const SITE_QR_LOGO_SRC = "/favicon.svg";
+/** Margem do QR (mostarda — identidade AnúncioLink) */
+export const SITE_QR_MARGIN_COLOR = "#fbbf24";
+/** Proporção do favicon no centro do QR (excavate reserva o espaço) */
+export const SITE_QR_LOGO_RATIO = 0.26;
+/** Módulos de margem quiet zone ao redor do código */
+export const SITE_QR_MARGIN_SIZE = 4;
 
 export const MAX_TITLE_LENGTH = 100;
 export const MAX_DESC_LENGTH = 1000;

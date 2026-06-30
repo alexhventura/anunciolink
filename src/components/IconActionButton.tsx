@@ -1,4 +1,5 @@
 import type { LucideIcon } from "lucide-react";
+import { HoverLabel } from "./HoverLabel";
 
 interface IconActionButtonProps {
   icon: LucideIcon;
@@ -11,7 +12,7 @@ interface IconActionButtonProps {
   className?: string;
 }
 
-/** Botão quadrado só com ícone — rótulo no hover/toque (tooltip CSS) */
+/** Botão quadrado só com ícone — popup com rótulo no hover/toque */
 export function IconActionButton({
   icon: Icon,
   label,
@@ -33,22 +34,22 @@ export function IconActionButton({
             ? "icon-action-btn--primary"
             : "";
 
+  const tipLabel = busy ? `${label} — aguarde` : label;
+
   return (
-    <div className={`icon-action-btn-wrap ${className}`.trim()}>
-      <span className="icon-action-btn-wrap__tip" role="tooltip">
-        {busy ? `${label} — aguarde` : label}
-      </span>
+    <HoverLabel label={tipLabel} className={className} placement="above">
       <button
         type="button"
         id={id}
         onClick={onClick}
         disabled={disabled || busy}
         aria-busy={busy}
-        aria-label={busy ? `${label} — aguarde` : label}
+        aria-label={tipLabel}
+        title={tipLabel}
         className={`icon-action-btn ${variantClass}`.trim()}
       >
         <Icon className="icon-action-btn__icon" strokeWidth={2.25} aria-hidden="true" />
       </button>
-    </div>
+    </HoverLabel>
   );
 }

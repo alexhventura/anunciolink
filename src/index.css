@@ -699,11 +699,16 @@
 
 /* ——— QR Code section ——— */
 .ad-qr-section__wrap {
-  padding: 0.75rem;
+  padding: 0.625rem;
   border: 2px solid #18181b;
   border-radius: 0.5rem;
-  background: #ffffff;
+  background: #fbbf24;
   box-shadow: 3px 3px 0 0 #18181b;
+}
+
+.ad-qr-section__wrap canvas {
+  display: block;
+  border-radius: 0.25rem;
 }
 
 .ad-qr-section__placeholder {
@@ -1402,28 +1407,39 @@
   gap: 0.5rem;
 }
 
-.icon-action-btn-wrap {
+.icon-action-btn-wrap,
+.hover-label-wrap {
   position: relative;
-  display: flex;
+  display: inline-flex;
   flex-direction: column;
   align-items: center;
   flex: 0 0 auto;
   min-width: 0;
 }
 
+.hover-label-wrap--block {
+  display: flex;
+  width: 100%;
+}
+
+.hover-label-wrap--block > button,
+.hover-label-wrap--block > a {
+  width: 100%;
+}
+
+.hover-label-wrap__popup,
 .icon-action-btn-wrap__tip {
   position: absolute;
-  bottom: calc(100% + 6px);
   left: 50%;
   transform: translateX(-50%);
-  z-index: 30;
-  max-width: 11rem;
-  padding: 0.35rem 0.5rem;
+  z-index: 100;
+  max-width: min(14rem, calc(100vw - 2rem));
+  padding: 0.45rem 0.65rem;
   border: 2px solid #18181b;
   border-radius: 0.375rem;
   background: #18181b;
   color: #fafafa;
-  font-size: 0.625rem;
+  font-size: 0.6875rem;
   font-weight: 700;
   line-height: 1.35;
   text-align: center;
@@ -1432,12 +1448,27 @@
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.12s ease, visibility 0.12s ease;
+  box-shadow: 3px 3px 0 0 #fbbf24;
 }
 
-.icon-action-btn-wrap:hover .icon-action-btn-wrap__tip,
-.icon-action-btn-wrap:focus-within .icon-action-btn-wrap__tip {
-  opacity: 1;
-  visibility: visible;
+.hover-label-wrap--below .hover-label-wrap__popup {
+  top: calc(100% + 8px);
+  bottom: auto;
+}
+
+.hover-label-wrap--above .hover-label-wrap__popup {
+  bottom: calc(100% + 8px);
+  top: auto;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .hover-label-wrap:hover .hover-label-wrap__popup,
+  .hover-label-wrap:focus-within .hover-label-wrap__popup,
+  .icon-action-btn-wrap:hover .icon-action-btn-wrap__tip,
+  .icon-action-btn-wrap:focus-within .icon-action-btn-wrap__tip {
+    opacity: 1;
+    visibility: visible;
+  }
 }
 
 .icon-action-btn-wrap__hint {
@@ -1503,16 +1534,13 @@
 .share-toolbar,
 .my-ads-item__toolbar {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
   width: 100%;
   max-width: 100%;
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  -webkit-overflow-scrolling: touch;
+  overflow: visible;
   padding-bottom: 0.125rem;
-  scrollbar-width: thin;
 }
 
 .export-qr-picker {

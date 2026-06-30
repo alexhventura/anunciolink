@@ -1,17 +1,16 @@
 import { forwardRef } from "react";
 import { QRCodeCanvas } from "qrcode.react";
-import { SITE_QR_LOGO_SRC } from "../lib/constants";
+import { getQrImageSettings, QR_CANVAS_MARGIN } from "../lib/qrImageSettings";
 
 interface AdQrCanvasProps {
   url: string;
   size: number;
   fgColor: string;
-  logoSize: number;
 }
 
-/** Canvas do QR — carregado sob demanda (code-split) */
+/** Canvas do QR — favicon central + margens mostarda (carregado sob demanda) */
 export const AdQrCanvas = forwardRef<HTMLCanvasElement, AdQrCanvasProps>(function AdQrCanvas(
-  { url, size, fgColor, logoSize },
+  { url, size, fgColor },
   ref
 ) {
   return (
@@ -21,18 +20,10 @@ export const AdQrCanvas = forwardRef<HTMLCanvasElement, AdQrCanvasProps>(functio
         value={url}
         size={size}
         level="H"
-        includeMargin
-        bgColor="#ffffff"
         fgColor={fgColor}
-        marginSize={2}
-        imageSettings={{
-          src: SITE_QR_LOGO_SRC,
-          height: logoSize,
-          width: logoSize,
-          excavate: true,
-          crossOrigin: "anonymous",
-        }}
-        aria-label="QR Code AnúncioLink"
+        {...QR_CANVAS_MARGIN}
+        imageSettings={getQrImageSettings(size)}
+        aria-label="QR Code AnúncioLink com favicon"
       />
     </div>
   );

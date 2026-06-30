@@ -1,9 +1,9 @@
 import { createRoot } from "react-dom/client";
 import { createElement } from "react";
 import { QRCodeCanvas } from "qrcode.react";
-import { SITE_QR_LOGO_SRC } from "./constants";
+import { getQrImageSettings, QR_CANVAS_MARGIN } from "./qrImageSettings";
 
-/** Gera canvas PNG do QR Code com favicon AnúncioLink */
+/** Gera canvas PNG do QR Code com favicon AnúncioLink e margens mostarda */
 export async function renderQrToCanvas(
   value: string,
   size: number,
@@ -16,7 +16,6 @@ export async function renderQrToCanvas(
   document.body.appendChild(container);
 
   const root = createRoot(container);
-  const logoSize = Math.round(size * 0.22);
 
   try {
     root.render(
@@ -24,17 +23,9 @@ export async function renderQrToCanvas(
         value,
         size,
         level: "H",
-        includeMargin: true,
-        bgColor: "#ffffff",
         fgColor,
-        marginSize: 2,
-        imageSettings: {
-          src: SITE_QR_LOGO_SRC,
-          height: logoSize,
-          width: logoSize,
-          excavate: true,
-          crossOrigin: "anonymous",
-        },
+        ...QR_CANVAS_MARGIN,
+        imageSettings: getQrImageSettings(size),
       })
     );
 
@@ -57,3 +48,5 @@ export async function renderQrToCanvas(
     container.remove();
   }
 }
+
+export { getQrImageSettings, getQrLogoSize, QR_CANVAS_MARGIN } from "./qrImageSettings";

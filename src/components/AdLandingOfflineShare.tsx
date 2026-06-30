@@ -52,7 +52,6 @@ export function AdLandingOfflineShare({ url, headingId }: AdLandingOfflineShareP
   };
 
   const qrSize = 128;
-  const logoSize = Math.round(qrSize * 0.22);
 
   return (
     <section
@@ -100,7 +99,6 @@ export function AdLandingOfflineShare({ url, headingId }: AdLandingOfflineShareP
                 url={url}
                 size={qrSize}
                 fgColor={AD_QR_FOREGROUND}
-                logoSize={logoSize}
               />
             </Suspense>
           </div>

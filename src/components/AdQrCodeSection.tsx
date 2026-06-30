@@ -2,6 +2,7 @@ import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react"
 import { Download } from "lucide-react";
 import { AD_QR_FOREGROUND } from "../lib/adThemes";
 import { downloadQrPng } from "../lib/qrDownload";
+import { HoverLabel } from "./HoverLabel";
 
 const LazyQrCanvas = lazy(() =>
   import("./AdQrCanvas").then((m) => ({ default: m.AdQrCanvas }))
@@ -76,7 +77,6 @@ export function AdQrCodeSection({
   }, []);
 
   const qrSize = compact || landing ? 168 : 208;
-  const logoSize = Math.round(qrSize * 0.22);
 
   return (
     <section
@@ -101,7 +101,6 @@ export function AdQrCodeSection({
               url={url}
               size={qrSize}
               fgColor={AD_QR_FOREGROUND}
-              logoSize={logoSize}
             />
           </Suspense>
         ) : (
@@ -110,18 +109,20 @@ export function AdQrCodeSection({
       </div>
 
       <div className="ad-qr-section__actions">
-        <button
-          type="button"
-          onClick={() => void handleDownload()}
-          disabled={!ready || downloading}
-          id="btn-download-qr-png"
-          className="ad-landing-cta btn-accent w-full gap-2"
-          aria-busy={downloading}
-          aria-label="Baixar QR Code em PNG"
-        >
-          <Download className="h-5 w-5 shrink-0" strokeWidth={2} aria-hidden="true" />
-          {downloading ? "Salvando…" : "Baixar QR Code (PNG)"}
-        </button>
+        <HoverLabel label="Baixar QR Code em PNG">
+          <button
+            type="button"
+            onClick={() => void handleDownload()}
+            disabled={!ready || downloading}
+            id="btn-download-qr-png"
+            className="ad-landing-cta btn-accent w-full gap-2"
+            aria-busy={downloading}
+            aria-label="Baixar QR Code em PNG"
+          >
+            <Download className="h-5 w-5 shrink-0" strokeWidth={2} aria-hidden="true" />
+            {downloading ? "Salvando…" : "Baixar QR Code (PNG)"}
+          </button>
+        </HoverLabel>
       </div>
     </section>
   );

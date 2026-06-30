@@ -4,6 +4,7 @@ import type { AdFormState } from "../hooks/useAdForm";
 import type { AdData } from "../types/ad";
 import { AdSenseSlot } from "./AdSenseSlot";
 import { AdPreviewCard } from "./AdPreviewCard";
+import { HoverLabel } from "./HoverLabel";
 import { ViewEnter } from "./ViewEnter";
 
 const ShareChannels = lazy(() =>
@@ -133,25 +134,29 @@ export function SuccessView({
         </div>
 
         <div className="flex flex-col sm:flex-row items-stretch justify-center gap-3 border-t-[3px] border-black pt-8">
-          <a
-            href={generatedLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            id="link-preview-direct"
-            className="btn-primary !text-sm"
-            aria-label="Abrir página do anúncio em nova aba"
-          >
-            Abrir anúncio
-          </a>
-          <button
-            type="button"
-            onClick={onResetHome}
-            id="btn-create-another-success"
-            className="btn-ghost !min-h-[64px]"
-            aria-label="Criar um novo anúncio do zero"
-          >
-            Novo anúncio
-          </button>
+          <HoverLabel label="Abrir página do anúncio em nova aba" className="hover-label-wrap--block">
+            <a
+              href={generatedLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              id="link-preview-direct"
+              className="btn-primary !text-sm"
+              aria-label="Abrir página do anúncio em nova aba"
+            >
+              Abrir anúncio
+            </a>
+          </HoverLabel>
+          <HoverLabel label="Criar um novo anúncio do zero" className="hover-label-wrap--block">
+            <button
+              type="button"
+              onClick={onResetHome}
+              id="btn-create-another-success"
+              className="btn-ghost !min-h-[64px]"
+              aria-label="Criar um novo anúncio do zero"
+            >
+              Novo anúncio
+            </button>
+          </HoverLabel>
         </div>
       </div>
 

@@ -321,11 +321,11 @@ function drawFooterCell(
   const frameX = qrArea.x + (qrArea.w - maxQr) / 2;
   const frameY = qrArea.y + (qrArea.h - maxQr) / 2;
 
-  ctx.fillStyle = WHITE;
+  ctx.fillStyle = MUSTARD;
   ctx.fillRect(frameX, frameY, maxQr, maxQr);
   drawStrokeRect(ctx, frameX, frameY, maxQr, maxQr, Math.max(3, border - 1));
 
-  const innerPad = Math.round(maxQr * 0.08);
+  const innerPad = Math.round(maxQr * 0.06);
   const innerSize = maxQr - innerPad * 2;
   ctx.drawImage(
     qrCanvas,

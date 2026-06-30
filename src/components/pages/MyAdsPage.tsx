@@ -13,6 +13,7 @@ import { useAdHistory } from "../../hooks/useAdHistory";
 import { useNativeShare } from "../../hooks/useNativeShare";
 import { DeleteAdConfirmDialog } from "../DeleteAdConfirmDialog";
 import { ExportQrPicker } from "../ExportQrPicker";
+import { HoverLabel } from "../HoverLabel";
 import { InstitutionalPageLayout } from "../InstitutionalPageLayout";
 import { IconActionButton } from "../IconActionButton";
 
@@ -123,9 +124,11 @@ export function MyAdsPage({ adsenseReady, onOpenAd, onCreateAd }: MyAdsPageProps
           <p className="my-ads-empty__text">
             Você ainda não criou nenhum anúncio perpétuo neste navegador.
           </p>
-          <button type="button" onClick={onCreateAd} className="btn-primary mt-6">
-            Criar Meu Anúncio Agora
-          </button>
+          <HoverLabel label="Criar meu anúncio agora" className="hover-label-wrap--block">
+            <button type="button" onClick={onCreateAd} className="btn-primary mt-6">
+              Criar Meu Anúncio Agora
+            </button>
+          </HoverLabel>
         </div>
       ) : (
         <ul className="my-ads-list" role="list">

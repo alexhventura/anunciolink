@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { HoverLabel } from "./HoverLabel";
 import type { AppView } from "../types/ad";
 import { AdSenseSlot } from "./AdSenseSlot";
 import { ViewEnter } from "./ViewEnter";
@@ -20,8 +21,9 @@ export function SiteNavLink({
   highlight = false,
 }: SiteNavLinkProps) {
   const href = view === "home" ? "/" : isInstitutionalView(view) ? getPathForInstitutionalView(view) : "/";
+  const tipLabel = typeof children === "string" ? children : undefined;
 
-  return (
+  const link = (
     <a
       href={href}
       className={`site-nav-link ${highlight ? "site-nav-link--highlight" : ""} ${className}`.trim()}
@@ -32,6 +34,14 @@ export function SiteNavLink({
     >
       {children}
     </a>
+  );
+
+  if (!tipLabel) return link;
+
+  return (
+    <HoverLabel label={tipLabel} placement="below">
+      {link}
+    </HoverLabel>
   );
 }
 
