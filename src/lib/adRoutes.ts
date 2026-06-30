@@ -17,6 +17,33 @@ export function buildAdUrl(payload: string): string {
   return `${origin}${buildAdPath(payload)}`;
 }
 
+/** Lê payload de URL completa (histórico local, links salvos) */
+export function extractPayloadFromAdUrl(url: string): string | null {
+  try {
+    const base = typeof window !== "undefined" ? window.location.origin : new URL(SITE_URL).origin;
+    const parsed = new URL(url, base);
+
+    if (isAdPathname(parsed.pathname)) {
+      const segment = parsed.pathname.slice(AD_PATH_PREFIX.length);
+      if (segment) {
+        try {
+          return decodeURIComponent(segment);
+        } catch {
+          return segment;
+        }
+      }
+    }
+
+    if (parsed.hash.startsWith("#dados=")) {
+      return parsed.hash.substring(7);
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+}
+
 /** Lê payload de /a/:payload (preferido) ou #dados= (legado) */
 export function extractPayloadFromLocation(loc: Location = window.location): string | null {
   if (isAdPathname(loc.pathname)) {

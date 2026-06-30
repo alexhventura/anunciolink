@@ -1,5 +1,8 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import { Printer } from "lucide-react";
 import type { SavedAdEntry } from "../lib/adHistory";
+import { AdSerializer } from "../lib/adSerializer";
+import { extractPayloadFromAdUrl } from "../lib/adRoutes";
 import { copyToClipboard } from "../lib/formatters";
 import { useAdHistory } from "../hooks/useAdHistory";
 
@@ -16,6 +19,41 @@ const typeLabel: Record<SavedAdEntry["type"], string> = {
 export function MyAdsPanel({ onOpenAd }: MyAdsPanelProps) {
   const { items, remove } = useAdHistory();
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [printingId, setPrintingId] = useState<string | null>(null);
+  const [printErrorId, setPrintErrorId] = useState<string | null>(null);
+
+  const handlePrint = useCallback(async (entry: SavedAdEntry) => {
+    if (printingId) return;
+    setPrintingId(entry.id);
+    setPrintErrorId(null);
+
+    try {
+      const payload = extractPayloadFromAdUrl(entry.url);
+      if (!payload) {
+        throw new Error("Não foi possível ler os dados deste anúncio.");
+      }
+
+      const ad = AdSerializer.decode(payload);
+      if (!ad) {
+        throw new Error("Anúncio inválido ou corrompido.");
+      }
+
+      const qrUrl = AdSerializer.buildQrUrl(ad);
+      if (!AdSerializer.isQrUrlSafe(qrUrl)) {
+        throw new Error("Anúncio muito grande para gerar o cartaz com QR Code.");
+      }
+
+      const { printA4CardPdf } = await import("../lib/a4CardPdf");
+      await printA4CardPdf(ad, qrUrl);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Não foi possível imprimir o cartaz.";
+      setPrintErrorId(entry.id);
+      window.setTimeout(() => setPrintErrorId((current) => (current === entry.id ? null : current)), 4000);
+      console.error(message);
+    } finally {
+      setPrintingId(null);
+    }
+  }, [printingId]);
 
   if (items.length === 0) return null;
 
@@ -51,7 +89,7 @@ export function MyAdsPanel({ onOpenAd }: MyAdsPanelProps) {
               </time>
             </div>
 
-            <div className="flex shrink-0 gap-2">
+            <div className="flex shrink-0 flex-wrap gap-2">
               <button
                 type="button"
                 onClick={() => handleCopy(entry)}
@@ -75,6 +113,22 @@ export function MyAdsPanel({ onOpenAd }: MyAdsPanelProps) {
               </button>
               <button
                 type="button"
+                onClick={() => void handlePrint(entry)}
+                disabled={printingId === entry.id}
+                className="btn-ghost text-xs !py-2 inline-flex items-center gap-1.5 min-h-[40px]"
+                aria-busy={printingId === entry.id}
+                aria-label={
+                  printingId === entry.id
+                    ? `Preparando cartaz A4 de ${entry.title}`
+                    : `Imprimir cartaz A4 de ${entry.title}`
+                }
+                title="Imprimir cartaz A4 (PDF)"
+              >
+                <Printer className="h-4 w-4 shrink-0" strokeWidth={2} aria-hidden="true" />
+                {printingId === entry.id ? "…" : "Imprimir"}
+              </button>
+              <button
+                type="button"
                 onClick={() => remove(entry.id)}
                 aria-label={`Excluir anúncio ${entry.title}`}
                 className="rounded-lg border-[3px] border-black bg-red-400 px-3 py-2 text-xs font-black uppercase neo-shadow-sm neo-interactive min-h-[40px]"
@@ -82,6 +136,11 @@ export function MyAdsPanel({ onOpenAd }: MyAdsPanelProps) {
                 ✕
               </button>
             </div>
+            {printErrorId === entry.id ? (
+              <p className="text-xs font-bold text-red-700 sm:col-span-2" role="alert">
+                Não foi possível gerar o cartaz. Tente abrir o anúncio e imprimir de lá.
+              </p>
+            ) : null}
           </li>
         ))}
       </ul>

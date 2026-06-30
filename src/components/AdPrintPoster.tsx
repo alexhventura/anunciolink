@@ -1,7 +1,7 @@
 import { Printer } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import type { AdData } from "../types/ad";
-import { printA4PosterDocument } from "../lib/a4PrintDocument";
+import { printA4CardPdf } from "../lib/a4CardPdf";
 import { isQrUrlSafe } from "../lib/qrShareUrl";
 import { TOOLTIP_COPY } from "../lib/tooltipCopy";
 import { ActionButtonWithHint } from "./HelpTooltip";
@@ -13,7 +13,7 @@ interface AdPrintPosterProps {
   hintVariant?: "default" | "on-dark";
 }
 
-/** Cartaz A4 — janela dedicada com todos os dados do formulário */
+/** Cartaz A4 — PDF com a imagem do card redimensionada para folha A4 */
 export function AdPrintPoster({
   ad,
   qrUrl,
@@ -33,7 +33,7 @@ export function AdPrintPoster({
     setPrinting(true);
     setError(null);
     try {
-      await printA4PosterDocument(ad, qrUrl);
+      await printA4CardPdf(ad, qrUrl);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Não foi possível abrir a impressão.";
       setError(message);

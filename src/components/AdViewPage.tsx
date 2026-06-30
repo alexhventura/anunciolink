@@ -7,7 +7,6 @@ import { AdPreviewCard } from "./AdPreviewCard";
 import { AdBrandedSurface } from "./AdBrandedSurface";
 import { AdExpiredBanner } from "./AdExpiredBanner";
 import { AdLandingOfflineShare } from "./AdLandingOfflineShare";
-import { SecurityBadge } from "./SecurityBadge";
 import { ViewEnter } from "./ViewEnter";
 import { PixPaymentSection } from "./PixPaymentSection";
 import { copyToClipboard } from "../lib/formatters";
@@ -76,7 +75,6 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
             description={ad.desc}
             icon={ad.icon}
             billingType={ad.billingType}
-            showSecurityBadge
             premium
             landing
             className={isExpired ? "opacity-95" : ""}
@@ -128,7 +126,6 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
                         ? "Escolha como pagar abaixo."
                         : "Tire dúvidas com quem publicou o anúncio."}
                   </p>
-                  <SecurityBadge compact className="mt-3" />
                 </header>
 
                 <div className="ad-landing-page__cta-stack">

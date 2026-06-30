@@ -89,26 +89,29 @@ export function IconPicker({ adType, value, onChange }: IconPickerProps) {
   };
 
   return (
-    <div className="emoji-picker space-y-3" role="group" aria-labelledby="icon-picker-label">
-      <FieldLabelWithHint hint={TOOLTIP_COPY.icon} fieldLabel="Ícone do produto" className="mb-0">
-        <span id="icon-picker-label">Ícone do produto</span>
-      </FieldLabelWithHint>
-
-      <div className="emoji-picker__preview" aria-live="polite">
-        <AdProductIcon
-          iconId={selected}
-          adType={adType}
-          size={44}
-          strokeWidth={2.25}
-          className="emoji-picker__preview-icon shrink-0 text-zinc-900"
-        />
-        <p className="emoji-picker__preview-label">Prévia do ícone no card</p>
-        {selectedDef && (
-          <span className="sr-only">Ícone selecionado: {selectedDef.label}</span>
-        )}
+    <div className="ad-form-field emoji-picker" role="group" aria-labelledby="icon-picker-label">
+      <div className="ad-form-field__head">
+        <FieldLabelWithHint hint={TOOLTIP_COPY.icon} fieldLabel="Ícone do produto" className="mb-0">
+          <span id="icon-picker-label">Ícone do produto</span>
+        </FieldLabelWithHint>
       </div>
 
-      <label className="emoji-picker__search">
+      <div className="ad-form-field__control space-y-3">
+        <div className="emoji-picker__preview" aria-live="polite">
+          <AdProductIcon
+            iconId={selected}
+            adType={adType}
+            size={44}
+            strokeWidth={2.25}
+            className="emoji-picker__preview-icon shrink-0 text-zinc-900"
+          />
+          <p className="emoji-picker__preview-label">Prévia do ícone no card</p>
+          {selectedDef && (
+            <span className="sr-only">Ícone selecionado: {selectedDef.label}</span>
+          )}
+        </div>
+
+        <label className="emoji-picker__search">
         <span className="sr-only">Buscar ícone</span>
         <Search className="h-4 w-4 shrink-0 text-zinc-500" aria-hidden="true" />
         <input
@@ -193,6 +196,7 @@ export function IconPicker({ adType, value, onChange }: IconPickerProps) {
             ))
           )}
         </div>
+      </div>
       </div>
     </div>
   );

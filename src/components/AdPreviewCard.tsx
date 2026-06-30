@@ -4,7 +4,6 @@ import type { AdIconId } from "../lib/adIcons";
 import type { AdType, BillingType } from "../types/ad";
 import { formatPhoneNumber } from "../lib/formatters";
 import { AdBentoHero } from "./AdBentoHero";
-import { SecurityBadge } from "./SecurityBadge";
 
 const TYPE_LABEL: Record<AdType, string> = {
   venda: "Venda",
@@ -20,7 +19,6 @@ interface AdPreviewCardProps {
   icon?: AdIconId;
   billingType?: BillingType;
   phone?: string;
-  showSecurityBadge?: boolean;
   exportMode?: boolean;
   qrSlot?: ReactNode;
   premium?: boolean;
@@ -38,7 +36,6 @@ export function AdPreviewCard({
   icon,
   billingType = "unico",
   phone,
-  showSecurityBadge = false,
   exportMode = false,
   qrSlot,
   premium = false,
@@ -53,12 +50,6 @@ export function AdPreviewCard({
         premium ? "ad-preview-card--premium" : ""
       } ${landing ? "ad-preview-card--landing" : ""} ${exportMode ? "ad-preview-card--export" : ""} ${className}`}
     >
-      {showSecurityBadge && (
-        <div className="flex justify-center px-4 pt-4 pb-0 bg-white">
-          <SecurityBadge />
-        </div>
-      )}
-
       <AdBentoHero
         adType={adType}
         title={title}

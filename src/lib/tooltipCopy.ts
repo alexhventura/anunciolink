@@ -23,7 +23,7 @@ export const TOOLTIP_COPY = {
   generateAd:
     "Gera anúncio + link + QR Code. Tudo codificado na URL — sem upload e sem banco.",
   printPoster:
-    "Cartaz A4 no layout do anúncio, com QR centralizado — pronto para imprimir.",
+    "Gera PDF A4 com a imagem do card centralizada — imprima ou salve como PDF.",
   socialCard:
     "Card PNG idêntico ao anúncio — ideal para status e redes sociais.",
   linkShortener:

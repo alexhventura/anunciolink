@@ -31,7 +31,7 @@ import { MyAdsPanel } from "./MyAdsPanel";
 import { AdSenseSlot } from "./AdSenseSlot";
 import { PayloadScoreIndicator } from "./PayloadScoreIndicator";
 import { ViewEnter } from "./ViewEnter";
-import { ActionButtonWithHint, FieldLegendWithHint, HelpTooltip } from "./HelpTooltip";
+import { ActionButtonWithHint, FieldLabelWithHint, HelpTooltip } from "./HelpTooltip";
 import { HomeSeoCta, HomeSeoSection } from "./HomeSeoSection";
 
 const IconPicker = lazy(() =>
@@ -214,48 +214,60 @@ export function HomeView({
               </header>
 
               <div className="ad-form-bento__cells">
-                <fieldset className="ad-form-bento__cell ad-form-bento__cell--wide space-y-3">
-                  <FieldLegendWithHint hint={TOOLTIP_COPY.adType} fieldLabel="Tipo de anúncio">
-                    Tipo de anúncio
-                  </FieldLegendWithHint>
-                  <div className="grid grid-cols-3 gap-2 sm:gap-3">
-                    {AD_TYPES.map(({ id, label }) => (
-                      <button
-                        key={id}
-                        type="button"
-                        id={`select-${id}`}
-                        aria-pressed={form.adType === id}
-                        onClick={() => onFieldChange("adType", id)}
-                        className={`${segmentBase} ${form.adType === id ? segmentActive : segmentIdle}`}
-                      >
-                        {label}
-                      </button>
-                    ))}
+                <div className="ad-form-bento__cell ad-form-bento__cell--wide">
+                  <div className="ad-form-field" role="group" aria-labelledby="ad-type-label">
+                    <div className="ad-form-field__head">
+                      <FieldLabelWithHint hint={TOOLTIP_COPY.adType} fieldLabel="Tipo de anúncio" className="mb-0">
+                        <span id="ad-type-label">Tipo de anúncio</span>
+                      </FieldLabelWithHint>
+                    </div>
+                    <div className="ad-form-field__control">
+                      <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                        {AD_TYPES.map(({ id, label }) => (
+                          <button
+                            key={id}
+                            type="button"
+                            id={`select-${id}`}
+                            aria-pressed={form.adType === id}
+                            onClick={() => onFieldChange("adType", id)}
+                            className={`${segmentBase} ${form.adType === id ? segmentActive : segmentIdle}`}
+                          >
+                            {label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   </div>
-                </fieldset>
+                </div>
 
-                <fieldset className="ad-form-bento__cell space-y-3">
-                  <FieldLegendWithHint hint={TOOLTIP_COPY.billing} fieldLabel="Tipo de cobrança">
-                    Cobrança
-                  </FieldLegendWithHint>
-                  <div className="grid grid-cols-2 gap-2 sm:gap-3">
-                    {(["unico", "recorrente"] as const).map((billing) => (
-                      <button
-                        key={billing}
-                        type="button"
-                        id={`select-billing-${billing}`}
-                        aria-pressed={form.billingType === billing}
-                        aria-label={billing === "unico" ? "Preço único" : "Cobrança recorrente mensal"}
-                        onClick={() => onFieldChange("billingType", billing)}
-                        className={`${segmentBase} ${
-                          form.billingType === billing ? "neo-segment-amber" : segmentIdle
-                        }`}
-                      >
-                        {billing === "unico" ? "Único" : "/mês"}
-                      </button>
-                    ))}
+                <div className="ad-form-bento__cell">
+                  <div className="ad-form-field" role="group" aria-labelledby="billing-type-label">
+                    <div className="ad-form-field__head">
+                      <FieldLabelWithHint hint={TOOLTIP_COPY.billing} fieldLabel="Tipo de cobrança" className="mb-0">
+                        <span id="billing-type-label">Cobrança</span>
+                      </FieldLabelWithHint>
+                    </div>
+                    <div className="ad-form-field__control">
+                      <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                        {(["unico", "recorrente"] as const).map((billing) => (
+                          <button
+                            key={billing}
+                            type="button"
+                            id={`select-billing-${billing}`}
+                            aria-pressed={form.billingType === billing}
+                            aria-label={billing === "unico" ? "Preço único" : "Cobrança recorrente mensal"}
+                            onClick={() => onFieldChange("billingType", billing)}
+                            className={`${segmentBase} ${
+                              form.billingType === billing ? "neo-segment-amber" : segmentIdle
+                            }`}
+                          >
+                            {billing === "unico" ? "Único" : "/mês"}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   </div>
-                </fieldset>
+                </div>
 
                 <div className="ad-form-bento__cell ad-form-bento__cell--wide">
                   <AdFormField
