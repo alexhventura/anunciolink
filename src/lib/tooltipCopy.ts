@@ -22,9 +22,9 @@ export const TOOLTIP_COPY = {
   generateAd:
     "Gera anúncio + link + QR Code. Tudo codificado na URL — sem upload e sem banco.",
   printPoster:
-    "Baixa PDF A4 com a imagem do card centralizada — o arquivo abre para você visualizar ou imprimir.",
+    "Baixa PDF A4 com layout de cartaz — ícone, preço, descrição completa e QR Code prontos para imprimir.",
   socialCard:
-    "Card PNG idêntico ao anúncio — ideal para status e redes sociais.",
+    "Card quadrado em JPG — ideal para Instagram, WhatsApp Status e redes sociais.",
   linkShortener:
     "Nosso link carrega tudo de graça — por isso é longo. Encurte no Bitly ou TinyURL para bios.",
   formRequired:

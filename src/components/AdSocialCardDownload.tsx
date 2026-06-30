@@ -46,10 +46,10 @@ export function AdSocialCardDownload({
         id="btn-download-social-card"
         className={triggerClassName}
         aria-busy={generating}
-        aria-label="Baixar card idêntico ao anúncio com QR Code para postagem"
+        aria-label="Baixar card quadrado em JPG para postagem nas redes"
       >
         <Download className="h-5 w-5 shrink-0" strokeWidth={2} aria-hidden="true" />
-        {generating ? "Gerando card…" : "Baixar Card para Postagem"}
+        {generating ? "Gerando card…" : "Baixar Card (JPG)"}
       </ActionButtonWithHint>
 
       {error && (

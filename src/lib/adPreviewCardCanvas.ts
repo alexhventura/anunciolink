@@ -266,9 +266,17 @@ export async function renderPreviewCardCanvas(input: PreviewCardCanvasInput): Pr
   return canvas;
 }
 
-export async function renderPreviewCardBlob(input: PreviewCardCanvasInput, mime = "image/png"): Promise<Blob> {
+export async function renderPreviewCardBlob(
+  input: PreviewCardCanvasInput,
+  mime = "image/png",
+  quality = 1
+): Promise<Blob> {
   const canvas = await renderPreviewCardCanvas(input);
   return new Promise((resolve, reject) => {
-    canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error("Falha ao gerar imagem"))), mime, 1);
+    canvas.toBlob(
+      (blob) => (blob ? resolve(blob) : reject(new Error("Falha ao gerar imagem"))),
+      mime,
+      quality
+    );
   });
 }

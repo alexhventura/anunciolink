@@ -12,7 +12,7 @@ interface AdPrintPosterProps {
   hintVariant?: "default" | "on-dark";
 }
 
-/** Cartaz A4 — PDF com a imagem do card redimensionada para folha A4 */
+/** Cartaz A4 — PDF com layout 2×2 pronto para impressão */
 export function AdPrintPoster({
   ad,
   qrUrl,
@@ -50,7 +50,7 @@ export function AdPrintPoster({
         className={`${triggerClassName} no-print`}
         disabled={!qrUrl.trim() || printing}
         aria-busy={printing}
-        aria-label="Baixar cartaz A4 em PDF com a imagem do card"
+        aria-label="Baixar cartaz A4 em PDF para impressão"
       >
         <Printer className="h-5 w-5 shrink-0" strokeWidth={2} aria-hidden="true" />
         {printing ? "Gerando PDF…" : "Baixar Cartaz A4 (PDF)"}

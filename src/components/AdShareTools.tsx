@@ -25,7 +25,7 @@ export function AdShareTools({ ad, shareUrl }: AdShareToolsProps) {
             Divulgue offline e online
           </h2>
           <p className="mt-1 text-xs font-medium text-zinc-500 leading-snug">
-            Card quadrado com QR Code ou panfleto A4 — disponível após gerar o link.
+            Card quadrado em JPG para redes ou cartaz A4 em PDF para impressão.
           </p>
         </div>
       </div>

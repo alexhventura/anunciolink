@@ -1,23 +1,23 @@
 import { jsPDF } from "jspdf";
 import type { AdData } from "../types/ad";
-import { generateShareCardBlob, shareCardFilename } from "./shareImage";
+import { renderA4PosterBlob } from "./a4PosterCanvas";
+import { shareCardFilename } from "./shareImage";
 
 const A4_W_MM = 210;
 const A4_H_MM = 297;
-const PAGE_MARGIN_MM = 12;
 const PAGE_BG = { r: 255, g: 251, b: 235 } as const;
 
 function blobToDataUrl(blob: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(String(reader.result));
-    reader.onerror = () => reject(new Error("Falha ao ler imagem do card."));
+    reader.onerror = () => reject(new Error("Falha ao ler imagem do cartaz."));
     reader.readAsDataURL(blob);
   });
 }
 
 function pdfFilename(ad: AdData): string {
-  return shareCardFilename(ad).replace(/\.png$/i, "-a4.pdf");
+  return shareCardFilename(ad).replace(/\.jpe?g$/i, "-a4.pdf");
 }
 
 function downloadBlob(blob: Blob, filename: string): void {
@@ -41,14 +41,14 @@ function openPdfPreview(blob: Blob): void {
 }
 
 async function buildA4CardPdf(ad: AdData, qrUrl: string): Promise<jsPDF> {
-  const cardBlob = await generateShareCardBlob(ad, qrUrl);
-  if (!cardBlob.size) {
-    throw new Error("A imagem do card não foi gerada.");
+  const posterBlob = await renderA4PosterBlob(ad, qrUrl);
+  if (!posterBlob.size) {
+    throw new Error("A imagem do cartaz não foi gerada.");
   }
 
-  const dataUrl = await blobToDataUrl(cardBlob);
+  const dataUrl = await blobToDataUrl(posterBlob);
   if (!dataUrl.startsWith("data:image/")) {
-    throw new Error("Formato de imagem do card inválido.");
+    throw new Error("Formato de imagem do cartaz inválido.");
   }
 
   const pdf = new jsPDF({
@@ -61,19 +61,14 @@ async function buildA4CardPdf(ad: AdData, qrUrl: string): Promise<jsPDF> {
   pdf.setFillColor(PAGE_BG.r, PAGE_BG.g, PAGE_BG.b);
   pdf.rect(0, 0, A4_W_MM, A4_H_MM, "F");
 
-  const innerW = A4_W_MM - PAGE_MARGIN_MM * 2;
-  const innerH = A4_H_MM - PAGE_MARGIN_MM * 2;
-  const cardMm = Math.min(innerW, innerH);
-  const x = (A4_W_MM - cardMm) / 2;
-  const y = (A4_H_MM - cardMm) / 2;
-
-  pdf.addImage(dataUrl, "PNG", x, y, cardMm, cardMm, undefined, "MEDIUM");
+  const format = dataUrl.includes("image/png") ? "PNG" : "JPEG";
+  pdf.addImage(dataUrl, format, 0, 0, A4_W_MM, A4_H_MM, undefined, "MEDIUM");
 
   return pdf;
 }
 
 /**
- * Gera PDF A4 com o card centralizado, baixa o arquivo e abre prévia em nova aba.
+ * Gera PDF A4 com layout de cartaz (grade 2×2), baixa o arquivo e abre prévia.
  */
 export async function printA4CardPdf(ad: AdData, qrUrl: string): Promise<void> {
   const pdf = await buildA4CardPdf(ad, qrUrl);

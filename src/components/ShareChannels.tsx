@@ -112,7 +112,7 @@ export function ShareChannels({ ad, shareUrl, whatsAppMessage }: ShareChannelsPr
     try {
       const qrUrl = buildQrShareUrl(ad);
       const blob = await generateShareCardBlob(ad, qrUrl);
-      const file = new File([blob], shareCardFilename(ad), { type: "image/png" });
+      const file = new File([blob], shareCardFilename(ad), { type: "image/jpeg" });
       const payload = {
         file,
         title: `${ad.title} — AnúncioLink`,
