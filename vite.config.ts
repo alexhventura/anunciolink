@@ -22,6 +22,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react(), tailwindcss(), adsTxtPlugin(adsenseClient)],
+    appType: "spa",
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "."),

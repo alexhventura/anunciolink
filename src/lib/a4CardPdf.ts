@@ -1,5 +1,6 @@
 import { jsPDF } from "jspdf";
 import type { AdData } from "../types/ad";
+import type { ExportQrPreference } from "./exportQr";
 import { renderA4PosterBlob } from "./adExportCanvas";
 import { exportPdfFilename, shareCardFilename } from "./shareImage";
 
@@ -40,8 +41,8 @@ function openPdfPreview(blob: Blob): void {
   window.setTimeout(() => URL.revokeObjectURL(url), 120_000);
 }
 
-async function buildA4CardPdf(ad: AdData, qrUrl: string): Promise<jsPDF> {
-  const posterBlob = await renderA4PosterBlob(ad, qrUrl);
+async function buildA4CardPdf(ad: AdData, qrUrl: string, qrPreference: ExportQrPreference = "ad"): Promise<jsPDF> {
+  const posterBlob = await renderA4PosterBlob(ad, qrUrl, qrPreference);
   if (!posterBlob.size) {
     throw new Error("A imagem do cartaz não foi gerada.");
   }
@@ -70,8 +71,12 @@ async function buildA4CardPdf(ad: AdData, qrUrl: string): Promise<jsPDF> {
 /**
  * Gera PDF A4 com layout de cartaz (grade 2×2), baixa o arquivo e abre prévia.
  */
-export async function printA4CardPdf(ad: AdData, qrUrl: string): Promise<void> {
-  const pdf = await buildA4CardPdf(ad, qrUrl);
+export async function printA4CardPdf(
+  ad: AdData,
+  qrUrl: string,
+  qrPreference: ExportQrPreference = "ad"
+): Promise<void> {
+  const pdf = await buildA4CardPdf(ad, qrUrl, qrPreference);
   const filename = pdfFilename(ad);
   const blob = pdf.output("blob") as Blob;
 
@@ -84,7 +89,11 @@ export async function printA4CardPdf(ad: AdData, qrUrl: string): Promise<void> {
 }
 
 /** Baixa o PDF A4 sem abrir prévia */
-export async function downloadA4CardPdf(ad: AdData, qrUrl: string): Promise<void> {
-  const pdf = await buildA4CardPdf(ad, qrUrl);
+export async function downloadA4CardPdf(
+  ad: AdData,
+  qrUrl: string,
+  qrPreference: ExportQrPreference = "ad"
+): Promise<void> {
+  const pdf = await buildA4CardPdf(ad, qrUrl, qrPreference);
   downloadBlob(pdf.output("blob") as Blob, pdfFilename(ad));
 }

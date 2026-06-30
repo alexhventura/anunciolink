@@ -1,14 +1,18 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { Eye, Link2, Share2, Trash2 } from "lucide-react";
 import type { SavedAdEntry } from "../../lib/adHistory";
+import type { ExportQrPreference } from "../../lib/exportQr";
 import { copyToClipboard } from "../../lib/formatters";
 import { buildNativeShareText } from "../../lib/shareLinks";
 import { generateShareCardBlob, shareCardFilename } from "../../lib/shareImage";
-import { isSavedAdExportable, resolveSavedAdData } from "../../lib/savedAdExport";
+import {
+  resolveSavedAdForExport,
+  savedAdHasPix,
+} from "../../lib/savedAdExport";
 import { useAdHistory } from "../../hooks/useAdHistory";
 import { useNativeShare } from "../../hooks/useNativeShare";
-import { TOOLTIP_COPY } from "../../lib/tooltipCopy";
 import { DeleteAdConfirmDialog } from "../DeleteAdConfirmDialog";
+import { ExportQrPicker } from "../ExportQrPicker";
 import { InstitutionalPageLayout } from "../InstitutionalPageLayout";
 import { IconActionButton } from "../IconActionButton";
 
@@ -32,18 +36,32 @@ export function MyAdsPage({ adsenseReady, onOpenAd, onCreateAd }: MyAdsPageProps
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [shareLoadingId, setShareLoadingId] = useState<string | null>(null);
   const [pendingDelete, setPendingDelete] = useState<SavedAdEntry | null>(null);
+  const [qrPreferenceById, setQrPreferenceById] = useState<Record<string, ExportQrPreference>>({});
 
   useEffect(() => {
     refresh();
   }, [refresh]);
 
-  const exportableById = useMemo(() => {
-    const map = new Map<string, ReturnType<typeof resolveSavedAdData>>();
+  const exportDataById = useMemo(() => {
+    const map = new Map<string, ReturnType<typeof resolveSavedAdForExport>>();
     for (const entry of items) {
-      map.set(entry.id, resolveSavedAdData(entry));
+      map.set(entry.id, resolveSavedAdForExport(entry));
     }
     return map;
   }, [items]);
+
+  const getQrPreference = useCallback(
+    (entry: SavedAdEntry): ExportQrPreference => {
+      const pref = qrPreferenceById[entry.id] ?? "ad";
+      if (pref === "pix" && !savedAdHasPix(entry)) return "ad";
+      return pref;
+    },
+    [qrPreferenceById]
+  );
+
+  const setQrPreference = useCallback((entryId: string, value: ExportQrPreference) => {
+    setQrPreferenceById((prev) => ({ ...prev, [entryId]: value }));
+  }, []);
 
   const handleCopy = useCallback(async (entry: SavedAdEntry) => {
     const ok = await copyToClipboard(entry.url);
@@ -55,15 +73,8 @@ export function MyAdsPage({ adsenseReady, onOpenAd, onCreateAd }: MyAdsPageProps
 
   const handleShare = useCallback(
     async (entry: SavedAdEntry) => {
-      const ad = exportableById.get(entry.id);
-      if (!ad) {
-        const ok = await copyToClipboard(entry.url);
-        if (ok) {
-          setCopiedId(entry.id);
-          window.setTimeout(() => setCopiedId(null), 2000);
-        }
-        return;
-      }
+      const ad = exportDataById.get(entry.id);
+      if (!ad) return;
 
       setShareLoadingId(entry.id);
       try {
@@ -72,7 +83,7 @@ export function MyAdsPage({ adsenseReady, onOpenAd, onCreateAd }: MyAdsPageProps
           price: ad.price,
           description: ad.desc,
         });
-        const blob = await generateShareCardBlob(ad, entry.url);
+        const blob = await generateShareCardBlob(ad, entry.url, getQrPreference(entry));
         const file = new File([blob], shareCardFilename(ad), { type: "image/jpeg" });
         const title = `${ad.title} — AnúncioLink`;
         const filePayload = { file, title, text: nativeText, url: entry.url };
@@ -87,16 +98,12 @@ export function MyAdsPage({ adsenseReady, onOpenAd, onCreateAd }: MyAdsPageProps
           return;
         }
 
-        const ok = await copyToClipboard(entry.url);
-        if (ok) {
-          setCopiedId(entry.id);
-          window.setTimeout(() => setCopiedId(null), 2000);
-        }
+        await handleCopy(entry);
       } finally {
         setShareLoadingId(null);
       }
     },
-    [canShare, canShareFile, exportableById, share, shareWithFile]
+    [canShare, canShareFile, exportDataById, getQrPreference, handleCopy, share, shareWithFile]
   );
 
   const confirmDelete = useCallback(() => {
@@ -108,7 +115,7 @@ export function MyAdsPage({ adsenseReady, onOpenAd, onCreateAd }: MyAdsPageProps
   return (
     <InstitutionalPageLayout
       title="Meus Anúncios"
-      subtitle="Anúncios criados neste navegador — salvos localmente, sem servidor. Compartilhe, copie o link ou baixe PDF e JPG."
+      subtitle="Anúncios salvos neste navegador. Escolha o QR, visualize, compartilhe ou baixe JPG e PDF."
       adsenseReady={adsenseReady}
     >
       {items.length === 0 ? (
@@ -123,8 +130,8 @@ export function MyAdsPage({ adsenseReady, onOpenAd, onCreateAd }: MyAdsPageProps
       ) : (
         <ul className="my-ads-list" role="list">
           {items.map((entry) => {
-            const ad = exportableById.get(entry.id);
-            const exportable = isSavedAdExportable(entry);
+            const ad = exportDataById.get(entry.id)!;
+            const qrPreference = getQrPreference(entry);
 
             return (
               <li key={entry.id} className="my-ads-item">
@@ -137,6 +144,14 @@ export function MyAdsPage({ adsenseReady, onOpenAd, onCreateAd }: MyAdsPageProps
                   {formatAdHeadline(entry)}
                 </button>
 
+                <ExportQrPicker
+                  id={`my-ads-qr-${entry.id}`}
+                  compact
+                  value={qrPreference}
+                  onChange={(value) => setQrPreference(entry.id, value)}
+                  hasPix={savedAdHasPix(entry)}
+                />
+
                 <div
                   className="my-ads-item__toolbar"
                   role="toolbar"
@@ -145,14 +160,12 @@ export function MyAdsPage({ adsenseReady, onOpenAd, onCreateAd }: MyAdsPageProps
                   <IconActionButton
                     icon={Eye}
                     label={`Visualizar anúncio ${entry.title}`}
-                    hint={TOOLTIP_COPY.viewSavedAd}
                     onClick={() => onOpenAd(entry.url)}
                   />
 
                   <IconActionButton
                     icon={Share2}
                     label={`Compartilhar anúncio ${entry.title}`}
-                    hint={TOOLTIP_COPY.nativeShare}
                     onClick={() => void handleShare(entry)}
                     busy={shareLoadingId === entry.id}
                   />
@@ -164,31 +177,21 @@ export function MyAdsPage({ adsenseReady, onOpenAd, onCreateAd }: MyAdsPageProps
                         ? `Link de ${entry.title} copiado`
                         : `Copiar link de ${entry.title}`
                     }
-                    hint="Copia somente o endereço do anúncio."
                     variant="accent"
                     onClick={() => void handleCopy(entry)}
                   />
 
-                  {exportable && ad ? (
-                    <Suspense fallback={null}>
-                      <AdExportButtons ad={ad} qrUrl={entry.url} iconsOnly />
-                    </Suspense>
-                  ) : null}
+                  <Suspense fallback={null}>
+                    <AdExportButtons ad={ad} qrUrl={entry.url} qrPreference={qrPreference} />
+                  </Suspense>
 
                   <IconActionButton
                     icon={Trash2}
                     label={`Excluir ${entry.title} da lista local`}
-                    hint="Remove este anúncio apenas do histórico deste navegador."
                     variant="danger"
                     onClick={() => setPendingDelete(entry)}
                   />
                 </div>
-
-                {!exportable ? (
-                  <p className="my-ads-item__export-hint" role="note">
-                    PDF e JPG disponíveis após abrir anúncios protegidos por senha.
-                  </p>
-                ) : null}
               </li>
             );
           })}

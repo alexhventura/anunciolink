@@ -1,25 +1,20 @@
 import type { LucideIcon } from "lucide-react";
-import { HelpTooltip } from "./HelpTooltip";
 
 interface IconActionButtonProps {
   icon: LucideIcon;
   label: string;
-  hint?: string;
-  hintVariant?: "default" | "on-dark";
   onClick?: () => void;
   disabled?: boolean;
   busy?: boolean;
-  variant?: "default" | "accent" | "danger" | "ghost";
+  variant?: "default" | "accent" | "danger" | "ghost" | "primary";
   id?: string;
   className?: string;
 }
 
-/** Botão quadrado só com ícone — toolbar responsiva */
+/** Botão quadrado só com ícone — rótulo no hover/toque (tooltip CSS) */
 export function IconActionButton({
   icon: Icon,
   label,
-  hint,
-  hintVariant = "default",
   onClick,
   disabled,
   busy,
@@ -34,10 +29,15 @@ export function IconActionButton({
         ? "icon-action-btn--danger"
         : variant === "ghost"
           ? "icon-action-btn--ghost"
-          : "";
+          : variant === "primary"
+            ? "icon-action-btn--primary"
+            : "";
 
   return (
     <div className={`icon-action-btn-wrap ${className}`.trim()}>
+      <span className="icon-action-btn-wrap__tip" role="tooltip">
+        {busy ? `${label} — aguarde` : label}
+      </span>
       <button
         type="button"
         id={id}
@@ -45,16 +45,10 @@ export function IconActionButton({
         disabled={disabled || busy}
         aria-busy={busy}
         aria-label={busy ? `${label} — aguarde` : label}
-        title={hint ? undefined : label}
         className={`icon-action-btn ${variantClass}`.trim()}
       >
         <Icon className="icon-action-btn__icon" strokeWidth={2.25} aria-hidden="true" />
       </button>
-      {hint ? (
-        <span className="icon-action-btn-wrap__hint">
-          <HelpTooltip text={hint} placement="top" variant={hintVariant} triggerLabel={`Ajuda: ${label}`} />
-        </span>
-      ) : null}
     </div>
   );
 }

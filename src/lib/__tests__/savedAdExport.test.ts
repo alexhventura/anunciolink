@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { encodeAdData } from "../adCodec";
 import { MINIMAL_AD } from "./fixtures";
-import { resolveSavedAdData, isSavedAdExportable } from "../savedAdExport";
+import {
+  resolveSavedAdData,
+  resolveSavedAdForExport,
+  isSavedAdExportable,
+} from "../savedAdExport";
 import type { SavedAdEntry } from "../adHistory";
 
 describe("savedAdExport", () => {
@@ -23,13 +27,15 @@ describe("savedAdExport", () => {
     expect(isSavedAdExportable(entry)).toBe(true);
   });
 
-  it("não exporta anúncio com senha (locked)", () => {
+  it("resolve dados mínimos para anúncio com senha", () => {
     const locked: SavedAdEntry = {
       ...entry,
       payload: "locked.U2FsdGVkX1-fake",
       url: "https://www.anunciolink.com.br/#locked_fake",
     };
     expect(resolveSavedAdData(locked)).toBeNull();
-    expect(isSavedAdExportable(locked)).toBe(false);
+    const fallback = resolveSavedAdForExport(locked);
+    expect(fallback.title).toBe(entry.title);
+    expect(isSavedAdExportable(locked)).toBe(true);
   });
 });

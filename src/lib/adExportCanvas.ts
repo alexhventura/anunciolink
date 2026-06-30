@@ -3,7 +3,7 @@ import { drawAdIconOnCanvas } from "./adIconCanvas";
 import { isValidAdIconId, usesBrandMarkIcon } from "./adIcons";
 import { drawCanvasBrandMarkCentered } from "./brandCanvas";
 import { SITE_DOMAIN } from "./constants";
-import type { ExportQrMode } from "./exportQr";
+import type { ExportQrMode, ExportQrPreference } from "./exportQr";
 import { resolveExportQr } from "./exportQr";
 import { formatPhoneNumber } from "./formatters";
 import { renderQrToCanvas } from "./qrCanvas";
@@ -342,26 +342,19 @@ function drawFooterCell(
   const lines: Array<{ text: string; size: number; weight: string; color: string; maxLines?: number }> =
     qrMode === "pix"
       ? [
-          { text: "QR Pix — pagamento", size: Math.round(s * 0.042), weight: "900", color: INK },
+          { text: "Escaneie para pagar via Pix", size: Math.round(s * 0.042), weight: "900", color: INK },
           {
-            text: "Escaneie no app do banco para pagar direto ao vendedor.",
+            text: "Pagamento direto ao vendedor — abra o app do banco e confirme valor e dados.",
             size: Math.round(s * 0.026),
             weight: "600",
             color: MUTED,
             maxLines: 4,
           },
-          {
-            text: "Confirme valor e dados no app antes de concluir.",
-            size: Math.round(s * 0.022),
-            weight: "600",
-            color: MUTED,
-            maxLines: 3,
-          },
         ]
       : [
-          { text: "Escaneie o QR Code", size: Math.round(s * 0.042), weight: "900", color: INK },
+          { text: "Escaneie para visitar", size: Math.round(s * 0.042), weight: "900", color: INK },
           {
-            text: "Aponte a câmera do celular para abrir o anúncio completo.",
+            text: "Aponte a câmera para ver o anúncio completo, descrição e formas de pagamento.",
             size: Math.round(s * 0.026),
             weight: "600",
             color: MUTED,
@@ -469,8 +462,12 @@ async function canvasToJpegBlob(canvas: HTMLCanvasElement): Promise<Blob> {
 }
 
 /** JPEG A4 — fonte única para JPG, PDF e compartilhamento nativo */
-export async function renderExportPosterBlob(ad: AdData, adUrl: string): Promise<Blob> {
-  const { value, mode } = resolveExportQr(ad, adUrl);
+export async function renderExportPosterBlob(
+  ad: AdData,
+  adUrl: string,
+  qrPreference: ExportQrPreference = "ad"
+): Promise<Blob> {
+  const { value, mode } = resolveExportQr(ad, adUrl, qrPreference);
   const qrCanvas = await renderQrToCanvas(value, 640, AD_QR_FOREGROUND);
   const canvas = await renderA4ExportCanvas(ad, qrCanvas, mode);
   return canvasToJpegBlob(canvas);

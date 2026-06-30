@@ -1,4 +1,5 @@
 import type { AdData } from "../types/ad";
+import type { ExportQrPreference } from "./exportQr";
 import { renderExportPosterBlob } from "./adExportCanvas";
 import { downloadBlob, slugifyFilename } from "./socialCardRenderer";
 
@@ -15,9 +16,13 @@ export function exportPdfFilename(ad: AdData): string {
 }
 
 /** Gera JPG A4 — mesma imagem embutida no PDF, só muda a extensão */
-export async function generateShareCardBlob(ad: AdData, qrUrl: string): Promise<Blob> {
+export async function generateShareCardBlob(
+  ad: AdData,
+  qrUrl: string,
+  qrPreference: ExportQrPreference = "ad"
+): Promise<Blob> {
   await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
-  return renderExportPosterBlob(ad, qrUrl);
+  return renderExportPosterBlob(ad, qrUrl, qrPreference);
 }
 
 function openImagePreview(blob: Blob): void {
@@ -28,8 +33,12 @@ function openImagePreview(blob: Blob): void {
 }
 
 /** Baixa JPG A4 e abre prévia para impressão */
-export async function exportJpgCard(ad: AdData, qrUrl: string): Promise<void> {
-  const blob = await generateShareCardBlob(ad, qrUrl);
+export async function exportJpgCard(
+  ad: AdData,
+  qrUrl: string,
+  qrPreference: ExportQrPreference = "ad"
+): Promise<void> {
+  const blob = await generateShareCardBlob(ad, qrUrl, qrPreference);
   if (!blob.size) throw new Error("A imagem do cartaz não foi gerada.");
   downloadBlob(blob, shareCardFilename(ad));
   openImagePreview(blob);
