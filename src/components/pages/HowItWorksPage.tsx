@@ -67,19 +67,18 @@ export function HowItWorksPage({ adsenseReady }: HowItWorksPageProps) {
         icon={<Share2 className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />}
         title="Divulgue em qualquer canal"
       >
-        Na tela de sucesso você encontra atalhos para <strong>WhatsApp</strong>, Telegram, Facebook, LinkedIn e
-        X/Twitter, além de <strong>copiar o link</strong> e <strong>compartilhar pelo celular</strong> (menu
-        nativo). O texto para WhatsApp já vem formatado com título, preço e descrição.
+        Na tela de sucesso use <strong>Compartilhar</strong> para enviar a imagem do card com o link pelo menu
+        do celular (WhatsApp, Instagram, Telegram e outros). Também há <strong>Copiar link</strong>,{" "}
+        <strong>PDF</strong> e <strong>JPG</strong> — ambos abrem prévia para impressão na sua máquina.
       </StepCard>
 
       <StepCard
         step={6}
         icon={<QrCode className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />}
-        title="QR Code, card PNG e cartaz A4"
+        title="QR Code no favicon, card JPG e cartaz A4"
       >
-        Baixe o <strong>QR Code em PNG</strong> para vitrines e panfletos. Gere o{" "}
-        <strong>card para postagem</strong> (imagem quadrada pronta para Instagram e stories) e o{" "}
-        <strong>cartaz A4</strong> para impressão — ambos no layout visual do seu anúncio, com QR centralizado.
+        O QR Code leva o favicon do site no centro. O <strong>JPG</strong> é o card quadrado para redes; o{" "}
+        <strong>PDF</strong> é o mesmo layout em folha A4 — prontos para imprimir ou salvar.
       </StepCard>
 
       <StepCard
@@ -101,7 +100,8 @@ export function HowItWorksPage({ adsenseReady }: HowItWorksPageProps) {
         Anúncios de <strong>venda</strong> expiram automaticamente em <strong>30 dias</strong> — os botões de
         compra são desativados e uma mensagem orienta a renovar. <strong>Serviços</strong> e{" "}
         <strong>vaquinhas</strong> permanecem ativos sem prazo, ideais para pagamentos recorrentes. Na home,{" "}
-        <strong>Meus anúncios</strong> guarda seus links recentes só no seu navegador (sem conta).
+        <strong>Meus anúncios</strong> guarda seus links recentes só no seu navegador (sem conta), com opções
+        de compartilhar, copiar link e baixar PDF/JPG de cada item.
       </StepCard>
 
       <InstitutionalSection title="O que está incluso — sempre grátis">
@@ -109,11 +109,11 @@ export function HowItWorksPage({ adsenseReady }: HowItWorksPageProps) {
           <li>Página de anúncio com visual Bento (mostarda e preto)</li>
           <li>Ícone personalizado por categoria</li>
           <li>Pix, cartão e WhatsApp na página do comprador</li>
-          <li>QR Code com logo {SITE_NAME}</li>
-          <li>Card PNG 1080×1080 para redes sociais</li>
-          <li>Cartaz A4 para impressão</li>
+          <li>QR Code com favicon {SITE_NAME}</li>
+          <li>Card JPG 1080×1080 para redes sociais</li>
+          <li>Cartaz A4 em PDF para impressão</li>
           <li>Senha opcional (até 4 caracteres) com criptografia na URL</li>
-          <li>Compartilhamento em múltiplos canais</li>
+          <li>Compartilhar nativo (imagem + link), copiar link, PDF e JPG</li>
           <li>Indicador de peso do link (payload) na prévia</li>
         </ul>
         <p className="mt-3 text-sm text-zinc-600">

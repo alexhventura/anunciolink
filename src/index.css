@@ -1405,6 +1405,17 @@
   box-shadow: 2px 2px 0 0 #18181b;
 }
 
+.my-ads-item__export-hint {
+  flex: 1 1 100%;
+  text-align: center;
+}
+
+@media (min-width: 480px) {
+  .my-ads-item__export-hint {
+    flex: 0 1 auto;
+  }
+}
+
 .delete-ad-dialog {
   position: fixed;
   inset: 0;
@@ -1554,8 +1565,12 @@
   gap: 0.5rem;
 }
 
+.share-channels__grid--actions {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 @media (min-width: 480px) {
-  .share-channels__grid {
+  .share-channels__grid:not(.share-channels__grid--actions) {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
@@ -1614,6 +1629,21 @@
   background: #ffffff;
 }
 
+.share-channel--primary {
+  background: #a3e635;
+  grid-column: span 2;
+}
+
+@media (min-width: 480px) {
+  .share-channel--primary {
+    grid-column: span 1;
+  }
+}
+
+.share-channels__grid--actions .action-btn-hint {
+  min-width: 0;
+}
+
 .share-channel--image {
   background: #fef3c7;
 }
@@ -1643,6 +1673,10 @@
   font-weight: 700;
   color: #3f3f46;
   text-align: center;
+}
+
+.share-channels__status--error {
+  color: #b91c1c;
 }
 
 /* ——— Landing page do comprador ——— */

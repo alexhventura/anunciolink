@@ -1,11 +1,11 @@
 import { jsPDF } from "jspdf";
 import type { AdData } from "../types/ad";
-import { renderA4PosterBlob } from "./a4PosterCanvas";
+import { renderA4PosterBlob } from "./adExportCanvas";
 import { shareCardFilename } from "./shareImage";
 
 const A4_W_MM = 210;
 const A4_H_MM = 297;
-const PAGE_BG = { r: 255, g: 251, b: 235 } as const;
+const PAGE_BG = { r: 255, g: 255, b: 255 } as const;
 
 function blobToDataUrl(blob: Blob): Promise<string> {
   return new Promise((resolve, reject) => {

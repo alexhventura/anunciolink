@@ -24,6 +24,14 @@ export function buildSocialShareText({ title, price, description, url }: ShareCo
   return `${safeTitle} por ${safePrice}. ${safeDesc}\n\nVeja e pague: ${url}`;
 }
 
+/** Texto para compartilhamento nativo — sem URL (evita duplicar o link no destino) */
+export function buildNativeShareText({ title, price, description }: Omit<ShareContent, "url">): string {
+  const safeTitle = sanitizePlainText(title, 100) || "Anúncio";
+  const safePrice = formatPriceForShare(sanitizePlainText(price, 32));
+  const safeDesc = shortenDescriptionForShare(sanitizePlainText(description, 500), 160);
+  return `${safeTitle} — ${safePrice}\n${safeDesc}`;
+}
+
 export function buildFacebookShareUrl(pageUrl: string): string {
   return `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}`;
 }

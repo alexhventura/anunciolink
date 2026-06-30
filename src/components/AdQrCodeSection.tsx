@@ -31,7 +31,7 @@ function QrPlaceholder({ compact }: { compact?: boolean }) {
   );
 }
 
-/** QR Code com logo AnúncioLink + download PNG */
+/** QR Code com favicon AnúncioLink + download PNG */
 export function AdQrCodeSection({
   url,
   deferMs = 120,

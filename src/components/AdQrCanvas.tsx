@@ -1,7 +1,6 @@
 import { forwardRef } from "react";
 import { QRCodeCanvas } from "qrcode.react";
-
-const QR_LOGO_SRC = "/qr-logo.svg";
+import { SITE_QR_LOGO_SRC } from "../lib/constants";
 
 interface AdQrCanvasProps {
   url: string;
@@ -27,7 +26,7 @@ export const AdQrCanvas = forwardRef<HTMLCanvasElement, AdQrCanvasProps>(functio
         fgColor={fgColor}
         marginSize={2}
         imageSettings={{
-          src: QR_LOGO_SRC,
+          src: SITE_QR_LOGO_SRC,
           height: logoSize,
           width: logoSize,
           excavate: true,

@@ -1,102 +1,40 @@
 import { useCallback, useMemo, useState } from "react";
-import {
-  Copy,
-  Facebook,
-  ImageIcon,
-  Link2,
-  Linkedin,
-  MessageCircle,
-  Send,
-} from "lucide-react";
+import { ImageIcon, Link2, Printer, Share2 } from "lucide-react";
 import type { AdData } from "../types/ad";
 import { copyToClipboard } from "../lib/formatters";
 import { buildQrShareUrl } from "../lib/qrShareUrl";
-import {
-  buildFacebookShareUrl,
-  buildLinkedInShareUrl,
-  buildShortShareText,
-  buildSocialShareText,
-  buildTelegramShareUrl,
-  buildTwitterShareUrl,
-  buildWhatsAppShareUrl,
-  type ShareContent,
-} from "../lib/shareLinks";
-import { generateShareCardBlob, shareCardFilename } from "../lib/shareImage";
+import { buildNativeShareText } from "../lib/shareLinks";
+import { exportJpgCard, generateShareCardBlob, shareCardFilename } from "../lib/shareImage";
+import { printA4CardPdf } from "../lib/a4CardPdf";
+import { TOOLTIP_COPY } from "../lib/tooltipCopy";
 import { useNativeShare } from "../hooks/useNativeShare";
+import { ActionButtonWithHint } from "./HelpTooltip";
 
 interface ShareChannelsProps {
   ad: AdData;
   shareUrl: string;
-  whatsAppMessage: string;
 }
 
-function XIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-    </svg>
-  );
-}
-
-export function ShareChannels({ ad, shareUrl, whatsAppMessage }: ShareChannelsProps) {
+export function ShareChannels({ ad, shareUrl }: ShareChannelsProps) {
   const [linkCopied, setLinkCopied] = useState(false);
-  const [imageSharing, setImageSharing] = useState(false);
+  const [sharing, setSharing] = useState(false);
+  const [pdfLoading, setPdfLoading] = useState(false);
+  const [jpgLoading, setJpgLoading] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
-  const { canShareFile, shareWithFile } = useNativeShare();
+  const [error, setError] = useState<string | null>(null);
+  const { canShare, canShareFile, share, shareWithFile } = useNativeShare();
 
-  const content: ShareContent = useMemo(
-    () => ({
-      title: ad.title,
-      price: ad.price,
-      description: ad.desc,
-      url: shareUrl,
-    }),
-    [ad.desc, ad.price, ad.title, shareUrl]
+  const qrUrl = useMemo(() => shareUrl || buildQrShareUrl(ad), [ad, shareUrl]);
+
+  const nativeText = useMemo(
+    () => buildNativeShareText({ title: ad.title, price: ad.price, description: ad.desc }),
+    [ad.desc, ad.price, ad.title]
   );
 
-  const shortText = useMemo(() => buildShortShareText(content), [content]);
-  const socialText = useMemo(() => buildSocialShareText(content), [content]);
-
-  const channels = useMemo(
-    () => [
-      {
-        id: "whatsapp",
-        label: "WhatsApp",
-        href: buildWhatsAppShareUrl(ad.title, ad.price, ad.desc, shareUrl),
-        icon: MessageCircle,
-        className: "share-channel share-channel--whatsapp",
-      },
-      {
-        id: "telegram",
-        label: "Telegram",
-        href: buildTelegramShareUrl(shareUrl, shortText),
-        icon: Send,
-        className: "share-channel share-channel--telegram",
-      },
-      {
-        id: "facebook",
-        label: "Facebook",
-        href: buildFacebookShareUrl(shareUrl),
-        icon: Facebook,
-        className: "share-channel share-channel--facebook",
-      },
-      {
-        id: "linkedin",
-        label: "LinkedIn",
-        href: buildLinkedInShareUrl(shareUrl),
-        icon: Linkedin,
-        className: "share-channel share-channel--linkedin",
-      },
-      {
-        id: "twitter",
-        label: "X / Twitter",
-        href: buildTwitterShareUrl(shortText, shareUrl),
-        icon: XIcon,
-        className: "share-channel share-channel--twitter",
-      },
-    ],
-    [ad.desc, ad.price, ad.title, shareUrl, shortText]
-  );
+  const showStatus = useCallback((message: string, ms = 3500) => {
+    setStatus(message);
+    window.setTimeout(() => setStatus(null), ms);
+  }, []);
 
   const handleCopyLink = useCallback(async () => {
     const ok = await copyToClipboard(shareUrl);
@@ -106,72 +44,91 @@ export function ShareChannels({ ad, shareUrl, whatsAppMessage }: ShareChannelsPr
     }
   }, [shareUrl]);
 
-  const handleShareImage = useCallback(async () => {
-    setImageSharing(true);
+  const handleNativeShare = useCallback(async () => {
+    setSharing(true);
+    setError(null);
     setStatus(null);
+
     try {
-      const qrUrl = buildQrShareUrl(ad);
       const blob = await generateShareCardBlob(ad, qrUrl);
       const file = new File([blob], shareCardFilename(ad), { type: "image/jpeg" });
-      const payload = {
-        file,
-        title: `${ad.title} — AnúncioLink`,
-        text: socialText,
-        url: shareUrl,
-      };
+      const title = `${ad.title} — AnúncioLink`;
+      const filePayload = { file, title, text: nativeText, url: shareUrl };
 
-      if (canShareFile(file, payload)) {
-        const result = await shareWithFile(payload);
-        if (result === "shared") {
-          setStatus("Imagem compartilhada!");
-          window.setTimeout(() => setStatus(null), 3500);
-        }
-      } else {
-        setStatus("Use “Baixar card” abaixo e anexe manualmente no app.");
-        window.setTimeout(() => setStatus(null), 4500);
+      if (canShareFile(file, filePayload)) {
+        const result = await shareWithFile(filePayload);
+        if (result === "shared") showStatus("Compartilhado!");
+        return;
       }
+
+      if (canShare) {
+        const result = await share({ title, text: nativeText, url: shareUrl });
+        if (result === "shared") showStatus("Compartilhado!");
+        return;
+      }
+
+      showStatus("Use os botões JPG ou Copiar link neste dispositivo.", 4500);
     } catch {
-      setStatus("Não foi possível gerar a imagem agora.");
-      window.setTimeout(() => setStatus(null), 3500);
+      setError("Não foi possível preparar o compartilhamento.");
     } finally {
-      setImageSharing(false);
+      setSharing(false);
     }
-  }, [ad, canShareFile, shareUrl, shareWithFile, socialText]);
+  }, [ad, canShare, canShareFile, nativeText, qrUrl, share, shareUrl, shareWithFile, showStatus]);
+
+  const handlePdf = useCallback(async () => {
+    if (!qrUrl.trim() || pdfLoading) return;
+    setPdfLoading(true);
+    setError(null);
+    try {
+      await printA4CardPdf(ad, qrUrl);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Não foi possível gerar o PDF.";
+      setError(message);
+    } finally {
+      setPdfLoading(false);
+    }
+  }, [ad, pdfLoading, qrUrl]);
+
+  const handleJpg = useCallback(async () => {
+    if (jpgLoading) return;
+    setJpgLoading(true);
+    setError(null);
+    try {
+      await exportJpgCard(ad, qrUrl);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Não foi possível gerar o JPG.";
+      setError(message);
+    } finally {
+      setJpgLoading(false);
+    }
+  }, [ad, jpgLoading, qrUrl]);
 
   return (
     <section className="share-channels" aria-labelledby="share-channels-heading">
       <header className="share-channels__header">
         <h2 id="share-channels-heading" className="share-channels__title">
-          Compartilhar em
+          Divulgue seu anúncio
         </h2>
         <p className="share-channels__lead">
-          WhatsApp, Telegram, redes sociais ou copie o link. A prévia aparece ao abrir o anúncio.
+          Compartilhe a imagem com o link, copie só o endereço ou baixe PDF e JPG para impressão.
         </p>
       </header>
 
-      <div className="share-channels__grid" role="list">
-        {channels.map(({ id, label, href, icon: Icon, className }) => (
-          <a
-            key={id}
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
-            role="listitem"
-            id={`btn-share-${id}`}
-            className={className}
-            aria-label={`Compartilhar no ${label} — abre em nova aba`}
-          >
-            {id === "twitter" ? (
-              <Icon className="h-4 w-4 shrink-0" />
-            ) : (
-              <Icon className="h-5 w-5 shrink-0" strokeWidth={2.25} aria-hidden="true" />
-            )}
-            <span>{label}</span>
-          </a>
-        ))}
-      </div>
+      <div className="share-channels__grid share-channels__grid--actions" role="list">
+        <ActionButtonWithHint
+          hint={TOOLTIP_COPY.nativeShare}
+          hintVariant="on-dark"
+          onClick={() => void handleNativeShare()}
+          disabled={sharing}
+          id="btn-native-share"
+          className="share-channel share-channel--primary"
+          aria-busy={sharing}
+          aria-label="Compartilhar imagem e link pelo menu do celular"
+        >
+          <Share2 className="h-5 w-5 shrink-0" strokeWidth={2.25} aria-hidden="true" />
+          {sharing ? "Preparando…" : "Compartilhar"}
+        </ActionButtonWithHint>
 
-      <div className="share-channels__utilities">
         <button
           type="button"
           onClick={() => void handleCopyLink()}
@@ -183,36 +140,44 @@ export function ShareChannels({ ad, shareUrl, whatsAppMessage }: ShareChannelsPr
           {linkCopied ? "Link copiado" : "Copiar link"}
         </button>
 
-        <button
-          type="button"
-          onClick={() => void handleShareImage()}
-          disabled={imageSharing}
-          className="share-channel share-channel--utility share-channel--image"
-          aria-busy={imageSharing}
-          aria-label="Compartilhar imagem do card nas redes"
+        <ActionButtonWithHint
+          hint={TOOLTIP_COPY.printPoster}
+          hintVariant="default"
+          onClick={() => void handlePdf()}
+          disabled={!qrUrl.trim() || pdfLoading}
+          id="btn-export-pdf"
+          className="share-channel share-channel--utility"
+          aria-busy={pdfLoading}
+          aria-label="Baixar cartaz A4 em PDF e abrir para impressão"
+        >
+          <Printer className="h-5 w-5 shrink-0" strokeWidth={2} aria-hidden="true" />
+          {pdfLoading ? "Gerando…" : "PDF"}
+        </ActionButtonWithHint>
+
+        <ActionButtonWithHint
+          hint={TOOLTIP_COPY.socialCard}
+          hintVariant="default"
+          onClick={() => void handleJpg()}
+          disabled={jpgLoading}
+          id="btn-export-jpg"
+          className="share-channel share-channel--utility"
+          aria-busy={jpgLoading}
+          aria-label="Baixar card quadrado em JPG e abrir para impressão"
         >
           <ImageIcon className="h-5 w-5 shrink-0" strokeWidth={2.25} aria-hidden="true" />
-          {imageSharing ? "Gerando imagem…" : "Compartilhar imagem"}
-        </button>
+          {jpgLoading ? "Gerando…" : "JPG"}
+        </ActionButtonWithHint>
       </div>
-
-      <details className="share-channels__message">
-        <summary className="share-channels__message-toggle">
-          <Copy className="h-4 w-4 shrink-0" aria-hidden="true" />
-          Ver texto para colar manualmente
-        </summary>
-        <textarea
-          readOnly
-          rows={5}
-          value={whatsAppMessage}
-          className="share-channels__message-field input-field !shadow-none text-xs font-medium resize-none min-h-[100px] mt-3"
-          aria-label="Texto formatado para compartilhar"
-        />
-      </details>
 
       {status && (
         <p className="share-channels__status" role="status">
           {status}
+        </p>
+      )}
+
+      {error && (
+        <p className="share-channels__status share-channels__status--error" role="alert">
+          {error}
         </p>
       )}
     </section>

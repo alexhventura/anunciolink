@@ -8,7 +8,7 @@ export const TOOLTIP_COPY = {
     "Detalhes que vendem: estado, entrega, garantia ou o que está incluso no serviço.",
   icon: "Opcional — sem escolha, usamos o logo AnúncioLink no card.",
   nativeShare:
-    "Abre o compartilhamento nativo do celular com texto pronto — ideal para WhatsApp e redes.",
+    "Abre o menu do celular para enviar a imagem do card junto com o link — WhatsApp, Instagram, Telegram e outros.",
   pix:
     "Cole o Pix copia e cola. Fica só na URL — sem servidor, sem cadastro.",
   adType:
@@ -22,9 +22,9 @@ export const TOOLTIP_COPY = {
   generateAd:
     "Gera anúncio + link + QR Code. Tudo codificado na URL — sem upload e sem banco.",
   printPoster:
-    "Baixa PDF A4 com layout de cartaz — ícone, preço, descrição completa e QR Code prontos para imprimir.",
+    "Baixa PDF A4 e abre prévia para impressão — mesmo layout do card, formato folha.",
   socialCard:
-    "Card quadrado em JPG — ideal para Instagram, WhatsApp Status e redes sociais.",
+    "Baixa JPG quadrado e abre prévia para impressão — ideal para redes e stories.",
   linkShortener:
     "Nosso link carrega tudo de graça — por isso é longo. Encurte no Bitly ou TinyURL para bios.",
   formRequired:

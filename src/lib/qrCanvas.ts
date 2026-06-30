@@ -1,10 +1,9 @@
 import { createRoot } from "react-dom/client";
 import { createElement } from "react";
 import { QRCodeCanvas } from "qrcode.react";
+import { SITE_QR_LOGO_SRC } from "./constants";
 
-const QR_LOGO_SRC = "/qr-logo.svg";
-
-/** Gera canvas PNG do QR Code com logo AnúncioLink */
+/** Gera canvas PNG do QR Code com favicon AnúncioLink */
 export async function renderQrToCanvas(
   value: string,
   size: number,
@@ -30,7 +29,7 @@ export async function renderQrToCanvas(
         fgColor,
         marginSize: 2,
         imageSettings: {
-          src: QR_LOGO_SRC,
+          src: SITE_QR_LOGO_SRC,
           height: logoSize,
           width: logoSize,
           excavate: true,

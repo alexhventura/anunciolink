@@ -56,7 +56,6 @@ export default function App() {
     unlockAd,
     openSavedAdUrl,
     resetToHome,
-    backToEdit,
     navigateToPage,
     isInstitutionalView,
   } = useAdRouting();
@@ -160,7 +159,6 @@ export default function App() {
                 generatedLink={generatedLink}
                 adsenseReady={adsenseReady}
                 textOptimizedWarning={textOptimizedWarning}
-                onBackToEdit={backToEdit}
                 onResetHome={handleResetHome}
               />
             </Suspense>

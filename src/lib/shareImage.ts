@@ -1,31 +1,28 @@
 import type { AdData } from "../types/ad";
-import { AD_QR_FOREGROUND } from "./adThemes";
-import { renderPreviewCardBlob } from "./adPreviewCardCanvas";
-import { renderQrToCanvas } from "./qrCanvas";
-import { slugifyFilename } from "./socialCardRenderer";
+import { renderCardExportBlob } from "./adExportCanvas";
+import { downloadBlob, slugifyFilename } from "./socialCardRenderer";
 
-/** Gera JPG 1080px do card quadrado para postagem manual ou Web Share API */
+/** Gera JPG quadrado — mesma composição do cartaz A4, formato card */
 export async function generateShareCardBlob(ad: AdData, qrUrl: string): Promise<Blob> {
   await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
-
-  const qrCanvas = await renderQrToCanvas(qrUrl, 256, AD_QR_FOREGROUND);
-  return renderPreviewCardBlob(
-    {
-      adType: ad.t,
-      title: ad.title,
-      price: ad.price,
-      description: ad.desc,
-      icon: ad.icon,
-      billingRecorrente: ad.billingType === "recorrente",
-      phone: ad.phone,
-      qrCanvas,
-      width: 1080,
-    },
-    "image/jpeg",
-    0.92
-  );
+  return renderCardExportBlob(ad, qrUrl);
 }
 
 export function shareCardFilename(ad: AdData): string {
   return `anunciolink-${slugifyFilename(ad.title)}.jpg`;
+}
+
+function openImagePreview(blob: Blob): void {
+  const url = URL.createObjectURL(blob);
+  const opened = window.open(url, "_blank", "noopener,noreferrer");
+  if (!opened) return;
+  window.setTimeout(() => URL.revokeObjectURL(url), 120_000);
+}
+
+/** Baixa JPG do card e abre prévia para impressão */
+export async function exportJpgCard(ad: AdData, qrUrl: string): Promise<void> {
+  const blob = await generateShareCardBlob(ad, qrUrl);
+  if (!blob.size) throw new Error("A imagem do card não foi gerada.");
+  downloadBlob(blob, shareCardFilename(ad));
+  openImagePreview(blob);
 }

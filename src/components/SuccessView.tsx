@@ -1,21 +1,13 @@
-import { lazy, Suspense, useId, useState } from "react";
-import { Check, Lightbulb, Lock, Share2, Zap } from "lucide-react";
+import { lazy, Suspense } from "react";
+import { Check, Lightbulb, Lock, Zap } from "lucide-react";
 import type { AdFormState } from "../hooks/useAdForm";
 import type { AdData } from "../types/ad";
 import { AdSenseSlot } from "./AdSenseSlot";
 import { AdPreviewCard } from "./AdPreviewCard";
-import { AdQrCodeSection } from "./AdQrCodeSection";
 import { ViewEnter } from "./ViewEnter";
-import { ActionButtonWithHint } from "./HelpTooltip";
-import { buildWhatsAppShareMessage } from "../lib/whatsappShare";
-import { useNativeShare } from "../hooks/useNativeShare";
-import { TOOLTIP_COPY } from "../lib/tooltipCopy";
 
 const ShareChannels = lazy(() =>
   import("./ShareChannels").then((m) => ({ default: m.ShareChannels }))
-);
-const AdShareTools = lazy(() =>
-  import("./AdShareTools").then((m) => ({ default: m.AdShareTools }))
 );
 
 interface SuccessViewProps {
@@ -23,7 +15,6 @@ interface SuccessViewProps {
   generatedLink: string;
   adsenseReady: boolean;
   textOptimizedWarning?: boolean;
-  onBackToEdit: () => void;
   onResetHome: () => void;
 }
 
@@ -32,34 +23,8 @@ export function SuccessView({
   generatedLink,
   adsenseReady,
   textOptimizedWarning,
-  onBackToEdit,
   onResetHome,
 }: SuccessViewProps) {
-  const [shareStatus, setShareStatus] = useState<string | null>(null);
-  const { canShare, share } = useNativeShare();
-  const qrHeadingId = useId();
-
-  const shareMessage = buildWhatsAppShareMessage(
-    form.title,
-    form.price,
-    form.description,
-    generatedLink
-  );
-
-  const handleNativeShare = async () => {
-    const result = await share({
-      title: `${form.title} — AnúncioLink`,
-      text: shareMessage,
-      url: generatedLink,
-    });
-    if (result === "shared") setShareStatus("Compartilhado!");
-    else if (result === "cancelled") setShareStatus(null);
-    else setShareStatus(null);
-    if (result === "shared") {
-      window.setTimeout(() => setShareStatus(null), 2500);
-    }
-  };
-
   const adSnapshot: AdData = {
     t: form.adType,
     title: form.title,
@@ -90,7 +55,7 @@ export function SuccessView({
             </h1>
           </div>
           <p className="text-sm font-bold text-black max-w-sm mx-auto">
-            Copie o link, baixe o QR Code e divulgue. Panfleto A4 e card offline também estão aqui.
+            Compartilhe a imagem com o link, copie o endereço ou baixe PDF e JPG para impressão.
           </p>
         </div>
 
@@ -117,29 +82,14 @@ export function SuccessView({
         ) : null}
 
         <div className="space-y-6 text-left">
-          <Suspense fallback={<div className="neo-inset p-6 text-center text-xs font-bold text-zinc-500">Carregando canais…</div>}>
-            <ShareChannels ad={adSnapshot} shareUrl={generatedLink} whatsAppMessage={shareMessage} />
-          </Suspense>
-
-          {canShare && (
-            <ActionButtonWithHint
-              hint={TOOLTIP_COPY.nativeShare}
-              hintVariant="on-dark"
-              onClick={() => void handleNativeShare()}
-              id="btn-native-share-success"
-              className="btn-primary gap-2"
-              aria-live="polite"
-              aria-label={shareStatus ?? "Divulgar pelo menu nativo do celular"}
-            >
-              <Share2 className="h-5 w-5 shrink-0" strokeWidth={2.5} aria-hidden="true" />
-              {shareStatus ?? "Compartilhar pelo celular"}
-            </ActionButtonWithHint>
-          )}
-
-          <AdQrCodeSection url={generatedLink} deferMs={200} headingId={qrHeadingId} />
-
-          <Suspense fallback={<div className="neo-inset p-6 text-center text-xs font-bold text-zinc-500">Carregando ferramentas…</div>}>
-            <AdShareTools ad={adSnapshot} shareUrl={generatedLink} />
+          <Suspense
+            fallback={
+              <div className="neo-inset p-6 text-center text-xs font-bold text-zinc-500">
+                Carregando opções…
+              </div>
+            }
+          >
+            <ShareChannels ad={adSnapshot} shareUrl={generatedLink} />
           </Suspense>
 
           <aside
@@ -193,15 +143,6 @@ export function SuccessView({
           >
             Abrir anúncio
           </a>
-          <button
-            type="button"
-            onClick={onBackToEdit}
-            id="btn-edit-info"
-            className="btn-accent !min-h-[64px]"
-            aria-label="Voltar e editar informações do anúncio"
-          >
-            Editar
-          </button>
           <button
             type="button"
             onClick={onResetHome}
