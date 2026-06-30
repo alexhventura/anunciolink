@@ -40,7 +40,7 @@ export function descriptionPlaceholder(adType: AdType): string {
 }
 
 export const FORM_SUBMIT_NOTICE =
-  "Cada geração cria um link novo. Se você editar e gerar de novo, o link anterior não muda — não há banco de dados.";
+  "Depois de pronto, o anúncio não pode ser alterado no mesmo link. Se você editar e gerar de novo, será criado um link novo — cada link gerado funciona para sempre.";
 
 export const FIELD_MICROCOPY = {
   title: "Curto e direto — é o destaque do card do anúncio.",

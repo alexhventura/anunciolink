@@ -1,7 +1,7 @@
 import type { AdType } from "../types/ad";
 import { SITE_DOMAIN } from "./constants";
 import type { AdIconChoice } from "./adIcons";
-import { isBrandMarkIcon, resolveAdIconId } from "./adIcons";
+import { isBrandMarkIcon, isValidAdIconId, usesBrandMarkIcon } from "./adIcons";
 import { drawAdIconOnCanvas } from "./adIconCanvas";
 import { drawCanvasBrandMarkCentered } from "./brandCanvas";
 import { formatPhoneNumber } from "./formatters";
@@ -144,8 +144,8 @@ export async function renderPreviewCardCanvas(input: PreviewCardCanvasInput): Pr
   const safeX = pad + 32;
   const safeW = innerW - 64;
 
-  const useBrandMark = isBrandMarkIcon(input.icon);
-  const iconId = useBrandMark ? undefined : resolveAdIconId(input.icon, input.adType);
+  const useBrandMark = usesBrandMarkIcon(input.icon);
+  const iconId = useBrandMark || !isValidAdIconId(input.icon) ? undefined : input.icon;
   const priceLabel = input.price + (input.billingRecorrente ? " /mês" : "");
   const typeLabel = TYPE_LABEL[input.adType].toUpperCase();
   const phoneDisplay = input.phone ? formatPhoneNumber(input.phone) : "";

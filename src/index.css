@@ -1279,6 +1279,12 @@
   color: #b91c1c;
 }
 
+.ad-form-submit-block {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
 .ad-form-submit-note {
   display: flex;
   align-items: flex-start;

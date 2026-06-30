@@ -3,8 +3,7 @@ import type { AdData, AdType, BillingType } from "../types/ad";
 import { computeExpiresAt } from "../lib/adExpiry";
 import type { AdIconChoice } from "../lib/adIcons";
 import {
-  DEFAULT_AD_ICON_ID,
-  isBrandMarkIcon,
+  AD_ICON_BRAND_MARK,
   isValidAdIconId,
   normalizeAdIconChoice,
 } from "../lib/adIcons";
@@ -40,7 +39,7 @@ const initialState: AdFormState = {
   phone: "",
   pix: "",
   cardLink: "",
-  icon: DEFAULT_AD_ICON_ID.venda,
+  icon: AD_ICON_BRAND_MARK,
   password: "",
   submitError: null,
 };
@@ -51,10 +50,8 @@ function adFormReducer(state: AdFormState, action: AdFormAction): AdFormState {
       const next = { ...state, [action.field]: action.value };
       if (action.field === "adType" && typeof action.value === "string") {
         const adType = action.value as AdType;
-        if (isBrandMarkIcon(next.icon)) {
-          // mantém marca do site ao trocar o tipo
-        } else if (!isValidAdIconId(next.icon) || next.icon === DEFAULT_AD_ICON_ID[state.adType]) {
-          next.icon = DEFAULT_AD_ICON_ID[adType];
+        if (!isValidAdIconId(next.icon)) {
+          next.icon = AD_ICON_BRAND_MARK;
         }
       }
       return next;

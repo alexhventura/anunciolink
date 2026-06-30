@@ -6,7 +6,7 @@ export const TOOLTIP_COPY = {
     "Digite só números — formatamos em R$ automaticamente. Em cobrança recorrente, exibimos '/mês'.",
   description:
     "Detalhes que vendem: estado, entrega, garantia ou o que está incluso no serviço.",
-  icon: "Ícone que representa seu produto ou serviço no card.",
+  icon: "Opcional — sem escolha, usamos o logo AnúncioLink no card.",
   nativeShare:
     "Abre o compartilhamento nativo do celular com texto pronto — ideal para WhatsApp e redes.",
   pix:

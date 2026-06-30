@@ -499,12 +499,13 @@ export function HomeView({
               )}
             </section>
 
-            <p className="ad-form-submit-note" role="note">
-              <Info className="ad-form-submit-note__icon" strokeWidth={2.5} aria-hidden="true" />
-              <span>{FORM_SUBMIT_NOTICE}</span>
-            </p>
+            <div className="ad-form-submit-block">
+              <p className="ad-form-submit-note" role="note">
+                <Info className="ad-form-submit-note__icon" strokeWidth={2.5} aria-hidden="true" />
+                <span>{FORM_SUBMIT_NOTICE}</span>
+              </p>
 
-            <ActionButtonWithHint
+              <ActionButtonWithHint
               hint={TOOLTIP_COPY.generateAd}
               hintVariant="on-dark"
               type="submit"
@@ -516,6 +517,7 @@ export function HomeView({
             >
               {isSubmitting ? "Gerando…" : "Gerar anúncio grátis"}
             </ActionButtonWithHint>
+            </div>
           </div>
 
           <aside className="ad-form-bento__aside">

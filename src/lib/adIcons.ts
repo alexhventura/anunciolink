@@ -333,6 +333,13 @@ export function isBrandMarkIcon(icon: unknown): icon is typeof AD_ICON_BRAND_MAR
   return icon === AD_ICON_BRAND_MARK;
 }
 
+/** Padrão do produto: logo AnúncioLink quando o usuário não escolhe ícone Lucide */
+export function usesBrandMarkIcon(icon: AdIconChoice | undefined): boolean {
+  if (isBrandMarkIcon(icon)) return true;
+  if (icon === undefined) return true;
+  return !isValidAdIconId(icon);
+}
+
 export function isAdIconChoice(value: unknown): value is AdIconChoice {
   return isBrandMarkIcon(value) || isValidAdIconId(value);
 }
@@ -360,21 +367,19 @@ export function decodeIconFromWire(value: unknown): AdIconChoice | undefined {
   return undefined;
 }
 
-/** Omite no wire quando igual ao default do tipo; `-1` codifica marca do site */
-export function iconIdForWire(icon: AdIconChoice | undefined, adType: AdType): number | undefined {
-  if (isBrandMarkIcon(icon)) return AD_ICON_BRAND_MARK;
-  const resolved = resolveAdIconId(icon, adType);
-  return resolved === DEFAULT_AD_ICON_ID[adType] ? undefined : resolved;
+/** Omite no wire quando é logo padrão; codifica só ícones Lucide escolhidos */
+export function iconIdForWire(icon: AdIconChoice | undefined, _adType: AdType): number | undefined {
+  if (usesBrandMarkIcon(icon)) return undefined;
+  return icon;
 }
 
 /** Normaliza escolha do formulário para payload do anúncio */
 export function normalizeAdIconChoice(
   icon: AdIconChoice | undefined,
-  adType: AdType
+  _adType: AdType
 ): AdIconChoice | undefined {
-  if (isBrandMarkIcon(icon)) return AD_ICON_BRAND_MARK;
-  if (icon !== undefined && isValidAdIconId(icon)) return icon;
-  return undefined;
+  if (usesBrandMarkIcon(icon)) return undefined;
+  return icon;
 }
 
 export function searchAdIcons(query: string, categoryId?: AdIconCategoryId): AdIconDefinition[] {

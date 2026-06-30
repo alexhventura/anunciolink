@@ -37,10 +37,13 @@ describe("adWire", () => {
     expect(wire.cz).toBeUndefined();
   });
 
-  it("codifica marca do site como e: -1", () => {
-    const wire = toCompactWire({ ...MINIMAL_AD, icon: -1 });
-    expect(wire.e).toBe(-1);
-    const ad = fromCompactWire(wire);
+  it("omite ícone no wire quando é logo padrão (marca do site)", () => {
+    expect(toCompactWire({ ...MINIMAL_AD, icon: undefined }).e).toBeUndefined();
+    expect(toCompactWire({ ...MINIMAL_AD, icon: -1 }).e).toBeUndefined();
+  });
+
+  it("decodifica e: -1 legado como marca do site", () => {
+    const ad = fromCompactWire({ ...COMPACT_WIRE, e: -1 });
     expect(ad.icon).toBe(-1);
   });
 
