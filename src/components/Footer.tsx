@@ -43,6 +43,19 @@ export function Footer({ onNavigate }: FooterProps) {
           Termos de Uso
         </SiteNavLink>
       </nav>
+
+      <p className="mt-6 text-[11px] text-zinc-500 tracking-wide">
+        Desenvolvido por{" "}
+        <a
+          href="https://hervenhub.com.br"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-black hover:underline"
+          style={{ color: "#F5C400" }}
+        >
+          Herven Hub
+        </a>
+      </p>
     </footer>
   );
 }
