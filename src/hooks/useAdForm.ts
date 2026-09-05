@@ -1,5 +1,6 @@
 import { useCallback, useReducer } from "react";
 import type { AdData, AdType, BillingType } from "../types/ad";
+import { adTypeRequiresPrice } from "../lib/adTypeUtils";
 import { computeExpiresAt } from "../lib/adExpiry";
 import type { AdIconChoice } from "../lib/adIcons";
 import {
@@ -52,6 +53,10 @@ function adFormReducer(state: AdFormState, action: AdFormAction): AdFormState {
         const adType = action.value as AdType;
         if (!isValidAdIconId(next.icon)) {
           next.icon = AD_ICON_BRAND_MARK;
+        }
+        if (!adTypeRequiresPrice(adType)) {
+          next.price = "";
+          next.billingType = "unico";
         }
       }
       return next;

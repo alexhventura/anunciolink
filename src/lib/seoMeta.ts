@@ -1,4 +1,5 @@
 import type { AdData, AdType } from "../types/ad";
+import { adTypeRequiresPrice } from "./adTypeUtils";
 import type { InstitutionalView } from "./siteRoutes";
 import { isAdExpired } from "./adExpiry";
 import { SITE_NAME, SITE_URL } from "./constants";
@@ -22,6 +23,7 @@ const AD_TYPE_LABEL: Record<AdType, string> = {
   venda: "Produto à venda",
   servico: "Serviço",
   vaquinha: "Vaquinha solidária",
+  aviso: "Aviso ou informativo",
 };
 
 function truncateAtWord(text: string, maxLen: number): string {
@@ -100,7 +102,7 @@ export const INSTITUTIONAL_SEO: Record<
   termos: {
     title: buildSeoTitle("Termos de uso"),
     description: buildSeoDescription(
-      "Termos de uso do Anuncio Link. Ferramenta gratuita de anúncios. Vendas expiram em 30 dias; serviços e vaquinhas permanecem ativos."
+      "Termos de uso do Anuncio Link. Ferramenta gratuita de anúncios. Vendas expiram em 30 dias; serviços, vaquinhas e avisos permanecem ativos."
     ),
     breadcrumb: "Termos",
   },
@@ -114,7 +116,7 @@ export function buildAdPageSeo(ad: AdData, canonicalUrl: string): PageSeoMeta {
   const category = AD_TYPE_LABEL[ad.t];
 
   const titleSuffix = ` — QR Code | ${SITE_NAME}`;
-  const pricePart = ` — ${safePrice}`;
+  const pricePart = adTypeRequiresPrice(ad.t) && safePrice ? ` — ${safePrice}` : "";
   const maxTitleLen = SEO_TITLE_MAX - titleSuffix.length - pricePart.length;
   const shortTitle = truncateAtWord(safeTitle, Math.max(16, maxTitleLen));
 

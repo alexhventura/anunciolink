@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { adTypeRequiresPrice } from "../lib/adTypeUtils";
 import type { AdFormState } from "../hooks/useAdForm";
 import { AdBuilder } from "../lib/adBuilder";
 import { AdSerializer, type PayloadScoreLevel } from "../lib/adSerializer";
@@ -24,7 +25,11 @@ interface PayloadScoreIndicatorProps {
 /** Indicador discreto de peso do payload — local, sem analytics */
 export function PayloadScoreIndicator({ form }: PayloadScoreIndicatorProps) {
   const score = useMemo(() => {
-    if (!form.title.trim() || !form.price.trim() || !form.description.trim()) {
+    if (
+      !form.title.trim() ||
+      !form.description.trim() ||
+      (adTypeRequiresPrice(form.adType) && !form.price.trim())
+    ) {
       return null;
     }
     try {

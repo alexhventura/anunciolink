@@ -1,6 +1,7 @@
 import { compressSync, decompressSync, strFromU8, strToU8 } from "fflate";
 import type { AdData } from "../types/ad";
 import { fromCompactWire, normalizeLegacyAd, toCompactWire } from "./adWire";
+import { adTypeRequiresPrice } from "./adTypeUtils";
 import { estimateAdUrlLength } from "./adRoutes";
 import { isLockedPayload } from "./adLock";
 import { sanitizeAdData } from "./sanitizeAd";
@@ -63,7 +64,9 @@ function decompressV2Payload(encoded: string): AdData | null {
 }
 
 function isValidAd(ad: AdData): boolean {
-  return Boolean(ad.t && ad.title?.trim() && ad.price?.trim() && ad.desc?.trim());
+  if (!ad.t || !ad.title?.trim() || !ad.desc?.trim()) return false;
+  if (adTypeRequiresPrice(ad.t) && !ad.price?.trim()) return false;
+  return true;
 }
 
 /** Codifica anúncio: JSON compacto → Deflate (fflate) → Base64 URL-safe */

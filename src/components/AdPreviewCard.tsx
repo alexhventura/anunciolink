@@ -9,6 +9,7 @@ const TYPE_LABEL: Record<AdType, string> = {
   venda: "Venda",
   servico: "Serviço",
   vaquinha: "Vaquinha",
+  aviso: "Aviso",
 };
 
 interface AdPreviewCardProps {

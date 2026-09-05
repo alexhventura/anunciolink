@@ -1,4 +1,5 @@
 import type { AdType } from "../types/ad";
+import { formatAdPriceDisplay } from "./adTypeUtils";
 import { SITE_DOMAIN } from "./constants";
 import type { AdIconChoice } from "./adIcons";
 import { isBrandMarkIcon, isValidAdIconId, usesBrandMarkIcon } from "./adIcons";
@@ -16,6 +17,7 @@ const TYPE_LABEL: Record<AdType, string> = {
   venda: "Venda",
   servico: "Serviço",
   vaquinha: "Vaquinha",
+  aviso: "Aviso",
 };
 
 /** Espaçamentos padronizados do card social (1080px) */
@@ -146,7 +148,11 @@ export async function renderPreviewCardCanvas(input: PreviewCardCanvasInput): Pr
 
   const useBrandMark = usesBrandMarkIcon(input.icon);
   const iconId = useBrandMark || !isValidAdIconId(input.icon) ? undefined : input.icon;
-  const priceLabel = input.price + (input.billingRecorrente ? " /mês" : "");
+  const priceLabel = formatAdPriceDisplay(
+    input.adType,
+    input.price,
+    input.billingRecorrente ? "recorrente" : "unico"
+  );
   const typeLabel = TYPE_LABEL[input.adType].toUpperCase();
   const phoneDisplay = input.phone ? formatPhoneNumber(input.phone) : "";
   const title = input.title.trim() || "Título do anúncio";

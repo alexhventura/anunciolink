@@ -1,4 +1,5 @@
 import type { AdData, AdType } from "../types/ad";
+import { formatAdPriceDisplay } from "./adTypeUtils";
 import { drawAdIconOnCanvas } from "./adIconCanvas";
 import { isValidAdIconId, usesBrandMarkIcon } from "./adIcons";
 import { drawCanvasBrandMarkCentered } from "./brandCanvas";
@@ -23,6 +24,7 @@ const TYPE_LABEL: Record<AdType, string> = {
   venda: "Venda",
   servico: "Serviço",
   vaquinha: "Vaquinha",
+  aviso: "Aviso",
 };
 
 interface Rect {
@@ -428,7 +430,7 @@ export async function renderAdExportCanvas(
   const { layout, border } = layoutExportGrid(width, height);
   const s = scale(width, height);
 
-  const priceLabel = ad.price + (ad.billingType === "recorrente" ? " /mês" : "");
+  const priceLabel = formatAdPriceDisplay(ad.t, ad.price, ad.billingType ?? "unico");
   const title = ad.title.trim() || "Título do anúncio";
   const description = ad.desc.trim() || "Descrição do anúncio.";
   const typeLabel = TYPE_LABEL[ad.t].toUpperCase();

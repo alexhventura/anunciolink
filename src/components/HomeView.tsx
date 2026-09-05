@@ -10,6 +10,7 @@ import {
   priceLabel,
   titlePlaceholder,
 } from "../lib/formMicrocopy";
+import { AD_TYPE_OPTIONS, adTypeRequiresPrice } from "../lib/adTypeUtils";
 import {
   formatBRL,
   formatPhoneNumber,
@@ -51,13 +52,11 @@ interface HomeViewProps {
   onNavigate: (view: AppView) => void;
 }
 
-const AD_TYPES = [
-  { id: "venda" as const, label: "Venda" },
-  { id: "servico" as const, label: "Serviço" },
-  { id: "vaquinha" as const, label: "Vaquinha" },
-];
+const AD_TYPES = AD_TYPE_OPTIONS;
 
-const REQUIRED_FIELDS: AdFormFieldKey[] = ["title", "price", "description"];
+function requiredFieldsFor(adType: AdFormState["adType"]): AdFormFieldKey[] {
+  return adTypeRequiresPrice(adType) ? ["title", "price", "description"] : ["title", "description"];
+}
 
 function toFormValues(form: AdFormState) {
   return {
@@ -118,7 +117,7 @@ export function HomeView({
     e.preventDefault();
     onSubmitError(null);
 
-    const allTouched = REQUIRED_FIELDS.reduce(
+    const allTouched = requiredFieldsFor(form.adType).reduce(
       (acc, field) => ({ ...acc, [field]: true }),
       { phone: true, pix: true, cardLink: true, password: true } as Partial<Record<AdFormFieldKey, boolean>>
     );
@@ -226,7 +225,7 @@ export function HomeView({
                       </FieldLabelWithHint>
                     </div>
                     <div className="ad-form-field__control">
-                      <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
                         {AD_TYPES.map(({ id, label }) => (
                           <button
                             key={id}
@@ -244,6 +243,7 @@ export function HomeView({
                   </div>
                 </div>
 
+                {adTypeRequiresPrice(form.adType) && (
                 <div className="ad-form-bento__cell">
                   <div className="ad-form-field" role="group" aria-labelledby="billing-type-label">
                     <div className="ad-form-field__head">
@@ -272,6 +272,7 @@ export function HomeView({
                     </div>
                   </div>
                 </div>
+                )}
 
                 <div className="ad-form-bento__cell ad-form-bento__cell--wide">
                   <AdFormField
@@ -301,6 +302,7 @@ export function HomeView({
                   </AdFormField>
                 </div>
 
+                {adTypeRequiresPrice(form.adType) && (
                 <div className="ad-form-bento__cell">
                   <AdFormField
                     id="price-input"
@@ -322,6 +324,7 @@ export function HomeView({
                     />
                   </AdFormField>
                 </div>
+                )}
 
                 <div className="ad-form-bento__cell ad-form-bento__cell--wide">
                   <AdFormField

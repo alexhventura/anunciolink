@@ -28,7 +28,7 @@ export function HowItWorksPage({ adsenseReady }: HowItWorksPageProps) {
         title="Monte seu anúncio"
       >
         Informe <strong>título</strong>, <strong>preço</strong> e <strong>descrição</strong>. Escolha o tipo
-        (venda, serviço ou vaquinha) e se o valor é único ou mensal. Tudo em um formulário curto — sem
+        (venda, serviço, vaquinha ou aviso). Em tipos com valor, escolha se a cobrança é única ou mensal. Tudo em um formulário curto — sem
         cadastro e sem etapas desnecessárias.
       </StepCard>
 
@@ -98,8 +98,7 @@ export function HowItWorksPage({ adsenseReady }: HowItWorksPageProps) {
         title="Validade e histórico local"
       >
         Anúncios de <strong>venda</strong> expiram automaticamente em <strong>30 dias</strong> — os botões de
-        compra são desativados e uma mensagem orienta a renovar. <strong>Serviços</strong> e{" "}
-        <strong>vaquinhas</strong> permanecem ativos sem prazo, ideais para pagamentos recorrentes. Na home,{" "}
+        compra são desativados e uma mensagem orienta a renovar. <strong>Serviços</strong>, <strong>vaquinhas</strong> e <strong>avisos</strong> permanecem ativos sem prazo — avisos são informativos e não exigem valor. Na home,{" "}
         <strong>Meus anúncios</strong> guarda seus links recentes só no seu navegador (sem conta), com opções
         de compartilhar, copiar link e baixar PDF/JPG de cada item.
       </StepCard>

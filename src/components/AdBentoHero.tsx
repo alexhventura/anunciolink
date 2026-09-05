@@ -1,4 +1,5 @@
 import type { AdType, BillingType } from "../types/ad";
+import { formatAdPriceDisplay } from "../lib/adTypeUtils";
 import type { AdIconChoice } from "../lib/adIcons";
 import { isValidAdIconId, usesBrandMarkIcon } from "../lib/adIcons";
 import { BrandMark } from "./BrandMark";
@@ -32,7 +33,7 @@ export function AdBentoHero({
   const iconSize = size === "lg" ? 88 : headingLevel === "h1" ? 80 : 72;
   const brandMarkClass =
     size === "lg" ? "ad-bento-hero__brand-mark ad-bento-hero__brand-mark--lg" : "ad-bento-hero__brand-mark";
-  const priceLabel = price + (billingType === "recorrente" ? " /mês" : "");
+  const priceLabel = formatAdPriceDisplay(adType, price, billingType);
   const sizeClass = size === "lg" ? "ad-bento-hero--lg" : "ad-bento-hero--card";
   const landingClass = headingLevel === "h1" ? " ad-bento-hero--landing" : "";
   const TitleTag = headingLevel;

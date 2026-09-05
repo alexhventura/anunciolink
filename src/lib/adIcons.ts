@@ -31,6 +31,7 @@ export const DEFAULT_AD_ICON_ID: Record<AdType, AdIconId> = {
   venda: 0,
   servico: 60,
   vaquinha: 90,
+  aviso: 8, // megaphone
 };
 
 export interface AdIconCategory {

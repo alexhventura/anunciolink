@@ -1,6 +1,6 @@
 import type { AdIconChoice } from "../lib/adIcons";
 
-export type AdType = "venda" | "servico" | "vaquinha";
+export type AdType = "venda" | "servico" | "vaquinha" | "aviso";
 export type BillingType = "unico" | "recorrente";
 export type AdThemeId = "amber" | "midnight" | "sunset" | "purple" | "minimal";
 export type AdSenseSlot = "topo" | "meio" | "rodape";

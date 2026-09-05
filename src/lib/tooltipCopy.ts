@@ -13,7 +13,7 @@ export const TOOLTIP_COPY = {
   pix:
     "Cole o Pix copia e cola. Fica só na URL — sem servidor, sem cadastro.",
   adType:
-    "Define rótulos, ícone padrão e exemplos. Você pode mudar a qualquer momento.",
+    "Venda, serviço, vaquinha ou aviso (informativo sem valor). Você pode mudar a qualquer momento.",
   billing:
     "Único: pagamento pontual. Recorrente: exibe '/mês' no preço.",
   phone:

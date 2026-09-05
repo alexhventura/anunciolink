@@ -1,5 +1,6 @@
 import { isValidAdPassword, sanitizeAdPassword } from "./adLock";
 import type { AdType } from "../types/ad";
+import { adTypeRequiresPrice } from "./adTypeUtils";
 import { MAX_DESC_LENGTH, MAX_PIX_LENGTH, MAX_TITLE_LENGTH } from "./constants";
 import { isValidPaymentUrl, parsePriceToNumber } from "./formatters";
 
@@ -43,6 +44,9 @@ export function validateAdFormField(field: AdFormFieldKey, values: AdFormValues)
       return null;
     }
     case "price": {
+      if (!adTypeRequiresPrice(values.adType)) {
+        return null; // aviso/informativo — sem valor
+      }
       const amount = parsePriceToNumber(values.price);
       if (!values.price.trim()) return "Informe o valor.";
       if (amount === undefined || amount <= 0) return "O valor precisa ser maior que zero.";
@@ -50,8 +54,16 @@ export function validateAdFormField(field: AdFormFieldKey, values: AdFormValues)
     }
     case "description": {
       const value = values.description.trim();
-      if (!value) return "Conte o que você vende ou oferece.";
-      if (value.length < 10) return "Use pelo menos 10 caracteres — ajuda quem compra a decidir.";
+      if (!value) {
+        return adTypeRequiresPrice(values.adType)
+          ? "Conte o que você vende ou oferece."
+          : "Descreva o aviso ou a informação.";
+      }
+      if (value.length < 10) {
+        return adTypeRequiresPrice(values.adType)
+          ? "Use pelo menos 10 caracteres — ajuda quem compra a decidir."
+          : "Use pelo menos 10 caracteres para deixar o aviso claro.";
+      }
       if (value.length > MAX_DESC_LENGTH) return `Máximo de ${MAX_DESC_LENGTH} caracteres.`;
       return null;
     }
@@ -91,7 +103,10 @@ export function validateAdFormField(field: AdFormFieldKey, values: AdFormValues)
 
 export function validateRequiredAdForm(values: AdFormValues): AdFormFieldErrors {
   const errors: AdFormFieldErrors = {};
-  for (const field of ["title", "price", "description"] as const) {
+  const fields: AdFormFieldKey[] = adTypeRequiresPrice(values.adType)
+    ? ["title", "price", "description"]
+    : ["title", "description"];
+  for (const field of fields) {
     const message = validateAdFormField(field, values);
     if (message) errors[field] = message;
   }

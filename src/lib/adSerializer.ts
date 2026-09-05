@@ -3,6 +3,7 @@ import { MAX_SHARE_URL_LENGTH, MAX_SHARE_URL_SAFE } from "./constants";
 import { buildAdUrl, estimateAdUrlLength } from "./adRoutes";
 import { decodeAdData, encodeAdData, AdCodecError } from "./adCodec";
 import { fromCompactWire, toCompactWire, type CompactAdWire } from "./adWire";
+import { adTypeRequiresPrice } from "./adTypeUtils";
 import { encryptAdPayload, isValidAdPassword, sanitizeAdPassword } from "./adLock";
 import { sanitizeAdData } from "./sanitizeAd";
 
@@ -27,7 +28,9 @@ export interface PayloadScore {
 }
 
 function isValidAd(ad: AdData): boolean {
-  return Boolean(ad.t && ad.title?.trim() && ad.price?.trim() && ad.desc?.trim());
+  if (!ad.t || !ad.title?.trim() || !ad.desc?.trim()) return false;
+  if (adTypeRequiresPrice(ad.t) && !ad.price?.trim()) return false;
+  return true;
 }
 
 function urlFitsShare(payload: string): boolean {

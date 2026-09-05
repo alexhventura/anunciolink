@@ -3,12 +3,12 @@ import type { AdType } from "../types/ad";
 export const FORM_SECTION_COPY = {
   required: {
     title: "Essencial",
-    subtitle: "Três campos e seu link já está pronto para compartilhar.",
+    subtitle: "Título e descrição bastam; preço só quando o tipo tiver valor.",
     badge: "Obrigatório",
   },
   optional: {
     title: "Extras",
-    subtitle: "Visual, pagamento e senha — deixe do jeito que você vende.",
+    subtitle: "Visual, contato, pagamento e senha — opcional conforme o tipo.",
     badge: "Opcional",
   },
   preview: {
@@ -20,13 +20,15 @@ export const FORM_SECTION_COPY = {
 export function titlePlaceholder(adType: AdType): string {
   if (adType === "venda") return "Ex.: iPhone 13 Pro Max 128GB";
   if (adType === "servico") return "Ex.: Personal Trainer — plano mensal";
-  return "Ex.: Vaquinha para abrigo de animais";
+  if (adType === "vaquinha") return "Ex.: Vaquinha para abrigo de animais";
+  return "Ex.: Aviso de mudança de endereço / horário";
 }
 
 export function priceLabel(adType: AdType): string {
   if (adType === "venda") return "Preço";
   if (adType === "servico") return "Valor do serviço";
-  return "Meta ou valor sugerido";
+  if (adType === "vaquinha") return "Meta ou valor sugerido";
+  return "Valor (não se aplica)";
 }
 
 export function descriptionPlaceholder(adType: AdType): string {
@@ -36,7 +38,10 @@ export function descriptionPlaceholder(adType: AdType): string {
   if (adType === "servico") {
     return "O que está incluso, prazo, região e o que te diferencia…";
   }
-  return "Objetivo da arrecadação, prazo e como o valor será usado…";
+  if (adType === "vaquinha") {
+    return "Objetivo da arrecadação, prazo e como o valor será usado…";
+  }
+  return "Detalhe o aviso ou informativo: o que muda, para quem é e até quando vale…";
 }
 
 export const FORM_SUBMIT_NOTICE =

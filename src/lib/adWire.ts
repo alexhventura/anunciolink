@@ -1,3 +1,4 @@
+import { adTypeRequiresPrice } from "./adTypeUtils";
 import type { AdData, AdType, AdThemeId, BillingType, CropTransform } from "../types/ad";
 import { decodeIconFromWire, iconIdForWire } from "./adIcons";
 import { isValidAdTheme } from "./adThemes";
@@ -94,7 +95,8 @@ export function normalizeLegacyAd(parsed: Record<string, unknown>): AdData | nul
   const legacy = parsed as Partial<
     AdData & { title?: string; desc?: string; expiresAt?: number | string }
   >;
-  if (!legacy.t || !legacy.title || !legacy.price || !legacy.desc) return null;
+  if (!legacy.t || !legacy.title || !legacy.desc) return null;
+  if (adTypeRequiresPrice(legacy.t as AdType) && !legacy.price) return null;
 
   const expiresAt =
     typeof legacy.expiresAt === "number"
@@ -108,7 +110,7 @@ export function normalizeLegacyAd(parsed: Record<string, unknown>): AdData | nul
   return {
     t: legacy.t,
     title: legacy.title,
-    price: legacy.price,
+    price: legacy.price ?? "",
     billingType: legacy.billingType ?? "unico",
     desc: legacy.desc,
     phone: legacy.phone ?? "",
