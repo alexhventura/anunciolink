@@ -506,17 +506,18 @@ export function HomeView({
               </p>
 
               <ActionButtonWithHint
-              hint={TOOLTIP_COPY.generateAd}
-              hintVariant="on-dark"
-              type="submit"
-              id="btn-submit-generate"
-              disabled={isSubmitting}
-              className="btn-primary"
-              aria-busy={isSubmitting}
-              aria-label={isSubmitting ? "Gerando anúncio" : "Gerar anúncio grátis"}
-            >
-              {isSubmitting ? "Gerando…" : "Gerar anúncio grátis"}
-            </ActionButtonWithHint>
+                hint={TOOLTIP_COPY.generateAd}
+                hintVariant="on-dark"
+                hintLayout="below"
+                type="submit"
+                id="btn-submit-generate"
+                disabled={isSubmitting}
+                className="btn-primary"
+                aria-busy={isSubmitting}
+                aria-label={isSubmitting ? "Gerando anúncio" : "Gerar anúncio grátis"}
+              >
+                {isSubmitting ? "Gerando…" : "Gerar anúncio grátis"}
+              </ActionButtonWithHint>
             </div>
           </div>
 

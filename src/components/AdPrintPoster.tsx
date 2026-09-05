@@ -45,6 +45,7 @@ export function AdPrintPoster({
       <ActionButtonWithHint
         hint={TOOLTIP_COPY.printPoster}
         hintVariant={hintVariant}
+        hintLayout="below"
         onClick={() => void handlePrint()}
         id="btn-print-a4-poster"
         className={`${triggerClassName} no-print`}

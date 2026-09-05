@@ -41,6 +41,7 @@ export function AdSocialCardDownload({
       <ActionButtonWithHint
         hint={TOOLTIP_COPY.socialCard}
         hintVariant={hintVariant}
+        hintLayout="below"
         onClick={handleDownload}
         disabled={generating}
         id="btn-download-social-card"

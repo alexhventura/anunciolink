@@ -175,15 +175,17 @@ export function FieldLabelWithHint({
   const triggerLabel = fieldLabel ? `Ajuda: ${fieldLabel}` : "Informação adicional sobre este campo";
 
   return (
-    <span className={`inline-flex items-center gap-1.5 flex-wrap ${className}`}>
+    <span className={`inline-flex items-center gap-1.5 max-w-full min-w-0 ${className}`}>
       {htmlFor ? (
-        <label htmlFor={htmlFor} className={labelClassName}>
+        <label htmlFor={htmlFor} className={`${labelClassName} min-w-0`}>
           {children}
         </label>
       ) : (
-        <span className={labelClassName}>{children}</span>
+        <span className={`${labelClassName} min-w-0`}>{children}</span>
       )}
-      <HelpTooltip text={hint} placement="top" triggerLabel={triggerLabel} />
+      <span className="inline-flex shrink-0 self-center leading-none">
+        <HelpTooltip text={hint} placement="top" triggerLabel={triggerLabel} />
+      </span>
     </span>
   );
 }
@@ -224,7 +226,7 @@ interface ActionButtonWithHintProps {
 export function ActionButtonWithHint({
   hint,
   hintVariant = "on-dark",
-  hintLayout = "overlay",
+  hintLayout = "below",
   children,
   className = "",
   id,
