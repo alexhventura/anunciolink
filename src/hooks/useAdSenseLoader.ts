@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ADSENSE_CLIENT } from "../lib/constants";
+import { ADSENSE_CLIENT, ADSENSE_ENABLED } from "../lib/constants";
 
 declare global {
   interface Window {
@@ -67,7 +67,7 @@ export function useAdSenseLoader(enabled: boolean, options: AdSenseLoaderOptions
   const activatedRef = useRef(false);
 
   const activate = useCallback(() => {
-    if (activatedRef.current || !ADSENSE_CLIENT) return undefined;
+    if (!ADSENSE_ENABLED || activatedRef.current || !ADSENSE_CLIENT) return undefined;
     activatedRef.current = true;
     injectAdSenseScript(ADSENSE_CLIENT);
 
@@ -85,7 +85,7 @@ export function useAdSenseLoader(enabled: boolean, options: AdSenseLoaderOptions
   }, []);
 
   useEffect(() => {
-    if (!enabled || !ADSENSE_CLIENT) return;
+    if (!ADSENSE_ENABLED || !enabled || !ADSENSE_CLIENT) return;
 
     if (eager) {
       const cleanup = activate();

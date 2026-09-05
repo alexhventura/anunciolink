@@ -10,6 +10,7 @@ import { saveAdToHistory } from "./lib/adHistory";
 import { focusMainContent } from "./lib/focusMainContent";
 import { AdBuilder } from "./lib/adBuilder";
 import { AdCodecError } from "./lib/adCodec";
+import { ADSENSE_ENABLED } from "./lib/constants";
 
 const HomeView = lazy(() =>
   import("./components/HomeView").then((m) => ({ default: m.HomeView }))
@@ -67,8 +68,9 @@ export default function App() {
 
   const isAdView = currentView === "anuncio";
   const showAdsense =
-    currentView === "home" || isAdView || currentView === "success" || isInstitutionalView;
-  const { adsenseReady } = useAdSenseLoader(showAdsense, { eager: isAdView });
+    ADSENSE_ENABLED &&
+    (currentView === "home" || isAdView || currentView === "success" || isInstitutionalView);
+  const { adsenseReady } = useAdSenseLoader(showAdsense, { eager: isAdView && ADSENSE_ENABLED });
   const themeClass = "theme-create";
 
   useDocumentMeta(decodedAd, currentView);

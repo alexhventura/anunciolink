@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import type { AdSenseSlot } from "../types/ad";
-import { ADSENSE_CLIENT, ADSENSE_SLOTS } from "../lib/constants";
+import { ADSENSE_CLIENT, ADSENSE_ENABLED, ADSENSE_SLOTS } from "../lib/constants";
 import { pushAdSenseSlot } from "../hooks/useAdSenseLoader";
 
 interface AdSenseSlotProps {
@@ -13,7 +13,7 @@ export function AdSenseSlot({ slot, ready }: AdSenseSlotProps) {
   const insRef = useRef<HTMLElement | null>(null);
   const asideRef = useRef<HTMLElement | null>(null);
   const config = ADSENSE_SLOTS[slot];
-  const hasRealSlot = Boolean(ADSENSE_CLIENT && config.slotId);
+  const hasRealSlot = Boolean(ADSENSE_ENABLED && ADSENSE_CLIENT && config.slotId);
 
   const tryPush = () => {
     if (!ready || !hasRealSlot || pushedRef.current || !insRef.current) return;
@@ -53,6 +53,11 @@ export function AdSenseSlot({ slot, ready }: AdSenseSlotProps) {
     return () => observer.disconnect();
   }, [ready, hasRealSlot]);
 
+  // Sem anunciantes / slots: não renderiza painel nem placeholder "Patrocinado"
+  if (!ADSENSE_ENABLED || !hasRealSlot) {
+    return null;
+  }
+
   return (
     <aside
       ref={asideRef}
@@ -60,25 +65,15 @@ export function AdSenseSlot({ slot, ready }: AdSenseSlotProps) {
       aria-label={`Espaço reservado para anúncio (${config.label})`}
       data-ad-slot={slot}
     >
-      {hasRealSlot ? (
-        <ins
-          ref={insRef}
-          className="adsbygoogle block w-full"
-          style={{ display: "block", minHeight: config.minHeight }}
-          data-ad-client={ADSENSE_CLIENT}
-          data-ad-slot={config.slotId}
-          data-ad-format="auto"
-          data-full-width-responsive="true"
-        />
-      ) : (
-        <div
-          className="adsense-slot__placeholder flex items-center justify-center text-[10px] font-bold uppercase text-zinc-500"
-          style={{ minHeight: config.minHeight }}
-          aria-hidden="true"
-        >
-          Patrocinado
-        </div>
-      )}
+      <ins
+        ref={insRef}
+        className="adsbygoogle block w-full"
+        style={{ display: "block", minHeight: config.minHeight }}
+        data-ad-client={ADSENSE_CLIENT}
+        data-ad-slot={config.slotId}
+        data-ad-format="auto"
+        data-full-width-responsive="true"
+      />
     </aside>
   );
 }

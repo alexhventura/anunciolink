@@ -21,6 +21,11 @@ export const MAX_SHARE_URL_LENGTH = 2048;
 export const MAX_SHARE_URL_SAFE = 2000;
 
 export const ADSENSE_CLIENT = import.meta.env.VITE_ADSENSE_CLIENT_ID ?? "";
+/**
+ * Painéis AdSense ocultos enquanto não houver anunciantes.
+ * Ligue para `true` (e configure VITE_ADSENSE_*) quando for exibir ads de novo.
+ */
+export const ADSENSE_ENABLED = false;
 export const ADSENSE_SLOTS: Record<
   import("../types/ad").AdSenseSlot,
   { slotId: string; minHeight: number; label: string }
