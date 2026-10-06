@@ -24,6 +24,7 @@ const AD_TYPE_LABEL: Record<AdType, string> = {
   servico: "Serviço",
   vaquinha: "Vaquinha solidária",
   aviso: "Aviso ou informativo",
+  contato: "Página de contato",
 };
 
 function truncateAtWord(text: string, maxLen: number): string {
@@ -60,11 +61,11 @@ export interface PageSeoMeta {
 export const HOME_SEO: Omit<PageSeoMeta, "canonicalUrl"> = {
   title: buildSeoTitle("Anúncio grátis com Pix e QR Code"),
   description: buildSeoDescription(
-    "Crie anúncio grátis com ícone, Pix e QR Code. Gerador de link e cartaz A4. Sem cadastro, sem login, 100% no navegador."
+    "Crie página grátis com link e QR Code — venda, aviso ou contato (ex.: coleira de pet). Pix opcional. Sem cadastro, 100% no navegador."
   ),
   robots: "index, follow, max-image-preview:large",
   ogType: "website",
-  imageAlt: `${SITE_NAME} — anúncio grátis com Pix e QR Code`,
+  imageAlt: `${SITE_NAME} — página grátis com link e QR Code`,
 };
 
 export const INSTITUTIONAL_SEO: Record<
@@ -81,14 +82,14 @@ export const INSTITUTIONAL_SEO: Record<
   "como-funciona": {
     title: buildSeoTitle("Como criar anúncio grátis"),
     description: buildSeoDescription(
-      "Passo a passo: anúncio com ícone, Pix, QR Code, card PNG e cartaz A4. Compartilhe no WhatsApp sem cadastro."
+      "Passo a passo: página com ícone, WhatsApp, QR Code e cartaz A4. Pix opcional. Compartilhe sem cadastro."
     ),
     breadcrumb: "Como funciona",
   },
   sobre: {
     title: buildSeoTitle("Sobre o Anuncio Link"),
     description: buildSeoDescription(
-      "Conheça o Anuncio Link: comércio digital direto com anúncios instantâneos, dados na URL e zero banco de dados."
+      "Conheça o Anuncio Link: páginas instantâneas com link e QR — venda, aviso ou contato. Dados na URL, zero banco de dados."
     ),
     breadcrumb: "Sobre",
   },
@@ -102,7 +103,7 @@ export const INSTITUTIONAL_SEO: Record<
   termos: {
     title: buildSeoTitle("Termos de uso"),
     description: buildSeoDescription(
-      "Termos de uso do Anuncio Link. Ferramenta gratuita de anúncios. Vendas expiram em 30 dias; serviços, vaquinhas e avisos permanecem ativos."
+      "Termos de uso do Anuncio Link. Ferramenta gratuita de anúncios. Vendas expiram em 30 dias; serviços, vaquinhas, avisos e contatos permanecem ativos."
     ),
     breadcrumb: "Termos",
   },
@@ -120,8 +121,10 @@ export function buildAdPageSeo(ad: AdData, canonicalUrl: string): PageSeoMeta {
   const maxTitleLen = SEO_TITLE_MAX - titleSuffix.length - pricePart.length;
   const shortTitle = truncateAtWord(safeTitle, Math.max(16, maxTitleLen));
 
-  const description = buildSeoDescription(
-    `${category}: ${safeTitle} por ${safePrice}. ${safeDesc} Anúncio com QR Code e Pix. Crie o seu grátis no ${SITE_NAME}.`
+    const description = buildSeoDescription(
+    adTypeRequiresPrice(ad.t) && safePrice
+      ? `${category}: ${safeTitle} — ${safePrice}. ${safeDesc} Página com QR Code no ${SITE_NAME}.`
+      : `${category}: ${safeTitle}. ${safeDesc} Página com QR Code e contato no ${SITE_NAME}.`
   );
 
   const expired = isAdExpired(ad);
@@ -132,7 +135,7 @@ export function buildAdPageSeo(ad: AdData, canonicalUrl: string): PageSeoMeta {
     canonicalUrl,
     robots: expired ? "noindex, nofollow" : "index, follow, max-image-preview:large",
     ogType: "product",
-    imageAlt: `${safeTitle} — ${safePrice} no ${SITE_NAME}`,
+    imageAlt: safePrice ? `${safeTitle} — ${safePrice} no ${SITE_NAME}` : `${safeTitle} no ${SITE_NAME}`,
     priceAmount: priceValue !== undefined ? priceValue.toFixed(2) : undefined,
     priceCurrency: "BRL",
   };

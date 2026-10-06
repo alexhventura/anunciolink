@@ -1,16 +1,25 @@
 import { describe, expect, it } from "vitest";
-import { adTypeRequiresPrice, formatAdPriceDisplay } from "../adTypeUtils";
+import {
+  adTypeRequiresPrice,
+  adTypeShowsPayment,
+  buildWhatsAppPrefill,
+  formatAdPriceDisplay,
+} from "../adTypeUtils";
 import { validateAdForm, validateAdFormField } from "../formValidation";
 import { encodeAdData, decodeAdData } from "../adCodec";
 import type { AdData } from "../../types/ad";
 
-describe("tipo aviso (informativo sem valor)", () => {
-  it("não exige preço", () => {
+describe("tipos sem valor (aviso e contato)", () => {
+  it("não exige preço nem pagamento", () => {
     expect(adTypeRequiresPrice("aviso")).toBe(false);
+    expect(adTypeRequiresPrice("contato")).toBe(false);
+    expect(adTypeShowsPayment("aviso")).toBe(false);
+    expect(adTypeShowsPayment("contato")).toBe(false);
     expect(adTypeRequiresPrice("venda")).toBe(true);
+    expect(adTypeShowsPayment("venda")).toBe(true);
   });
 
-  it("valida formulário sem preço", () => {
+  it("valida formulário de aviso sem preço", () => {
     const errors = validateAdForm({
       adType: "aviso",
       title: "Mudança de horário",
@@ -24,6 +33,20 @@ describe("tipo aviso (informativo sem valor)", () => {
     expect(errors.price).toBeUndefined();
     expect(errors.title).toBeUndefined();
     expect(errors.description).toBeUndefined();
+  });
+
+  it("valida página de contato (pet) sem preço nem pix", () => {
+    const errors = validateAdForm({
+      adType: "contato",
+      title: "Thor — se achar, avise",
+      price: "",
+      description: "Cachorro labrador. Dono: Ana. Bairro Centro. Favor ligar no WhatsApp.",
+      phone: "(11) 98888-7777",
+      pix: "",
+      cardLink: "",
+      password: "",
+    });
+    expect(Object.keys(errors)).toEqual([]);
   });
 
   it("rejeita preço vazio em venda", () => {
@@ -40,24 +63,28 @@ describe("tipo aviso (informativo sem valor)", () => {
     expect(msg).toBeTruthy();
   });
 
-  it("exibe Sem valor no lugar do preço", () => {
+  it("textos de exibição e WhatsApp por tipo", () => {
     expect(formatAdPriceDisplay("aviso", "", "unico")).toBe("Sem valor");
+    expect(formatAdPriceDisplay("contato", "", "unico")).toBe("Contato");
     expect(formatAdPriceDisplay("venda", "R$ 10,00", "recorrente")).toBe("R$ 10,00 /mês");
+    expect(buildWhatsAppPrefill("contato", "Thor")).toContain("Escaneei o QR");
+    expect(buildWhatsAppPrefill("venda", "Bike")).toContain("anúncio");
   });
 
-  it("codifica e decodifica aviso com preço vazio", () => {
+  it("codifica e decodifica contato com preço vazio", () => {
     const ad: AdData = {
-      t: "aviso",
-      title: "Aviso importante",
+      t: "contato",
+      title: "Thor",
       price: "",
-      desc: "Informativo sem cobrança para a comunidade local.",
-      phone: "",
+      desc: "Se encontrar, fale com o dono pelo WhatsApp da página.",
+      phone: "5511988887777",
       timestamp: 1_700_000_000_000,
     };
     const encoded = encodeAdData(ad);
     const decoded = decodeAdData(encoded);
-    expect(decoded?.t).toBe("aviso");
-    expect(decoded?.title).toBe("Aviso importante");
+    expect(decoded?.t).toBe("contato");
+    expect(decoded?.title).toBe("Thor");
     expect(decoded?.price ?? "").toBe("");
+    expect(decoded?.phone).toContain("98888");
   });
 });

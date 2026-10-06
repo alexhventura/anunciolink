@@ -32,6 +32,7 @@ export const DEFAULT_AD_ICON_ID: Record<AdType, AdIconId> = {
   servico: 60,
   vaquinha: 90,
   aviso: 8, // megaphone
+  contato: 87, // paw-print — pet / identificação
 };
 
 export interface AdIconCategory {

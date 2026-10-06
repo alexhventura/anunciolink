@@ -25,6 +25,7 @@ const TYPE_LABEL: Record<AdType, string> = {
   servico: "Serviço",
   vaquinha: "Vaquinha",
   aviso: "Aviso",
+  contato: "Contato",
 };
 
 interface Rect {

@@ -18,6 +18,7 @@ const TYPE_LABEL: Record<AdType, string> = {
   servico: "Serviço",
   vaquinha: "Vaquinha",
   aviso: "Aviso",
+  contato: "Contato",
 };
 
 /** Espaçamentos padronizados do card social (1080px) */

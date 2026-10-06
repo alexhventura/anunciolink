@@ -10,6 +10,11 @@ import { AdLandingOfflineShare } from "./AdLandingOfflineShare";
 import { ViewEnter } from "./ViewEnter";
 import { PixPaymentSection } from "./PixPaymentSection";
 import { copyToClipboard } from "../lib/formatters";
+import {
+  buildWhatsAppPrefill,
+  landingActionsLead,
+  landingActionsTitle,
+} from "../lib/adTypeUtils";
 
 interface AdViewPageProps {
   ad: AdData;
@@ -58,7 +63,7 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
           href="#landing-actions"
           className="ad-landing-skip sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-4 focus:left-4 focus:rounded-lg focus:border-2 focus:border-black focus:bg-amber-400 focus:px-4 focus:py-2 focus:text-sm focus:font-bold"
         >
-          Ir para pagamento e contato
+          {hasPayment ? "Ir para pagamento e contato" : "Ir para contato"}
         </a>
       )}
 
@@ -92,7 +97,7 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
             >
               <Zap className="h-6 w-6 shrink-0 fill-amber-500 stroke-black" strokeWidth={2.5} aria-hidden="true" />
               <span className="ad-landing-cta__copy">
-                <span className="ad-landing-cta__eyebrow">Quer vender algo rápido assim também?</span>
+                <span className="ad-landing-cta__eyebrow">Quer uma página rápida assim também?</span>
                 <span className="ad-landing-cta__label">Criar meu anúncio grátis</span>
               </span>
             </button>
@@ -117,14 +122,10 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
               >
                 <header className="ad-landing-section__header">
                   <h2 id={actionsHeadingId} className="ad-landing-section__title">
-                    Pagamento e contato
+                    {landingActionsTitle(hasPayment, Boolean(ad.phone))}
                   </h2>
                   <p className="ad-landing-section__lead">
-                    {hasPayment && ad.phone
-                      ? "Pague agora ou fale direto com quem publicou."
-                      : hasPayment
-                        ? "Escolha como pagar abaixo."
-                        : "Tire dúvidas com quem publicou o anúncio."}
+                    {landingActionsLead(hasPayment, Boolean(ad.phone))}
                   </p>
                 </header>
 
@@ -156,13 +157,13 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
                   {ad.phone && (
                     <a
                       href={`https://wa.me/${ad.phone}?text=${encodeURIComponent(
-                        `Olá! Vi seu anúncio "${ad.title}" no AnúncioLink. Gostaria de combinar a compra.`
+                        buildWhatsAppPrefill(ad.t, ad.title)
                       )}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       id="btn-wa-buyer-contact"
                       className={`ad-landing-cta btn-whatsapp w-full ${hasPayment ? "ad-landing-cta--secondary" : "ad-landing-cta--primary"}`}
-                      aria-label="Conversar com o vendedor via WhatsApp — abre em nova aba"
+                      aria-label="Conversar via WhatsApp — abre em nova aba"
                     >
                       <MessageCircle className="h-5 w-5 shrink-0" strokeWidth={2.5} aria-hidden="true" />
                       <span className="ad-landing-cta__label">Falar no WhatsApp</span>
@@ -193,10 +194,10 @@ export function AdViewPage({ ad, adsenseReady, onCreateOwn }: AdViewPageProps) {
           >
             <Share2 className="ad-landing-page__promo-icon h-5 w-5" strokeWidth={2.25} aria-hidden="true" />
             <h2 id={promoHeadingId} className="ad-landing-section__title ad-landing-section__title--sm">
-              Quer vender assim também?
+              Quer uma página assim também?
             </h2>
             <p className="ad-landing-section__lead ad-landing-section__lead--center">
-              Crie seu anúncio grátis em segundos — sem cadastro.
+              Venda, aviso, QR de pet ou contato — grátis, sem cadastro.
             </p>
             <button
               type="button"

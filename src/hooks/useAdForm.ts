@@ -1,6 +1,6 @@
 import { useCallback, useReducer } from "react";
 import type { AdData, AdType, BillingType } from "../types/ad";
-import { adTypeRequiresPrice } from "../lib/adTypeUtils";
+import { adTypeRequiresPrice, adTypeShowsPayment } from "../lib/adTypeUtils";
 import { computeExpiresAt } from "../lib/adExpiry";
 import type { AdIconChoice } from "../lib/adIcons";
 import {
@@ -57,6 +57,10 @@ function adFormReducer(state: AdFormState, action: AdFormAction): AdFormState {
         if (!adTypeRequiresPrice(adType)) {
           next.price = "";
           next.billingType = "unico";
+        }
+        if (!adTypeShowsPayment(adType)) {
+          next.pix = "";
+          next.cardLink = "";
         }
       }
       return next;

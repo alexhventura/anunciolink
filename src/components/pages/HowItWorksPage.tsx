@@ -19,7 +19,7 @@ export function HowItWorksPage({ adsenseReady }: HowItWorksPageProps) {
   return (
     <InstitutionalPageLayout
       title="Como Funciona"
-      subtitle={`O ${SITE_NAME} cria páginas de anúncio profissionais em segundos — sem cadastro, sem banco de dados e sem taxas. Veja o passo a passo completo.`}
+      subtitle={`O ${SITE_NAME} cria páginas com link e QR em segundos — venda, aviso, contato de pet e mais. Sem cadastro, sem banco de dados e sem taxas.`}
       adsenseReady={adsenseReady}
     >
       <StepCard
@@ -27,19 +27,19 @@ export function HowItWorksPage({ adsenseReady }: HowItWorksPageProps) {
         icon={<FilePenLine className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />}
         title="Monte seu anúncio"
       >
-        Informe <strong>título</strong>, <strong>preço</strong> e <strong>descrição</strong>. Escolha o tipo
-        (venda, serviço, vaquinha ou aviso). Em tipos com valor, escolha se a cobrança é única ou mensal. Tudo em um formulário curto — sem
-        cadastro e sem etapas desnecessárias.
+        Informe <strong>título</strong> e <strong>descrição</strong>. Escolha o tipo (venda, serviço, vaquinha,
+        aviso ou contato). Em tipos com valor, o preço é pedido; em aviso/contato, não. Pagamento nunca é
+        obrigatório. Formulário curto — sem cadastro.
       </StepCard>
 
       <StepCard
         step={2}
         icon={<Shapes className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />}
-        title="Personalize com ícone e pagamento"
+        title="Personalize ícone, contato e (opcional) pagamento"
       >
-        Opcionalmente, escolha um <strong>ícone</strong> que representa seu produto ou serviço, adicione{" "}
-        <strong>WhatsApp</strong>, <strong>Pix copia e cola</strong> e <strong>link de cartão</strong> (Mercado
-        Pago, Stripe, etc.). A prévia ao lado mostra exatamente como o card do anúncio ficará.
+        Opcionalmente, escolha um <strong>ícone</strong>, adicione <strong>WhatsApp</strong> e — só se quiser —
+        <strong>Pix</strong> ou <strong>link de cartão</strong>. Em páginas de contato (ex.: QR na coleira), o
+        WhatsApp basta. A prévia mostra o card em tempo real.
       </StepCard>
 
       <StepCard
@@ -86,10 +86,9 @@ export function HowItWorksPage({ adsenseReady }: HowItWorksPageProps) {
         icon={<Smartphone className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />}
         title="O comprador abre a página do anúncio"
       >
-        Quem recebe o link vê o card completo com ícone, preço e descrição. Se você informou pagamento, aparecem
-        botões de <strong>Pix</strong> e <strong>cartão</strong>; com telefone, há atalho direto para{" "}
-        <strong>WhatsApp</strong>. Quem já está na página pode copiar o link ou baixar um QR discreto para uso
-        offline.
+        Quem abre o link vê o card com ícone, título e descrição. Preço e botões de <strong>Pix</strong>/<strong>cartão</strong>
+        só aparecem se você preencheu. Com telefone, há atalho para <strong>WhatsApp</strong> — o essencial em
+        páginas de contato (ex.: QR na coleira). Na própria página dá para copiar o link ou baixar o QR.
       </StepCard>
 
       <StepCard
@@ -98,7 +97,7 @@ export function HowItWorksPage({ adsenseReady }: HowItWorksPageProps) {
         title="Validade e histórico local"
       >
         Anúncios de <strong>venda</strong> expiram automaticamente em <strong>30 dias</strong> — os botões de
-        compra são desativados e uma mensagem orienta a renovar. <strong>Serviços</strong>, <strong>vaquinhas</strong> e <strong>avisos</strong> permanecem ativos sem prazo — avisos são informativos e não exigem valor. Na home,{" "}
+        compra são desativados e uma mensagem orienta a renovar. <strong>Serviços</strong>, <strong>vaquinhas</strong>, <strong>avisos</strong> e <strong>contatos</strong> permanecem ativos sem prazo — páginas informativas e de contato não exigem valor nem pagamento. Na home,{" "}
         <strong>Meus anúncios</strong> guarda seus links recentes só no seu navegador (sem conta), com opções
         de compartilhar, copiar link e baixar PDF/JPG de cada item.
       </StepCard>

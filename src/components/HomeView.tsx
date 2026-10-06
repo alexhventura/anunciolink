@@ -3,14 +3,14 @@ import { lazy, Suspense, useEffect, useRef, type FormEvent, useCallback, useMemo
 import type { AdFormState } from "../hooks/useAdForm";
 import { focusFirstField } from "../lib/focusMainContent";
 import {
-  FIELD_MICROCOPY,
   FORM_SECTION_COPY,
   FORM_SUBMIT_NOTICE,
   descriptionPlaceholder,
+  fieldMicrocopy,
   priceLabel,
   titlePlaceholder,
 } from "../lib/formMicrocopy";
-import { AD_TYPE_OPTIONS, adTypeRequiresPrice } from "../lib/adTypeUtils";
+import { AD_TYPE_OPTIONS, adTypeRequiresPrice, adTypeShowsPayment } from "../lib/adTypeUtils";
 import {
   formatBRL,
   formatPhoneNumber,
@@ -85,6 +85,7 @@ export function HomeView({
   const submitErrorRef = useRef<HTMLDivElement>(null);
   const formStartRef = useRef<HTMLDivElement>(null);
   const formValues = useMemo(() => toFormValues(form), [form]);
+  const FIELD_MICROCOPY = fieldMicrocopy(form.adType);
 
   useEffect(() => {
     if (form.submitError) {
@@ -157,18 +158,18 @@ export function HomeView({
 
         <div className="neo-hero-banner mx-auto max-w-lg w-full">
           <h1 className="neo-hero-banner__title text-display font-black leading-[1.08] text-black uppercase">
-            Anúncios
+            Página + QR
             <br />
             <span className="text-white bg-black px-2 py-0.5 inline-block mt-1 -rotate-1">Em Segundos</span>
           </h1>
         </div>
 
-        <p className="home-landing__pillars" aria-label="Simples, rápido e grátis">
-          Simples · Rápido · Grátis
+        <p className="home-landing__pillars" aria-label="Venda, aviso, contato e QR">
+          Venda · Aviso · Contato · QR
         </p>
 
         <p className="home-landing__tagline text-base sm:text-lg font-semibold text-black max-w-md mx-auto leading-snug tracking-tight">
-          Anúncio profissional e pronto para compartilhar em poucos segundos.
+          Crie uma página com link e QR — venda, informativo ou contato de pet. Pagamento só se você quiser.
         </p>
 
         <a
@@ -179,7 +180,7 @@ export function HomeView({
             scrollToForm();
           }}
         >
-          Crie o Seu Anúncio Grátis
+          Criar minha página grátis
         </a>
       </section>
 
@@ -225,7 +226,7 @@ export function HomeView({
                       </FieldLabelWithHint>
                     </div>
                     <div className="ad-form-field__control">
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
                         {AD_TYPES.map(({ id, label }) => (
                           <button
                             key={id}
@@ -423,6 +424,7 @@ export function HomeView({
                     </AdFormField>
                   </div>
 
+                  {adTypeShowsPayment(form.adType) && (
                   <div className="ad-form-bento__cell ad-form-bento__cell--wide">
                     <AdFormField
                       id="pix-input"
@@ -449,7 +451,9 @@ export function HomeView({
                       />
                     </AdFormField>
                   </div>
+                  )}
 
+                  {adTypeShowsPayment(form.adType) && (
                   <div className="ad-form-bento__cell ad-form-bento__cell--wide">
                     <AdFormField
                       id="card-input"
@@ -474,6 +478,7 @@ export function HomeView({
                       />
                     </AdFormField>
                   </div>
+                  )}
 
                   <div className="ad-form-bento__cell">
                     <AdFormField
@@ -516,9 +521,9 @@ export function HomeView({
               disabled={isSubmitting}
               className="btn-primary"
               aria-busy={isSubmitting}
-              aria-label={isSubmitting ? "Gerando anúncio" : "Gerar anúncio grátis"}
+              aria-label={isSubmitting ? "Gerando página" : "Gerar página grátis"}
             >
-              {isSubmitting ? "Gerando…" : "Gerar anúncio grátis"}
+              {isSubmitting ? "Gerando…" : "Gerar página grátis"}
             </ActionButtonWithHint>
             </div>
           </div>
